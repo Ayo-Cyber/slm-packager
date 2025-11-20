@@ -1,0 +1,36 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "slm-packager"
+version = "0.1.0"
+description = "A unified runtime and developer layer for Small Language Models"
+readme = "README.md"
+requires-python = ">=3.9"
+license = {text = "MIT"}
+authors = [
+    {name = "SLM Packager Team"}
+]
+dependencies = [
+    "fastapi>=0.109.0",
+    "uvicorn>=0.27.0",
+    "click>=8.1.7",
+    "pydantic>=2.6.0",
+    "llama-cpp-python>=0.2.55",
+    "onnxruntime>=1.17.0",
+    "transformers>=4.37.0",
+    "torch>=2.2.0",
+    "pyyaml>=6.0.1"
+]
+
+[project.scripts]
+slm = "slm_packager.cli.main:cli"
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0.0",
+    "black>=24.0.0",
+    "isort>=5.13.0",
+    "mypy>=1.8.0"
+]
