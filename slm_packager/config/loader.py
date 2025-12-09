@@ -1,9 +1,12 @@
 import yaml
 import json
+import logging
 from pathlib import Path
 from typing import Union, Dict
 from pydantic import ValidationError
 from .models import SLMConfig
+
+logger = logging.getLogger(__name__)
 
 class ConfigLoader:
     @staticmethod
@@ -12,8 +15,8 @@ class ConfigLoader:
         
         if not path.exists():
             raise FileNotFoundError(
-                f"❌ Config file not found: '{path}'\n"
-                "💡 Create one with:\n"
+                f"Config file not found: '{path}'\n"
+                "Create one with:\n"
                 "   slm init\n"
                 "\n"
                 "   Or see examples/ directory for reference configs"
@@ -26,13 +29,13 @@ class ConfigLoader:
                         data = yaml.safe_load(f)
                     except yaml.YAMLError as e:
                         raise ValueError(
-                            f"❌ Invalid YAML syntax in config file\n"
+                            f"Invalid YAML syntax in config file\n"
                             f"   File: {path}\n"
                             f"   Error: {str(e)}\n"
-                            "💡 Check for:\n"
-                            "   - Proper indentation (use spaces, not tabs)\n"
-                            "   - Matching quotes\n"
-                            "   - Valid YAML structure\n"
+                            "Suggestions:\n"
+                            "   - Check proper indentation (use spaces, not tabs)\n"
+                            "   - Verify matching quotes\n"
+                            "   - Validate YAML structure\n"
                             "\n"
                             "   See examples/ for reference configs"
                         ) from e
@@ -41,34 +44,36 @@ class ConfigLoader:
                         data = json.load(f)
                     except json.JSONDecodeError as e:
                         raise ValueError(
-                            f"❌ Invalid JSON syntax in config file\n"
+                            f"Invalid JSON syntax in config file\n"
                             f"   File: {path}\n"
                             f"   Error: {str(e)}\n"
-                            "💡 Check for:\n"
-                            "   - Matching braces and brackets\n"
-                            "   - Proper comma placement\n"
-                            "   - Valid JSON structure"
+                            "Suggestions:\n"
+                            "   - Check matching braces and brackets\n"
+                            "   - Verify proper comma placement\n"
+                            "   - Validate JSON structure"
                         ) from e
                 else:
                     raise ValueError(
-                        f"❌ Unsupported config format: '{path.suffix}'\n"
-                        "💡 Use .yaml, .yml, or .json file extension"
+                        f"Unsupported config format: '{path.suffix}'\n"
+                        "Use .yaml, .yml, or .json file extension"
                     )
         except PermissionError:
             raise PermissionError(
-                f"❌ Permission denied reading config file: '{path}'\n"
-                "💡 Check file permissions:\n"
+                f"Permission denied reading config file: '{path}'\n"
+                "Check file permissions:\n"
                 f"   chmod 644 {path}"
             )
         except Exception as e:
             raise RuntimeError(
-                f"❌ Error reading config file: '{path}'\n"
+                f"Error reading config file: '{path}'\n"
                 f"   {type(e).__name__}: {str(e)}"
             ) from e
 
         # Validate config structure
         try:
-            return SLMConfig(**data)
+            config = SLMConfig(**data)
+            logger.info(f"Successfully loaded config from {path}")
+            return config
         except ValidationError as e:
             # Format validation errors nicely
             error_details = []
@@ -78,12 +83,12 @@ class ConfigLoader:
                 error_details.append(f"   • {field}: {msg}")
             
             raise ValueError(
-                f"❌ Invalid config structure in: '{path}'\n"
+                f"Invalid config structure in: '{path}'\n"
                 f"\n"
                 f"Validation errors:\n" +
                 "\n".join(error_details) +
                 f"\n\n"
-                f"💡 Check that all required fields are present:\n"
+                f"Required fields:\n"
                 f"   - model.name (string)\n"
                 f"   - model.path (string)\n"
                 f"   - model.format (gguf, onnx, or pytorch)\n"
@@ -93,9 +98,9 @@ class ConfigLoader:
             ) from e
         except Exception as e:
             raise RuntimeError(
-                f"❌ Error creating config from file: '{path}'\n"
+                f"Error creating config from file: '{path}'\n"
                 f"   {type(e).__name__}: {str(e)}\n"
-                "💡 Check that the config structure is correct"
+                "Check that the config structure is correct"
             ) from e
 
     @staticmethod
@@ -106,7 +111,7 @@ class ConfigLoader:
             data = config.model_dump(mode="json")
         except Exception as e:
             raise RuntimeError(
-                f"❌ Error serializing config\n"
+                f"Error serializing config\n"
                 f"   {type(e).__name__}: {str(e)}"
             ) from e
         
@@ -121,19 +126,21 @@ class ConfigLoader:
                     json.dump(data, f, indent=2)
                 else:
                     raise ValueError(
-                        f"❌ Unsupported config format: '{path.suffix}'\n"
-                        "💡 Use .yaml, .yml, or .json file extension"
+                        f"Unsupported config format: '{path.suffix}'\n"
+                        "Use .yaml, .yml, or .json file extension"
                     )
+            
+            logger.info(f"Successfully saved config to {path}")
+            
         except PermissionError:
             raise PermissionError(
-                f"❌ Permission denied writing config file: '{path}'\n"
-                "💡 Check:\n"
+                f"Permission denied writing config file: '{path}'\n"
+                "Check:\n"
                 f"   - You have write permission in {path.parent}\n"
                 f"   - The directory exists and is writable"
             )
         except Exception as e:
             raise RuntimeError(
-                f"❌ Error writing config file: '{path}'\n"
+                f"Error writing config file: '{path}'\n"
                 f"   {type(e).__name__}: {str(e)}"
             ) from e
-

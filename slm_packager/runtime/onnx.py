@@ -1,4 +1,5 @@
 from typing import Iterator, Union
+import logging
 import numpy as np
 from pathlib import Path
 
@@ -13,13 +14,15 @@ except ImportError as e:
 from .base import BaseRuntime
 from ..config.models import SLMConfig, GenerationParams
 
+logger = logging.getLogger(__name__)
+
 class OnnxRuntime(BaseRuntime):
     def load(self):
         # Check for required dependencies
         if not ONNX_AVAILABLE:
             raise ImportError(
-                "❌ ONNX runtime requires 'onnxruntime' and 'transformers' packages.\n"
-                "💡 Install them with:\n"
+                "ONNX runtime requires 'onnxruntime' and 'transformers' packages.\n"
+                "Install them with:\n"
                 "   pip install onnxruntime transformers\n"
                 "\n"
                 "   For GPU support:\n"
@@ -27,34 +30,34 @@ class OnnxRuntime(BaseRuntime):
                 f"\n   Error details: {IMPORT_ERROR}"
             )
         
-        print("\n⚠️  WARNING: ONNX runtime support is currently limited in v0.1")
-        print("   - Generation uses simplified loop without KV-cache")
-        print("   - Performance may be slower than expected")
-        print("   - This is a known limitation being improved\n")
+        logger.warning("ONNX runtime support is currently limited in v0.1")
+        logger.warning("- Generation uses simplified loop without KV-cache")
+        logger.warning("- Performance may be slower than expected")
+        logger.warning("- This is a known limitation being improved")
         
         model_path = Path(self.config.model.path)
         
         # Check if model file exists
         if not model_path.exists():
             raise FileNotFoundError(
-                f"❌ ONNX model file not found: '{self.config.model.path}'\n"
-                "💡 Check that:\n"
-                "   - The file path is correct\n"
-                "   - The .onnx file was fully downloaded\n"
-                f"   - You're running from the correct directory (current: {Path.cwd()})"
+                f"ONNX model file not found: '{self.config.model.path}'\n"
+                "Suggestions:\n"
+                "   - Verify the file path is correct\n"
+                "   - Ensure the .onnx file was fully downloaded\n"
+                f"   - Confirm you're running from the correct directory (current: {Path.cwd()})"
             )
         
         # Check file extension
         if not str(model_path).endswith('.onnx'):
             raise ValueError(
-                f"❌ File doesn't appear to be an ONNX model: '{self.config.model.path}'\n"
-                "💡 ONNX models must have .onnx extension\n"
+                f"File doesn't appear to be an ONNX model: '{self.config.model.path}'\n"
+                "ONNX models must have .onnx extension\n"
                 "   - For PyTorch models, use 'transformers' runtime\n"
                 "   - For GGUF models, use 'llama_cpp' runtime"
             )
         
         try:
-            print(f"📥 Loading tokenizer for '{self.config.model.name}'...")
+            logger.info(f"Loading tokenizer for '{self.config.model.name}'")
             
             # Try to load tokenizer from model name (assumed to be HF repo ID)
             self.tokenizer = AutoTokenizer.from_pretrained(
@@ -62,20 +65,20 @@ class OnnxRuntime(BaseRuntime):
                 trust_remote_code=True
             )
             
-            print("✅ Tokenizer loaded")
+            logger.info("Tokenizer loaded")
             
         except Exception as e:
             raise RuntimeError(
-                f"❌ Failed to load tokenizer for '{self.config.model.name}'\n"
+                f"Failed to load tokenizer for '{self.config.model.name}'\n"
                 f"   Error: {str(e)}\n"
-                "💡 For ONNX models:\n"
+                "For ONNX models:\n"
                 "   - Set model.name to the HuggingFace repo ID (e.g., 'microsoft/phi-2')\n"
                 "   - Or provide a local path with tokenizer files\n"
                 "   - Tokenizer is needed for text encoding/decoding"
             ) from e
         
         try:
-            print(f"📥 Loading ONNX model from '{self.config.model.path}'...")
+            logger.info(f"Loading ONNX model from '{self.config.model.path}'")
             
             sess_options = ort.SessionOptions()
             if self.config.runtime.threads > 0:
@@ -92,32 +95,32 @@ class OnnxRuntime(BaseRuntime):
             )
             self.model = self.session
             
-            print("✅ ONNX model loaded")
+            logger.info("ONNX model loaded")
             
         except Exception as e:
             error_str = str(e).lower()
             if "cuda" in error_str and "not available" in error_str:
                 raise RuntimeError(
-                    "❌ CUDA provider not available\n"
-                    "💡 Try:\n"
+                    "CUDA provider not available\n"
+                    "Suggestions:\n"
                     "   - Set device to 'cpu' in your config\n"
                     "   - Install onnxruntime-gpu: pip install onnxruntime-gpu\n"
                     "   - Ensure CUDA is properly installed"
                 ) from e
             else:
                 raise RuntimeError(
-                    f"❌ Error loading ONNX model\n"
+                    f"Error loading ONNX model\n"
                     f"   {type(e).__name__}: {str(e)}\n"
-                    "💡 Check:\n"
-                    "   - The .onnx file is valid\n"
-                    "   - The model is compatible with onnxruntime"
+                    "Suggestions:\n"
+                    "   - Verify the .onnx file is valid\n"
+                    "   - Ensure the model is compatible with onnxruntime"
                 ) from e
 
     def generate(self, prompt: str, params: GenerationParams) -> Union[str, Iterator[str]]:
         if not self.is_loaded:
             raise RuntimeError(
-                "❌ Model is not loaded. Call runtime.load() first.\n"
-                "💡 If using CLI, this is a bug - please report it."
+                "Model is not loaded. Call runtime.load() first.\n"
+                "If using CLI, this is a bug - please report it."
             )
 
         try:
@@ -129,7 +132,7 @@ class OnnxRuntime(BaseRuntime):
             # This is mentioned in the README as a known limitation
             
             warning_msg = (
-                f"\n⚠️  ONNX generation not fully implemented in v0.1\n"
+                f"\nWarning: ONNX generation not fully implemented in v0.1\n"
                 f"   Input prompt: \"{prompt}\"\n"
                 f"   Model: {self.config.model.name}\n"
                 f"\n"
@@ -138,18 +141,19 @@ class OnnxRuntime(BaseRuntime):
                 f"   - Full generation loop with sampling\n"
                 f"\n"
                 f"   For now, use 'transformers' runtime for full generation capability.\n"
-                f"   See IMPROVEMENTS.md for roadmap.\n"
+                f"   See README for known limitations.\n"
             )
             
+            logger.warning("ONNX generation attempted - returning placeholder")
             return warning_msg
             
         except Exception as e:
             raise RuntimeError(
-                f"❌ Error during ONNX generation\n"
+                f"Error during ONNX generation\n"
                 f"   {type(e).__name__}: {str(e)}\n"
-                "💡 ONNX runtime is currently experimental\n"
+                "ONNX runtime is currently experimental\n"
                 "   - Consider using 'transformers' runtime for now\n"
-                "   - See IMPROVEMENTS.md for current limitations"
+                "   - See README for current limitations"
             ) from e
 
     def unload(self):
@@ -159,4 +163,4 @@ class OnnxRuntime(BaseRuntime):
             self.model = None
         if self.tokenizer:
             self.tokenizer = None
-
+        logger.info("ONNX model unloaded")

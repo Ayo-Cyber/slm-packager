@@ -1,9 +1,12 @@
 import subprocess
+import logging
 import os
 from pathlib import Path
 from typing import Optional
 
 from .binary_manager import BinaryManager
+
+logger = logging.getLogger(__name__)
 
 class Quantizer:
     @staticmethod
@@ -12,11 +15,11 @@ class Quantizer:
         Quantize a GGUF model - downloads tool automatically if needed
         """
         try:
-            # Auto-download binary (Terraform-style!)
+            # Auto-download binary
             binary = BinaryManager.get_quantize_binary()
             
-            print(f"📦 Quantizing {Path(model_path).name} to {type}...")
-            print(f"   Output: {output_path}\n")
+            logger.info(f"Quantizing {Path(model_path).name} to {type}")
+            logger.debug(f"Output: {output_path}")
             
             cmd = [str(binary), model_path, output_path, type]
             
@@ -27,24 +30,27 @@ class Quantizer:
                 check=True
             )
             
-            print(result.stdout)
-            print(f"\n✅ Quantized successfully: {output_path}")
-            print(f"   You can now use: slm run {output_path}")
+            if result.stdout:
+                print(result.stdout)
+            
+            logger.info(f"Quantized successfully: {output_path}")
+            print(f"Quantization complete: {output_path}")
+            print(f"Use with: slm run {output_path}")
             
         except subprocess.CalledProcessError as e:
             raise RuntimeError(
-                f"❌ Quantization failed\n"
+                f"Quantization failed\n"
                 f"   {e.stderr}\n"
-                "💡 Check that:\n"
-                "   - Input model file exists\n"
-                "   - You have enough disk space\n"
-                "   - Quantization type is valid (q4_0, q4_k_m, q5_k_m, q8_0)"
+                "Suggestions:\n"
+                "   - Verify input model file exists\n"
+                "   - Ensure you have enough disk space\n"
+                "   - Check quantization type is valid (q4_0, q4_k_m, q5_k_m, q8_0)"
             ) from e
         except Exception as e:
             raise RuntimeError(
-                f"❌ Unexpected error during quantization\n"
+                f"Unexpected error during quantization\n"
                 f"   {type(e).__name__}: {str(e)}\n"
-                "💡 Alternatives:\n"
+                "Alternatives:\n"
                 "   - Download pre-quantized models: slm pull tinyllama --quant q4_k_m"
             ) from e
 
@@ -57,11 +63,11 @@ class Quantizer:
             from onnxruntime.quantization import quantize_dynamic, QuantType
         except ImportError:
             raise ImportError(
-                "❌ ONNX quantization requires 'onnxruntime'\n"
-                "💡 Install with: pip install onnxruntime"
+                "ONNX quantization requires 'onnxruntime'\n"
+                "Install with: pip install onnxruntime"
             )
 
-        print(f"📦 Quantizing ONNX model to {type}...")
+        logger.info(f"Quantizing ONNX model to {type}")
         
         quant_type = QuantType.QUInt8 if type == "int8" else QuantType.QInt8
         
@@ -71,10 +77,10 @@ class Quantizer:
                 model_output=Path(output_path),
                 weight_type=quant_type
             )
-            print(f"✅ Successfully quantized to {output_path}")
+            logger.info(f"Successfully quantized to {output_path}")
+            print(f"Quantization complete: {output_path}")
         except Exception as e:
             raise RuntimeError(
-                f"❌ ONNX quantization failed\n"
+                f"ONNX quantization failed\n"
                 f"   {str(e)}"
             ) from e
-
