@@ -206,10 +206,33 @@ curl -X POST http://localhost:8000/generate \
 ## 🚧 Known Limitations (v0.1)
 
 - **ONNX Runtime**: Simplified generation without KV-cache (slow, experimental)
-- **Apple Silicon**: Untested on MPS devices
+- **AMD GPUs (ROCm)**: Untested
 - **Tests**: No automated test suite yet (manual testing only)
 
+**Currently Testing:**
+- ✅ Apple Silicon (M2 Pro, 8GB RAM) - Active testing in progress
+
 See [issues](https://github.com/YOUR_USERNAME/slm-packager/issues) for details.
+
+## 💻 System Requirements
+
+### Minimum
+- Python 3.9+
+- 4GB RAM (for small models like GPT-2)
+- 2GB free disk space
+
+### Recommended
+- Python 3.10+
+- 8GB+ RAM (for models like TinyLlama, Phi-2)
+- 10GB+ free disk space
+- Apple Silicon (M1/M2/M3) for fast CPU inference with llama.cpp
+- OR NVIDIA GPU with CUDA for GPU inference
+
+### Tested Platforms
+- ✅ macOS (M2 Pro, 8GB RAM)
+- ✅ Linux (CUDA)
+- ⚠️ Windows (Basic support, untested)
+- ⚠️ AMD GPUs (ROCm - untested)
 
 ## 🗺️ Roadmap
 
