@@ -1,0 +1,87 @@
+{
+  "version": "0.1.0",
+  "models": {
+    "tinyllama": {
+      "name": "TinyLlama 1.1B Chat",
+      "description": "Compact chat model, great for testing",
+      "format": "gguf",
+      "runtime": "llama_cpp",
+      "repo": "TheBloke/TinyLlama-1.1B-Chat-v1.0-GGUF",
+      "variants": {
+        "q4_k_m": {
+          "file": "tinyllama-1.1b-chat-v1.0.Q4_K_M.gguf",
+          "size": "637MB",
+          "speed": "fast",
+          "quality": "good",
+          "recommended": true
+        },
+        "q5_k_m": {
+          "file": "tinyllama-1.1b-chat-v1.0.Q5_K_M.gguf",
+          "size": "774MB",
+          "speed": "medium",
+          "quality": "better"
+        },
+        "q8_0": {
+          "file": "tinyllama-1.1b-chat-v1.0.Q8_0.gguf",
+          "size": "1.1GB",
+          "speed": "slower",
+          "quality": "excellent"
+        }
+      }
+    },
+    "phi-2": {
+      "name": "Microsoft Phi-2",
+      "description": "2.7B parameter model with strong reasoning",
+      "format": "gguf",
+      "runtime": "llama_cpp",
+      "repo": "TheBloke/phi-2-GGUF",
+      "variants": {
+        "q4_k_m": {
+          "file": "phi-2.Q4_K_M.gguf",
+          "size": "1.6GB",
+          "speed": "fast",
+          "quality": "good",
+          "recommended": true
+        },
+        "q8_0": {
+          "file": "phi-2.Q8_0.gguf",
+          "size": "2.8GB",
+          "speed": "medium",
+          "quality": "excellent"
+        }
+      }
+    },
+    "qwen-1.8b": {
+      "name": "Qwen 1.8B Chat",
+      "description": "Alibaba's efficient chat model",
+      "format": "gguf",
+      "runtime": "llama_cpp",
+      "repo": "Qwen/Qwen-1_8B-Chat-GGUF",
+      "variants": {
+        "q4_k_m": {
+          "file": "qwen-1_8b-chat-q4_k_m.gguf",
+          "size": "1.1GB",
+          "speed": "fast",
+          "quality": "good",
+          "recommended": true
+        }
+      }
+    },
+    "gpt2": {
+      "name": "GPT-2",
+      "description": "Classic GPT-2, PyTorch format",
+      "format": "pytorch",
+      "runtime": "transformers",
+      "repo": "gpt2",
+      "variants": {
+        "default": {
+          "file": "gpt2",
+          "size": "500MB",
+          "speed": "slow",
+          "quality": "good",
+          "recommended": true
+        }
+      }
+    }
+  }
+}

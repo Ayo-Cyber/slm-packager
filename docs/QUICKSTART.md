@@ -1,4 +1,4 @@
-# SLM Packager - Quickstart Guide
+# SLM Packager - Guide
 
 This guide walks you through initializing and running your first Small Language Model using SLM Packager.
 

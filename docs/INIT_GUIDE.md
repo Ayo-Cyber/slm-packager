@@ -1,4 +1,4 @@
-# SLM Init Walkthrough - Interactive Guide
+# SLM Init - Interactive Guide
 
 This guide shows you **exactly** what to input during `slm init` for different scenarios.
 

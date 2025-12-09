@@ -8,6 +8,8 @@ from ..runtime import get_runtime
 from ..api import start_server
 from ..quantization import Quantizer
 from ..evaluation import Benchmarker
+from ..registry.downloader import ModelDownloader
+from ..registry import ModelRegistry
 
 @click.group()
 def cli():
@@ -188,6 +190,85 @@ def serve(host, port):
     except Exception as e:
         click.echo(f"\n❌ Error starting server:", err=True)
         click.echo(f"   {type(e).__name__}: {str(e)}", err=True)
+        sys.exit(1)
+
+@cli.command()
+@click.argument("model_name")
+@click.option("--quant", "--quantization", default=None, help="Quantization type (q4_k_m, q8_0, etc.)")
+@click.option("--list-variants", is_flag=True, help="List available variants for this model")
+def pull(model_name, quant, list_variants):
+    """Pull a model from the registry"""
+    try:
+        downloader = ModelDownloader()
+        registry = ModelRegistry()
+        
+        # List variants if requested
+        if list_variants:
+            model = registry.get_model(model_name)
+            if not model:
+                click.echo(f"❌ Model '{model_name}' not found", err=True)
+                click.echo(f"💡 See available models with: slm list", err=True)
+                sys.exit(1)
+            
+            click.echo(f"\nAvailable variants for {model.name}:")
+            for variant_name, variant in model.variants.items():
+                recommended = " ⭐" if variant.recommended else ""
+                click.echo(f"  • {variant_name} ({variant.size}){recommended}")
+                click.echo(f"    Speed: {variant.speed}, Quality: {variant.quality}")
+            sys.exit(0)
+        
+        # Pull model
+        downloader.pull(model_name, quant)
+        
+    except ValueError as e:
+        click.echo(f"\n{str(e)}", err=True)
+        sys.exit(1)
+    except Exception as e:
+        click.echo(f"\n❌ Error pulling model:", err=True)
+        click.echo(f"   {str(e)}", err=True)
+        sys.exit(1)
+
+@cli.command("list")
+@click.option("--installed", is_flag=True, help="Show only installed models")
+def list_models(installed):
+    """List available or installed models"""
+    try:
+        if installed:
+            # List installed models
+            downloader = ModelDownloader()
+            models = downloader.list_installed()
+            
+            if not models:
+                click.echo("\nNo models installed yet.")
+                click.echo("💡 Pull a model with: slm pull tinyllama\n")
+                sys.exit(0)
+            
+            click.echo("\n📦 Installed models:\n")
+            for model in models:
+                click.echo(f"  • {model['name']} ({model['size']})")
+                click.echo(f"    Format: {model['format']}")
+                click.echo(f"    Path: {model['path']}")
+                click.echo()
+        else:
+            # List available models from registry
+            registry = ModelRegistry()
+            models = registry.get_all_models()
+            
+            click.echo("\n📋 Available models in registry:\n")
+            for name, model in models.items():
+                recommended = registry.get_recommended_variant(name)
+                click.echo(f"  • {name} - {model.name}")
+                click.echo(f"    {model.description}")
+                click.echo(f"    Format: {model.format}, Runtime: {model.runtime}")
+                click.echo(f"    Recommended: {recommended}")
+                click.echo()
+            
+            click.echo("💡 Pull a model with: slm pull <model-name>")
+            click.echo("💡 List variants with: slm pull <model-name> --list-variants\n")
+            
+    except Exception as e:
+        click.echo(f"\n❌ Error listing models:", err=True)
+        click.echo(f"   {str(e)}", err=True)
         sys.exit(1)
 
 if __name__ == "__main__":

@@ -1,4 +1,4 @@
-# GGUF Models - Quick Start Guide
+# GGUF Models - Guide
 
 This guide shows you how to use GGUF models with llama.cpp for **fast CPU inference**.
 
