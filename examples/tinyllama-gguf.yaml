@@ -1,0 +1,19 @@
+model:
+  name: tinyllama-gguf-q4
+  path: ./models/tinyllama-1.1b-chat-v1.0.Q4_K_M.gguf
+  description: TinyLlama GGUF Q4_K_M - Fast CPU inference (600MB)
+  format: gguf
+runtime:
+  type: llama_cpp
+  device: cpu
+  threads: 4
+  gpu_layers: 0
+  context_size: 2048
+params:
+  temperature: 0.7
+  top_p: 0.9
+  top_k: 40
+  max_tokens: 256
+  stop: ["</s>"]
+  stream: true
+quantization: q4_k_m

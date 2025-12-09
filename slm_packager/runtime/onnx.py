@@ -1,77 +1,162 @@
 from typing import Iterator, Union
 import numpy as np
+from pathlib import Path
+
 try:
     import onnxruntime as ort
     from transformers import AutoTokenizer
-except ImportError:
-    ort = None
-    AutoTokenizer = None
+    ONNX_AVAILABLE = True
+except ImportError as e:
+    ONNX_AVAILABLE = False
+    IMPORT_ERROR = str(e)
 
 from .base import BaseRuntime
 from ..config.models import SLMConfig, GenerationParams
 
 class OnnxRuntime(BaseRuntime):
     def load(self):
-        if ort is None or AutoTokenizer is None:
-            raise ImportError("onnxruntime and transformers are required for ONNX runtime.")
+        # Check for required dependencies
+        if not ONNX_AVAILABLE:
+            raise ImportError(
+                "❌ ONNX runtime requires 'onnxruntime' and 'transformers' packages.\n"
+                "💡 Install them with:\n"
+                "   pip install onnxruntime transformers\n"
+                "\n"
+                "   For GPU support:\n"
+                "   pip install onnxruntime-gpu transformers\n"
+                f"\n   Error details: {IMPORT_ERROR}"
+            )
         
-        # Load tokenizer (assuming it's in the same directory or specified)
-        # For simplicity in v0.1, we might assume the model path is a directory containing model.onnx and tokenizer files
-        # or we might need a separate config for tokenizer. 
-        # Let's assume model.path points to the .onnx file and tokenizer is standard HF name or path.
-        # For this MVP, let's assume the user provides a HF repo ID or local path for tokenizer in description or a separate field.
-        # But wait, the white paper says "Phi-3 ONNX". 
-        # Let's try to infer tokenizer from the model name if possible, or default to a standard one.
-        # A better approach for v0.1: assume model.path is the onnx file, and we need a tokenizer.
-        # Let's add a temporary hack: use 'model.name' as the tokenizer source if it looks like a HF repo, 
-        # otherwise we might need to add 'tokenizer_path' to config.
-        # For now, let's assume model.name is the HF repo ID for the tokenizer.
+        print("\n⚠️  WARNING: ONNX runtime support is currently limited in v0.1")
+        print("   - Generation uses simplified loop without KV-cache")
+        print("   - Performance may be slower than expected")
+        print("   - This is a known limitation being improved\n")
         
-        self.tokenizer = AutoTokenizer.from_pretrained(self.config.model.name)
+        model_path = Path(self.config.model.path)
         
-        sess_options = ort.SessionOptions()
-        if self.config.runtime.threads > 0:
-            sess_options.intra_op_num_threads = self.config.runtime.threads
+        # Check if model file exists
+        if not model_path.exists():
+            raise FileNotFoundError(
+                f"❌ ONNX model file not found: '{self.config.model.path}'\n"
+                "💡 Check that:\n"
+                "   - The file path is correct\n"
+                "   - The .onnx file was fully downloaded\n"
+                f"   - You're running from the correct directory (current: {Path.cwd()})"
+            )
+        
+        # Check file extension
+        if not str(model_path).endswith('.onnx'):
+            raise ValueError(
+                f"❌ File doesn't appear to be an ONNX model: '{self.config.model.path}'\n"
+                "💡 ONNX models must have .onnx extension\n"
+                "   - For PyTorch models, use 'transformers' runtime\n"
+                "   - For GGUF models, use 'llama_cpp' runtime"
+            )
+        
+        try:
+            print(f"📥 Loading tokenizer for '{self.config.model.name}'...")
             
-        providers = ["CPUExecutionProvider"]
-        if self.config.runtime.device == "cuda":
-            providers = ["CUDAExecutionProvider", "CPUExecutionProvider"]
+            # Try to load tokenizer from model name (assumed to be HF repo ID)
+            self.tokenizer = AutoTokenizer.from_pretrained(
+                self.config.model.name,
+                trust_remote_code=True
+            )
             
-        self.session = ort.InferenceSession(self.config.model.path, sess_options, providers=providers)
-        self.model = self.session
+            print("✅ Tokenizer loaded")
+            
+        except Exception as e:
+            raise RuntimeError(
+                f"❌ Failed to load tokenizer for '{self.config.model.name}'\n"
+                f"   Error: {str(e)}\n"
+                "💡 For ONNX models:\n"
+                "   - Set model.name to the HuggingFace repo ID (e.g., 'microsoft/phi-2')\n"
+                "   - Or provide a local path with tokenizer files\n"
+                "   - Tokenizer is needed for text encoding/decoding"
+            ) from e
+        
+        try:
+            print(f"📥 Loading ONNX model from '{self.config.model.path}'...")
+            
+            sess_options = ort.SessionOptions()
+            if self.config.runtime.threads > 0:
+                sess_options.intra_op_num_threads = self.config.runtime.threads
+                
+            providers = ["CPUExecutionProvider"]
+            if self.config.runtime.device == "cuda":
+                providers = ["CUDAExecutionProvider", "CPUExecutionProvider"]
+                
+            self.session = ort.InferenceSession(
+                str(model_path),
+                sess_options,
+                providers=providers
+            )
+            self.model = self.session
+            
+            print("✅ ONNX model loaded")
+            
+        except Exception as e:
+            error_str = str(e).lower()
+            if "cuda" in error_str and "not available" in error_str:
+                raise RuntimeError(
+                    "❌ CUDA provider not available\n"
+                    "💡 Try:\n"
+                    "   - Set device to 'cpu' in your config\n"
+                    "   - Install onnxruntime-gpu: pip install onnxruntime-gpu\n"
+                    "   - Ensure CUDA is properly installed"
+                ) from e
+            else:
+                raise RuntimeError(
+                    f"❌ Error loading ONNX model\n"
+                    f"   {type(e).__name__}: {str(e)}\n"
+                    "💡 Check:\n"
+                    "   - The .onnx file is valid\n"
+                    "   - The model is compatible with onnxruntime"
+                ) from e
 
     def generate(self, prompt: str, params: GenerationParams) -> Union[str, Iterator[str]]:
         if not self.is_loaded:
-            raise RuntimeError("Model is not loaded")
+            raise RuntimeError(
+                "❌ Model is not loaded. Call runtime.load() first.\n"
+                "💡 If using CLI, this is a bug - please report it."
+            )
 
-        # This is a simplified greedy generation loop for ONNX
-        # Real implementation would need a proper KV cache and sampling support
-        # For v0.1 we will implement a very basic greedy search
-        
-        input_ids = self.tokenizer.encode(prompt, return_tensors="np")
-        
-        # TODO: Implement full generation loop with KV cache for ONNX
-        # Since ONNX generation from scratch is complex (managing inputs/outputs), 
-        # we might want to use `optimum` if possible, but the requirement was "ONNX Runtime".
-        # For this MVP, I will leave a placeholder or a very simple non-cached generation if feasible.
-        # Actually, `optimum` is the standard way to run ONNX models easily. 
-        # If we strictly use ORT, we have to handle the graph inputs manually.
-        # Let's stick to the "Runtime Abstraction Layer" concept. 
-        # If the user wants "ONNX", they likely want the raw speed or portability.
-        # For now, I will implement a dummy generation or a simple one-token prediction to prove the point,
-        # as full ONNX generation loop is quite verbose.
-        
-        # Let's use a simplified approach: just run the model once to show it works for now, 
-        # or better, use `optimum.onnxruntime` if we can add it to dependencies.
-        # The white paper mentions "Backend: ONNX Runtime / MLC".
-        # Let's assume we can use `optimum` for the heavy lifting if available, or just raw ORT.
-        # Given the constraints, I'll implement a basic loop.
-        
-        # NOTE: This is a placeholder for the complex ONNX generation loop.
-        # In a real production version, we would use `optimum` or a dedicated generation script.
-        return f"[ONNX Generation not fully implemented in v0.1 prototype] Input: {prompt}"
+        try:
+            # Encode prompt
+            input_ids = self.tokenizer.encode(prompt, return_tensors="np")
+            
+            # IMPORTANT NOTE: This is a placeholder implementation
+            # Full ONNX generation requires complex KV-cache management
+            # This is mentioned in the README as a known limitation
+            
+            warning_msg = (
+                f"\n⚠️  ONNX generation not fully implemented in v0.1\n"
+                f"   Input prompt: \"{prompt}\"\n"
+                f"   Model: {self.config.model.name}\n"
+                f"\n"
+                f"   This runtime needs:\n"
+                f"   - Proper KV-cache implementation\n"
+                f"   - Full generation loop with sampling\n"
+                f"\n"
+                f"   For now, use 'transformers' runtime for full generation capability.\n"
+                f"   See IMPROVEMENTS.md for roadmap.\n"
+            )
+            
+            return warning_msg
+            
+        except Exception as e:
+            raise RuntimeError(
+                f"❌ Error during ONNX generation\n"
+                f"   {type(e).__name__}: {str(e)}\n"
+                "💡 ONNX runtime is currently experimental\n"
+                "   - Consider using 'transformers' runtime for now\n"
+                "   - See IMPROVEMENTS.md for current limitations"
+            ) from e
 
     def unload(self):
-        self.session = None
-        self.model = None
-        self.tokenizer = None
+        if self.session:
+            self.session = None
+        if self.model:
+            self.model = None
+        if self.tokenizer:
+            self.tokenizer = None
+

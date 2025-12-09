@@ -1,5 +1,6 @@
 import click
 import os
+import sys
 from pathlib import Path
 from ..config.models import SLMConfig, ModelConfig, RuntimeConfig, RuntimeType, DeviceType
 from ..config.loader import ConfigLoader
@@ -21,12 +22,19 @@ def cli():
 @click.option("--output", default="slm.yaml", help="Output config file")
 def init(name, path, format, runtime, output):
     """Initialize a new SLM config"""
-    config = SLMConfig(
-        model=ModelConfig(name=name, path=path, format=format),
-        runtime=RuntimeConfig(type=runtime)
-    )
-    ConfigLoader.save(config, output)
-    click.echo(f"Config saved to {output}")
+    try:
+        config = SLMConfig(
+            model=ModelConfig(name=name, path=path, format=format),
+            runtime=RuntimeConfig(type=runtime)
+        )
+        ConfigLoader.save(config, output)
+        click.echo(f"✅ Config saved to {output}")
+        
+    except Exception as e:
+        click.echo(f"\n❌ Error creating initialization config:", err=True)
+        click.echo(f"   {str(e)}", err=True)
+        click.echo(f"\n💡 Check your inputs and try again", err=True)
+        sys.exit(1)
 
 @cli.command()
 @click.argument("config_path", type=click.Path(exists=True))
@@ -34,71 +42,154 @@ def init(name, path, format, runtime, output):
 @click.option("--stream/--no-stream", default=True, help="Stream output")
 def run(config_path, prompt, stream):
     """Run a model from a config file"""
-    config = ConfigLoader.load(config_path)
-    
-    # Override stream param if provided
-    config.params.stream = stream
-    
-    click.echo(f"Loading model {config.model.name} with {config.runtime.type}...")
-    runtime = get_runtime(config)
-    runtime.load()
-    
-    if not prompt:
-        prompt = click.prompt("Enter prompt")
+    try:
+        # Load config
+        config = ConfigLoader.load(config_path)
         
-    click.echo("-" * 20)
-    if stream:
-        for chunk in runtime.generate(prompt, config.params):
-            click.echo(chunk, nl=False)
-        click.echo()
-    else:
-        output = runtime.generate(prompt, config.params)
-        click.echo(output)
-    
-    runtime.unload()
+        # Override stream param if provided
+        config.params.stream = stream
+        
+        click.echo(f"Loading model {config.model.name} with {config.runtime.type}...")
+        
+        # Get and load runtime
+        runtime = get_runtime(config)
+        runtime.load()
+        
+        # Get prompt if not provided
+        if not prompt:
+            prompt = click.prompt("Enter prompt")
+            
+        click.echo("-" * 20)
+        
+        # Generate
+        if stream:
+            for chunk in runtime.generate(prompt, config.params):
+                click.echo(chunk, nl=False)
+            click.echo()
+        else:
+            output = runtime.generate(prompt, config.params)
+            click.echo(output)
+        
+        # Cleanup
+        runtime.unload()
+        
+    except FileNotFoundError as e:
+        click.echo(f"\n{str(e)}", err=True)
+        sys.exit(1)
+    except ImportError as e:
+        click.echo(f"\n{str(e)}", err=True)
+        sys.exit(1)
+    except ValueError as e:
+        click.echo(f"\n{str(e)}", err=True)
+        sys.exit(1)
+    except RuntimeError as e:
+        click.echo(f"\n{str(e)}", err=True)
+        sys.exit(1)
+    except MemoryError as e:
+        click.echo(f"\n{str(e)}", err=True)
+        sys.exit(1)
+    except KeyboardInterrupt:
+        click.echo(f"\n\n⚠️  Interrupted by user (Ctrl+C)", err=True)
+        sys.exit(130)
+    except Exception as e:
+        click.echo(f"\n❌ Unexpected error running model:", err=True)
+        click.echo(f"   {type(e).__name__}: {str(e)}", err=True)
+        click.echo(f"\n💡 If this persists, please report it as a bug with:", err=True)
+        click.echo(f"   - Your config file", err=True)
+        click.echo(f"   - The command you ran", err=True)
+        click.echo(f"   - Python version: {sys.version}", err=True)
+        sys.exit(1)
 
 @cli.command()
 @click.argument("config_path", type=click.Path(exists=True))
 def benchmark(config_path):
     """Benchmark a model"""
-    config = ConfigLoader.load(config_path)
-    
-    click.echo(f"Benchmarking {config.model.name}...")
-    
-    benchmarker = Benchmarker(config)
-    metrics = benchmarker.run()
-    
-    click.echo(f"Load Time: {metrics['load_time_sec']:.2f}s")
-    click.echo(f"Generation Time: {metrics['generation_time_sec']:.2f}s")
-    click.echo(f"Memory Usage: {metrics['memory_mb']:.2f} MB")
-    click.echo(f"Latency: {metrics['latency_ms']:.2f} ms")
-    click.echo(f"Estimated TPS: {metrics['tokens_per_second']:.2f}")
+    try:
+        config = ConfigLoader.load(config_path)
+        
+        click.echo(f"Benchmarking {config.model.name}...")
+        
+        benchmarker = Benchmarker(config)
+        metrics = benchmarker.run()
+        
+        click.echo(f"\n📊 Benchmark Results:")
+        click.echo(f"   Load Time: {metrics['load_time_sec']:.2f}s")
+        click.echo(f"   Generation Time: {metrics['generation_time_sec']:.2f}s")
+        click.echo(f"   Memory Usage: {metrics['memory_mb']:.2f} MB")
+        click.echo(f"   Latency: {metrics['latency_ms']:.2f} ms")
+        click.echo(f"   Estimated TPS: {metrics['tokens_per_second']:.2f}")
+        
+    except FileNotFoundError as e:
+        click.echo(f"\n{str(e)}", err=True)
+        sys.exit(1)
+    except Exception as e:
+        click.echo(f"\n❌ Error during benchmarking:", err=True)
+        click.echo(f"   {str(e)}", err=True)
+        click.echo(f"\n💡 Try:", err=True)
+        click.echo(f"   - Checking your config file is valid", err=True)
+        click.echo(f"   - Ensuring the model loads correctly with 'slm run'", err=True)
+        sys.exit(1)
 
 @cli.command()
 @click.argument("model_name")
 @click.option("--type", default="q4_k_m", help="Quantization type (q4_k_m, int8)")
 def quantize(model_name, type):
     """Quantize a model"""
-    # This is a simplified CLI that assumes model_name is a path for now
-    # In a real app, we would look up the model in a registry
-    model_path = model_name
-    
-    if model_path.endswith(".gguf"):
-        output_path = model_path.replace(".gguf", f"-{type}.gguf")
-        Quantizer.quantize_gguf(model_path, output_path, type)
-    elif model_path.endswith(".onnx"):
-        output_path = model_path.replace(".onnx", f"-{type}.onnx")
-        Quantizer.quantize_onnx(model_path, output_path, type)
-    else:
-        click.echo("Unsupported file extension. Only .gguf and .onnx are supported.")
+    try:
+        # This is a simplified CLI that assumes model_name is a path for now
+        # In a real app, we would look up the model in a registry
+        model_path = model_name
+        
+        if not Path(model_path).exists():
+            click.echo(f"❌ Model file not found: '{model_path}'", err=True)
+            click.echo(f"💡 Provide the full path to the model file", err=True)
+            sys.exit(1)
+        
+        if model_path.endswith(".gguf"):
+            output_path = model_path.replace(".gguf", f"-{type}.gguf")
+            click.echo(f"Quantizing GGUF model to {type}...")
+            Quantizer.quantize_gguf(model_path, output_path, type)
+        elif model_path.endswith(".onnx"):
+            output_path = model_path.replace(".onnx", f"-{type}.onnx")
+            click.echo(f"Quantizing ONNX model to {type}...")
+            Quantizer.quantize_onnx(model_path, output_path, type)
+        else:
+            click.echo(f"❌ Unsupported file extension: '{Path(model_path).suffix}'", err=True)
+            click.echo(f"💡 Only .gguf and .onnx are supported", err=True)
+            sys.exit(1)
+            
+    except Exception as e:
+        click.echo(f"\n❌ Error during quantization:", err=True)
+        click.echo(f"   {str(e)}", err=True)
+        sys.exit(1)
 
 @cli.command()
 @click.option("--host", default="0.0.0.0", help="Host to bind to")
 @click.option("--port", default=8000, help="Port to bind to")
 def serve(host, port):
     """Start the API server"""
-    click.echo(f"Starting API server on {host}:{port}")
-    start_server(host, port)
+    try:
+        click.echo(f"🚀 Starting API server on {host}:{port}")
+        click.echo(f"   Press Ctrl+C to stop")
+        start_server(host, port)
+    except KeyboardInterrupt:
+        click.echo(f"\n\n⚠️  Server stopped by user (Ctrl+C)")
+        sys.exit(0)
+    except OSError as e:
+        if "Address already in use" in str(e):
+            click.echo(f"\n❌ Port {port} is already in use", err=True)
+            click.echo(f"💡 Try:", err=True)
+            click.echo(f"   - Using a different port: slm serve --port 8001", err=True)
+            click.echo(f"   - Finding and stopping the other process on port {port}", err=True)
+        else:
+            click.echo(f"\n❌ Error starting server:", err=True)
+            click.echo(f"   {str(e)}", err=True)
+        sys.exit(1)
+    except Exception as e:
+        click.echo(f"\n❌ Error starting server:", err=True)
+        click.echo(f"   {type(e).__name__}: {str(e)}", err=True)
+        sys.exit(1)
 
 if __name__ == "__main__":
     cli()
+

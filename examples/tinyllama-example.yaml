@@ -1,0 +1,19 @@
+model:
+  name: tinyllama-example
+  path: TinyLlama/TinyLlama-1.1B-Chat-v1.0
+  description: TinyLlama 1.1B Chat model for quick testing
+  format: pytorch
+runtime:
+  type: transformers
+  device: cpu
+  threads: 4
+  gpu_layers: 0
+  context_size: 2048
+params:
+  temperature: 0.7
+  top_p: 0.9
+  top_k: 40
+  max_tokens: 256
+  stop: []
+  stream: true
+quantization: null
