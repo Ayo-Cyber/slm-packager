@@ -39,12 +39,35 @@ def init(name, path, format, runtime, output):
         sys.exit(1)
 
 @cli.command()
-@click.argument("config_path", type=click.Path(exists=True))
+@click.argument("model_or_config")
 @click.option("--prompt", "-p", help="Prompt to generate from")
 @click.option("--stream/--no-stream", default=True, help="Stream output")
-def run(config_path, prompt, stream):
-    """Run a model from a config file"""
+def run(model_or_config, prompt, stream):
+    """Run a model from a config file or by name"""
     try:
+        # Check if input is a model name or config path
+        input_path = Path(model_or_config)
+        
+        # Try to resolve as config path first
+        if input_path.exists():
+            config_path = input_path
+        else:
+            # Try to resolve as model name from ~/.slm/configs/
+            config_dir = Path.home() / ".slm" / "configs"
+            potential_config = config_dir / f"{model_or_config}.yaml"
+            
+            if potential_config.exists():
+                config_path = potential_config
+            else:
+                click.echo(f"\n❌ Model or config not found: '{model_or_config}'", err=True)
+                click.echo(f"\nTried:", err=True)
+                click.echo(f"   - Direct path: {input_path}", err=True)
+                click.echo(f"   - Model config: {potential_config}", err=True)
+                click.echo(f"\n💡 Suggestions:", err=True)
+                click.echo(f"   - List installed models: slm list --installed", err=True)
+                click.echo(f"   - Pull a model: slm pull gpt2", err=True)
+                sys.exit(1)
+        
         # Load config
         config = ConfigLoader.load(config_path)
         

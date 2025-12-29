@@ -37,7 +37,8 @@ class TransformersRuntime(BaseRuntime):
             )
         
         try:
-            device_map = "auto" if self.config.runtime.device == "cuda" else "cpu"
+            # Determine device and configuration
+            device_config = self._configure_device()
             
             print(f"📥 Loading tokenizer from '{self.config.model.path}'...")
             self.tokenizer = AutoTokenizer.from_pretrained(
@@ -46,17 +47,22 @@ class TransformersRuntime(BaseRuntime):
             )
             
             print(f"📥 Loading model from '{self.config.model.path}'...")
-            print(f"   Device: {device_map}")
+            print(f"   Device: {device_config['name']}")
             print(f"   This may take a while for large models...")
             
             self.model = AutoModelForCausalLM.from_pretrained(
                 self.config.model.path,
-                device_map=device_map,
-                torch_dtype="auto",
+                device_map=device_config['device_map'],
+                torch_dtype=device_config['dtype'],
                 trust_remote_code=True
             )
             
-            print("✅ Model loaded successfully!")
+            # Move to MPS if needed (device_map doesn't support MPS yet)
+            if self.config.runtime.device == "mps":
+                self.model = self.model.to(device_config['device'])
+                print(f"✅ Model loaded successfully on Apple Silicon GPU (MPS)!")
+            else:
+                print("✅ Model loaded successfully!")
             
         except FileNotFoundError as e:
             raise FileNotFoundError(
@@ -102,6 +108,54 @@ class TransformersRuntime(BaseRuntime):
                 "   - Ensuring sufficient RAM (need ~4GB+ for small models)"
             ) from e
 
+    def _configure_device(self):
+        """Configure device settings based on runtime config."""
+        device = self.config.runtime.device
+        
+        # MPS (Apple Silicon GPU)
+        if device == "mps":
+            if not torch.backends.mps.is_available():
+                raise RuntimeError(
+                    "❌ MPS requested but not available\n"
+                    "💡 MPS requires:\n"
+                    "   - macOS 12.3+\n"
+                    "   - Apple Silicon (M1/M2/M3)\n"
+                    "   - PyTorch 1.12+\n"
+                    "\n   Falling back to CPU might work - set device: 'cpu' in config"
+                )
+            return {
+                'device': torch.device("mps"),
+                'device_map': None,  # MPS doesn't support device_map yet
+                'dtype': torch.float32,  # MPS works best with float32
+                'name': 'MPS (Apple Silicon GPU)'
+            }
+        
+        # CUDA (NVIDIA GPU)
+        elif device == "cuda":
+            if not torch.cuda.is_available():
+                raise RuntimeError(
+                    "❌ CUDA requested but not available\n"
+                    "💡 Ensure:\n"
+                    "   - NVIDIA GPU is present\n"
+                    "   - CUDA drivers are installed\n"
+                    "   - PyTorch CUDA version matches your CUDA version"
+                )
+            return {
+                'device': None,
+                'device_map': 'auto',
+                'dtype': torch.float16,  # FP16 for faster GPU inference
+                'name': 'CUDA (NVIDIA GPU)'
+            }
+        
+        # CPU (default)
+        else:
+            return {
+                'device': torch.device("cpu"),
+                'device_map': None,
+                'dtype': 'auto',
+                'name': 'CPU'
+            }
+    
     def generate(self, prompt: str, params: GenerationParams) -> Union[str, Iterator[str]]:
         if not self.is_loaded:
             raise RuntimeError(
@@ -110,7 +164,9 @@ class TransformersRuntime(BaseRuntime):
             )
 
         try:
-            inputs = self.tokenizer(prompt, return_tensors="pt").to(self.model.device)
+            # Determine device for inputs
+            device = self.model.device if hasattr(self.model, 'device') else 'cpu'
+            inputs = self.tokenizer(prompt, return_tensors="pt").to(device)
             
             if params.stream:
                 streamer = TextIteratorStreamer(self.tokenizer, skip_prompt=True)
@@ -163,6 +219,10 @@ class TransformersRuntime(BaseRuntime):
             self.model = None
         if self.tokenizer:
             self.tokenizer = None
+        
+        # Clear GPU cache
         if torch.cuda.is_available():
             torch.cuda.empty_cache()
+        if torch.backends.mps.is_available():
+            torch.mps.empty_cache()
 

@@ -1,0 +1,20 @@
+model:
+  name: "microsoft/phi-2"
+  description: "Microsoft Phi-2 2.7B exported to ONNX"
+  format: "onnx"
+  path: "./models/phi-2-onnx"  # Path to ONNX model directory
+
+runtime:
+  type: "onnx"
+  device: "cpu"  # or "cuda" for GPU
+  threads: 4
+  context_size: 2048
+  gpu_layers: 0  # Not applicable for ONNX
+
+params:
+  temperature: 0.8
+  top_p: 0.95
+  top_k: 40
+  max_tokens: 512
+  stream: true
+  stop: []

@@ -8,7 +8,7 @@ version = "0.1.0"
 description = "A unified runtime and developer layer for Small Language Models"
 readme = "README.md"
 requires-python = ">=3.9"
-license = {text = "MIT"}
+license = "MIT"
 authors = [
     {name = "SLM Packager Team"}
 ]
@@ -33,7 +33,45 @@ slm = "slm_packager.cli.main:cli"
 [project.optional-dependencies]
 dev = [
     "pytest>=8.0.0",
+    "pytest-cov>=4.1.0",
+    "pytest-asyncio>=0.23.0",
+    "pytest-mock>=3.12.0",
     "black>=24.0.0",
     "isort>=5.13.0",
-    "mypy>=1.8.0"
+    "mypy>=1.8.0",
+    "httpx>=0.26.0"
 ]
+onnx = [
+    "onnxruntime-genai>=0.4.0"  # For proper ONNX generation with KV-cache
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["slm_packager*"]
+exclude = ["tests*", "docs*", "examples*", "models*", "build*"]
+
+[tool.black]
+line-length = 100
+target-version = ['py39', 'py310', 'py311']
+exclude = '''
+/(
+    \.git
+  | \.venv
+  | venv
+  | build
+  | dist
+)/
+'''
+
+[tool.isort]
+profile = "black"
+line_length = 100
+skip_gitignore = true
+
+[tool.mypy]
+python_version = "3.9"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = false
+ignore_missing_imports = true
+

@@ -179,3 +179,19 @@ cython_debug/
 #  refer to https://docs.cursor.com/context/ignore-files
 .cursorignore
 .cursorindexingignore
+
+# macOS system files
+.DS_Store
+**/.DS_Store
+
+# Test and development scripts
+benchmark_onnx.py
+test_mps.py
+test_onnx.py
+gpt2-onnx-test.yaml
+
+# Model files (large binaries)
+# These should be downloaded via the package manager, not committed
+models/
+*.gguf
+*.onnx

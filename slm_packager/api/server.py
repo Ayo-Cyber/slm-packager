@@ -42,8 +42,12 @@ async def load_model(config_path: str = Body(..., embed=True)):
         runtime = get_runtime(config)
         runtime.load()
         return {"status": "success", "message": f"Loaded model {config.model.name}"}
+    except FileNotFoundError as e:
+        raise HTTPException(status_code=404, detail=f"Config file not found: {config_path}")
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=f"Invalid configuration: {str(e)}")
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail=f"Failed to load model: {str(e)}")
 
 @app.post("/generate")
 async def generate(request: GenerateRequest):
@@ -62,14 +66,20 @@ async def generate(request: GenerateRequest):
         else:
             output = runtime.generate(request.prompt, params)
             return {"text": output}
+    except TimeoutError as e:
+        raise HTTPException(status_code=504, detail="Generation timeout exceeded")
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail=f"Generation failed: {str(e)}")
 
 async def _stream_generator(rt, prompt, params):
-    for chunk in rt.generate(prompt, params):
-        yield f"data: {json.dumps({'text': chunk})}\n\n"
-        await asyncio.sleep(0) # Yield control
-    yield "data: [DONE]\n\n"
+    try:
+        for chunk in rt.generate(prompt, params):
+            yield f"data: {json.dumps({'text': chunk})}\n\n"
+            await asyncio.sleep(0)  # Yield control
+        yield "data: [DONE]\n\n"
+    except Exception as e:
+        yield f"data: {json.dumps({'error': str(e)})}\n\n"
+        yield "data: [DONE]\n\n"
 
 @app.get("/info")
 async def info():
