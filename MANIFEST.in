@@ -1,0 +1,5 @@
+include slm_packager/registry/models.json
+include README.md
+include LICENSE
+include CHANGELOG.md
+include CONTRIBUTING.md

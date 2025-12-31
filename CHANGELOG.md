@@ -143,4 +143,4 @@ See [README.md](README.md) for planned features in v1.0:
 
 ---
 
-**Questions?** Open an issue on [GitHub](https://github.com/YOUR_USERNAME/slm-packager/issues)
+**Questions?** Open an issue on [GitHub](https://github.com/Ayo-Cyber/slm-packager/issues)

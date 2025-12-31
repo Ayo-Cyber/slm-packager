@@ -24,7 +24,7 @@ SLM Packager is an open-source toolkit for running, packaging, and evaluating Sm
 ### Installation
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/slm-packager.git
+git clone https://github.com/Ayo-Cyber/slm-packager.git
 cd slm-packager
 pip install -e .
 ```
@@ -476,9 +476,9 @@ MIT License - see [LICENSE](LICENSE) for details
 
 ## 📞 Support
 
-- **Issues**: [GitHub Issues](https://github.com/YOUR_USERNAME/slm-packager/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/YOUR_USERNAME/slm-packager/discussions)
-- **Email**: your-email@example.com
+- **Issues**: [GitHub Issues](https://github.com/Ayo-Cyber/slm-packager/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/Ayo-Cyber/slm-packager/discussions)
+- **GitHub**: [@Ayo-Cyber](https://github.com/Ayo-Cyber)
 
 ---
 
