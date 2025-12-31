@@ -313,7 +313,7 @@ Real-world benchmarks on different hardware:
 | M2 Pro | transformers MPS | `device: mps` | 28 | 1.8GB |
 | RTX 3080 | llama.cpp CUDA | `gpu_layers: 32` | 100-150 | 600MB VRAM |
 
-*Benchmarks collected December 2024. Performance varies by hardware, model, and config.*
+*Benchmarks collected December 2025. Performance varies by hardware, model, and config.*
 
 ---
 

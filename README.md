@@ -177,7 +177,7 @@ Real-world performance on different hardware:
 | **llama.cpp** | Metal (M1) | 40-60 | ~800MB | With GPU layers |
 | **transformers** | CPU | 5-10 | 4GB | Full precision |
 
-*Performance varies based on hardware, model size, and configuration. Benchmarks collected on M2 Pro (Dec 2024).*
+*Performance varies based on hardware, model size, and configuration. Benchmarks collected on M2 Pro (Dec 2025).*
 
 ---
 
@@ -395,7 +395,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed development guidelines.
 
 ## 🗺️ Roadmap
 
-### v0.2 (Current - December 2024)
+### v0.2 (Current - December 2025)
 - [x] Automated test suite (✅ Complete: 73 tests, 52% coverage)
 - [x] MPS GPU support for Apple Silicon (✅ Complete: 2.14x speedup)
 - [x] ONNX runtime with KV-cache (✅ Complete: 13.8 tok/s)

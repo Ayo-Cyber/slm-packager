@@ -5,7 +5,7 @@ All notable changes to SLM Packager will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.2.0] - 2024-12-24
+## [0.2.0] - 2025-12-24
 
 ### Added
 
@@ -72,7 +72,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Performance
 
-Real-world benchmarks (December 2024):
+Real-world benchmarks (December 2025):
 
 **GPT-2 (124M parameters):**
 - transformers + CPU: 1.3 tok/s
@@ -84,7 +84,7 @@ Real-world benchmarks (December 2024):
 - llama.cpp + Metal (M1): 40-60 tok/s
 - transformers + MPS (M2 Pro): 28 tok/s
 
-## [0.1.0] - 2024-11-20
+## [0.1.0] - 2025-11-20
 
 ### Added
 
