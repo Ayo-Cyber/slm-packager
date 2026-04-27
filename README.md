@@ -5,6 +5,7 @@
 SLM Packager is an open-source toolkit for running, packaging, and evaluating Small Language Models (1B-7B parameters) across different formats and runtimes. Think of it as **Terraform for SLMs** — making model deployment simple, reproducible, and developer-friendly.
 
 [![PyPI](https://img.shields.io/pypi/v/slm-packager?color=blue&label=pypi%20package)](https://pypi.org/project/slm-packager/)
+[![CI](https://github.com/Ayo-Cyber/slm-packager/actions/workflows/test.yml/badge.svg)](https://github.com/Ayo-Cyber/slm-packager/actions/workflows/test.yml)
 [![Tests](https://img.shields.io/badge/tests-117%20passing-brightgreen)]()
 [![Coverage](https://img.shields.io/badge/coverage-52%25-yellow)]()
 [![Python](https://img.shields.io/badge/python-3.9%2B-blue)]()
@@ -23,6 +24,12 @@ SLM Packager is an open-source toolkit for running, packaging, and evaluating Sm
 ## 🚀 Quick Start
 
 ### Installation
+
+```bash
+pip install slm-packager
+```
+
+Or install from source:
 
 ```bash
 git clone https://github.com/Ayo-Cyber/slm-packager.git
@@ -382,14 +389,10 @@ pytest --cov=slm_packager --cov-report=html
 black slm_packager tests
 isort slm_packager tests
 mypy slm_packager
-
-# Pre-commit hooks
-pre-commit install
-pre-commit run --all-files
 ```
 
 **Test Results:**
-- ✅ 73 tests passing
+- ✅ 117 tests passing
 - Coverage: 52% overall
   - API: 82% ⭐
   - Core runtime: 60%
@@ -401,8 +404,8 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed development guidelines.
 
 ## 🗺️ Roadmap
 
-### v0.2 (Current - December 2025)
-- [x] Automated test suite (✅ Complete: 73 tests, 52% coverage)
+### v0.2 (Current)
+- [x] Automated test suite (✅ Complete: 117 tests, 52% coverage)
 - [x] MPS GPU support for Apple Silicon (✅ Complete: 2.14x speedup)
 - [x] ONNX runtime with KV-cache (✅ Complete: 13.8 tok/s)
 - [x] API server improvements (✅ Complete: 82% coverage)
