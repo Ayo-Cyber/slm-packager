@@ -196,3 +196,5 @@ gpt2-onnx-test.yaml
 models/
 *.gguf
 *.onnx
+# Local benchmark runs
+day4_bench/

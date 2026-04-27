@@ -57,6 +57,8 @@ class ConfigLoader:
                         f"Unsupported config format: '{path.suffix}'\n"
                         "Use .yaml, .yml, or .json file extension"
                     )
+        except ValueError:
+            raise
         except PermissionError:
             raise PermissionError(
                 f"Permission denied reading config file: '{path}'\n"
@@ -129,9 +131,11 @@ class ConfigLoader:
                         f"Unsupported config format: '{path.suffix}'\n"
                         "Use .yaml, .yml, or .json file extension"
                     )
-            
+
             logger.info(f"Successfully saved config to {path}")
-            
+
+        except ValueError:
+            raise
         except PermissionError:
             raise PermissionError(
                 f"Permission denied writing config file: '{path}'\n"

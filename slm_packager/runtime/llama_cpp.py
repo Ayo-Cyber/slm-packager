@@ -3,6 +3,7 @@ import logging
 import sys
 from pathlib import Path
 
+IMPORT_ERROR = ""
 try:
     from llama_cpp import Llama
     LLAMA_CPP_AVAILABLE = True
@@ -74,13 +75,43 @@ class LlamaCppRuntime(BaseRuntime):
             logger.debug(f"GPU layers: {self.config.runtime.gpu_layers}")
             logger.debug(f"Threads: {self.config.runtime.threads}")
             
-            self.model = Llama(
-                model_path=str(model_path),
-                n_ctx=self.config.runtime.context_size,
-                n_gpu_layers=self.config.runtime.gpu_layers,
-                n_threads=self.config.runtime.threads,
-                verbose=False
-            )
+            import os
+            from contextlib import redirect_stderr
+
+            # Suppress C++ noise (ggml/metal logs) by redirecting stderr
+            with open(os.devnull, "w") as fnull:
+                with redirect_stderr(fnull):
+                    # Also try to silence stdout via fd redirection for lower-level C logs
+                    # if redirect_stderr isn't enough (often C libs write directly to fd 2)
+                    try:
+                        # Save actual stderr fd
+                        stderr_fd = sys.stderr.fileno()
+                        saved_stderr_fd = os.dup(stderr_fd)
+                        
+                        try:
+                            # Redirect stderr to devnull
+                            os.dup2(fnull.fileno(), stderr_fd)
+                            
+                            self.model = Llama(
+                                model_path=str(model_path),
+                                n_ctx=self.config.runtime.context_size,
+                                n_gpu_layers=self.config.runtime.gpu_layers,
+                                n_threads=self.config.runtime.threads,
+                                verbose=False
+                            )
+                        finally:
+                            # Restore stderr
+                            os.dup2(saved_stderr_fd, stderr_fd)
+                            os.close(saved_stderr_fd)
+                    except Exception:
+                        # Fallback if fd manipulation fails (e.g. some environments)
+                        self.model = Llama(
+                            model_path=str(model_path),
+                            n_ctx=self.config.runtime.context_size,
+                            n_gpu_layers=self.config.runtime.gpu_layers,
+                            n_threads=self.config.runtime.threads,
+                            verbose=False
+                        )
             
             logger.info("Model loaded successfully")
             
@@ -140,6 +171,7 @@ class LlamaCppRuntime(BaseRuntime):
                 temperature=params.temperature,
                 top_p=params.top_p,
                 top_k=params.top_k,
+                repeat_penalty=params.repetition_penalty,
                 stop=params.stop,
                 stream=params.stream
             )

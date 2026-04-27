@@ -2,14 +2,43 @@ from typing import Iterator, Union, Dict, Any
 import logging
 import numpy as np
 from pathlib import Path
+from types import SimpleNamespace
 
+IMPORT_ERROR = ""
 try:
     import onnxruntime as ort
     from transformers import AutoTokenizer
     ONNX_AVAILABLE = True
 except ImportError as e:
-    ONNX_AVAILABLE = False
     IMPORT_ERROR = str(e)
+    ONNX_AVAILABLE = False
+
+    class _SessionOptions:
+        def __init__(self):
+            self.intra_op_num_threads = 0
+
+    def _missing_inference_session(*args, **kwargs):
+        raise ImportError(
+            "ONNX runtime requires 'onnxruntime' and 'transformers'\n"
+            "Install with:\n"
+            "  pip install onnxruntime transformers\n"
+            f"\nError: {IMPORT_ERROR}"
+        )
+
+    class AutoTokenizer:
+        @staticmethod
+        def from_pretrained(*args, **kwargs):
+            raise ImportError(
+                "ONNX runtime requires 'onnxruntime' and 'transformers'\n"
+                "Install with:\n"
+                "  pip install onnxruntime transformers\n"
+                f"\nError: {IMPORT_ERROR}"
+            )
+
+    ort = SimpleNamespace(
+        SessionOptions=_SessionOptions,
+        InferenceSession=_missing_inference_session,
+    )
 
 from .base import BaseRuntime
 from ..config.models import SLMConfig, GenerationParams
@@ -136,40 +165,45 @@ class OnnxRuntime(BaseRuntime):
     def _forward(self, input_ids: np.ndarray, attention_mask: np.ndarray, 
                  past_kv: Dict[str, np.ndarray] = None, is_first_forward: bool = False) -> Dict[str, np.ndarray]:
         """Run model forward pass with optional KV-cache."""
-        seq_len = input_ids.shape[1]
-        batch_size = input_ids.shape[0]
-        
-        # Build input dict
-        inputs = {
-            'input_ids': input_ids,
-            'attention_mask': attention_mask
-        }
-        
-        # Add position_ids if model requires it
-        if self.has_position_ids:
-            if is_first_forward:
-                # First forward: positions 0 to seq_len-1
-                position_ids = np.arange(seq_len, dtype=np.int64).reshape(1, -1)
-            else:
-                # Subsequent: position is past_len + current position
-                past_len = attention_mask.shape[1] - 1
-                position_ids = np.array([[past_len]], dtype=np.int64)
-            inputs['position_ids'] = position_ids
-        
-        # Add KV-cache
-        if self.has_kv_cache:
-            if is_first_forward:
-                # Initialize empty cache for first forward
-                cache = self._init_empty_kv_cache(batch_size)
-                inputs.update(cache)
-            elif past_kv is not None:
-                inputs.update(past_kv)
-        
-        # Run inference
-        outputs = self.session.run(self.output_names, inputs)
-        
-        # Convert to dict
-        return {name: output for name, output in zip(self.output_names, outputs)}
+        try:
+            seq_len = input_ids.shape[1]
+            batch_size = input_ids.shape[0]
+            
+            # Build input dict
+            inputs = {
+                'input_ids': input_ids,
+                'attention_mask': attention_mask
+            }
+            
+            # Add position_ids if model requires it
+            if self.has_position_ids:
+                if is_first_forward:
+                    # First forward: positions 0 to seq_len-1
+                    position_ids = np.arange(seq_len, dtype=np.int64).reshape(1, -1)
+                else:
+                    # Subsequent: position is past_len + current position
+                    past_len = attention_mask.shape[1] - 1
+                    position_ids = np.array([[past_len]], dtype=np.int64)
+                inputs['position_ids'] = position_ids
+            
+            # Add KV-cache
+            if self.has_kv_cache:
+                if is_first_forward:
+                    # Initialize empty cache for first forward
+                    cache = self._init_empty_kv_cache(batch_size)
+                    inputs.update(cache)
+                elif past_kv is not None:
+                    inputs.update(past_kv)
+            
+            # Run inference
+            outputs = self.session.run(self.output_names, inputs)
+            
+            # Convert to dict
+            return {name: output for name, output in zip(self.output_names, outputs)}
+            
+        except Exception as e:
+            logger.error(f"ONNX inference failed: {str(e)}")
+            raise RuntimeError(f"Model inference failed: {str(e)}") from e
     
     def _extract_kv_cache(self, outputs: Dict[str, np.ndarray]) -> Dict[str, np.ndarray]:
         """Extract KV-cache from outputs for next iteration."""
@@ -189,13 +223,26 @@ class OnnxRuntime(BaseRuntime):
     
     def _sample(self, logits: np.ndarray, params: GenerationParams) -> int:
         """Sample next token from logits distribution."""
+        # Check for NaNs
+        if np.isnan(logits).any():
+            logger.warning("NaNs detected in logits, replacing with -inf")
+            logits = np.nan_to_num(logits, nan=-np.inf)
+
         # Apply temperature
         if params.temperature > 0 and params.temperature != 1.0:
             logits = logits / params.temperature
         
         # Convert to probabilities (with numerical stability)
-        probs = np.exp(logits - np.max(logits))
-        probs = probs / np.sum(probs)
+        logits_max = np.max(logits)
+        probs = np.exp(logits - logits_max)
+        probs_sum = np.sum(probs)
+        
+        # Avoid division by zero
+        if probs_sum == 0:
+            logger.warning("Probability sum is zero, falling back to uniform")
+            probs = np.ones_like(probs) / len(probs)
+        else:
+            probs = probs / probs_sum
         
         # Top-k filtering
         if params.top_k > 0 and params.top_k < len(probs):
@@ -205,7 +252,7 @@ class OnnxRuntime(BaseRuntime):
             probs = probs_filtered / np.sum(probs_filtered)
         
         # Top-p (nucleus) filtering
-        if params.top_p < 1.0:
+        if params.top_p < 1.0 and params.top_p > 0:
             sorted_idx = np.argsort(probs)[::-1]
             cumsum = np.cumsum(probs[sorted_idx])
             cutoff = np.searchsorted(cumsum, params.top_p)
@@ -221,6 +268,10 @@ class OnnxRuntime(BaseRuntime):
         if not self.is_loaded:
             raise RuntimeError("Model not loaded. Call runtime.load() first")
         
+        if not prompt:
+            logger.warning("Received empty prompt")
+            return "" if not params.stream else iter([])
+
         if params.stream:
             return self._generate_stream(prompt, params)
         else:
@@ -318,10 +369,12 @@ class OnnxRuntime(BaseRuntime):
                 past_kv = self._extract_kv_cache(outputs)
     
     def unload(self):
+        import gc
         if hasattr(self, 'session') and self.session:
             self.session = None
         if hasattr(self, 'model') and self.model:
             self.model = None
         if hasattr(self, 'tokenizer') and self.tokenizer:
             self.tokenizer = None
+        gc.collect()
         logger.info("ONNX model unloaded")

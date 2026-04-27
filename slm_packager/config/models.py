@@ -34,6 +34,7 @@ class RuntimeConfig(BaseModel):
     threads: int = Field(default=4, ge=1)
     gpu_layers: int = Field(default=0, ge=0)
     context_size: int = Field(default=2048, ge=512)
+    trust_remote_code: bool = Field(default=False, description="Allow running custom code from model repos (security risk)")
 
 class GenerationParams(BaseModel):
     temperature: float = Field(default=0.7, ge=0.0, le=2.0)
@@ -42,6 +43,7 @@ class GenerationParams(BaseModel):
     max_tokens: int = Field(default=512, ge=1)
     stop: List[str] = Field(default_factory=list)
     stream: bool = False
+    repetition_penalty: float = Field(default=1.1, ge=1.0)
 
 class SLMConfig(BaseModel):
     model: ModelConfig

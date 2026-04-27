@@ -1,9 +1,10 @@
 """Integration tests for FastAPI server."""
 import pytest
 from fastapi.testclient import TestClient
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch, MagicMock, AsyncMock, PropertyMock
 
 from slm_packager.api.server import app
+from slm_packager.api.manager import ModelBusyError
 
 
 @pytest.mark.integration
@@ -12,112 +13,105 @@ class TestAPIServer:
     
     def test_health_endpoint(self):
         """Test /health endpoint."""
-        client = TestClient(app)
-        response = client.get("/health")
-        
-        assert response.status_code == 200
-        assert response.json() == {"status": "ok"}
+        with TestClient(app) as client:
+            response = client.get("/health")
+            
+            assert response.status_code == 200
+            assert response.json() == {"status": "ok"}
     
     def test_info_endpoint_no_model(self):
         """Test /info endpoint when no model is loaded."""
-        client = TestClient(app)
-        response = client.get("/info")
-        
-        assert response.status_code == 200
-        data = response.json()
-        assert "status" in data or "model" in data
+        with TestClient(app) as client:
+            response = client.get("/info")
+            
+            assert response.status_code == 200
+            data = response.json()
+            assert "status" in data
     
-    @patch('slm_packager.api.server.ConfigLoader')
-    @patch('slm_packager.api.server.get_runtime')
+    @patch('slm_packager.api.manager.ConfigLoader')
+    @patch('slm_packager.api.manager.get_runtime')
     def test_load_endpoint(self, mock_get_runtime, mock_loader, sample_config_yaml, mock_runtime):
         """Test POST /load endpoint."""
-        client = TestClient(app)
-        
-        mock_loader.load.return_value = MagicMock()
-        mock_get_runtime.return_value = mock_runtime
-        
-        response = client.post("/load", json={"config_path": str(sample_config_yaml)})
-        
-        assert response.status_code == 200
-        assert response.json()["status"] == "success"
-        mock_runtime.load.assert_called_once()
+        with TestClient(app) as client:
+            mock_loader.load.return_value = MagicMock()
+            mock_get_runtime.return_value = mock_runtime
+            
+            response = client.post("/load", json={"config_path": str(sample_config_yaml)})
+            
+            assert response.status_code == 200
+            assert response.json()["status"] == "success"
+            mock_runtime.load.assert_called_once()
     
-    @patch('slm_packager.api.server.runtime', new_callable=MagicMock)
-    @patch('slm_packager.api.server.config', new_callable=MagicMock)
-    def test_generate_endpoint_no_model(self, mock_config, mock_runtime_global):
+    def test_generate_endpoint_no_model(self):
         """Test POST /generate when no model is loaded."""
-        # Simulate no model loaded
-        mock_runtime_global.is_loaded = False
+        # Ensure fresh state (no model loaded)
+        # Note: TestClient(app) makes a fresh lifespan context if not reused across tests?
+        # Actually starlette/fastapi TestClient re-runs lifespan for each client context usually.
         
-        client = TestClient(app)
-        response = client.post("/generate", json={"prompt": "Hello"})
-        
-        assert response.status_code == 400
-        assert "not loaded" in response.json()["detail"].lower()
+        with TestClient(app) as client:
+            response = client.post("/generate", json={"prompt": "Hello"})
+            
+            assert response.status_code == 400
+            assert "not loaded" in response.json()["detail"].lower()
     
-    @patch('slm_packager.api.server.get_runtime')
-    @patch('slm_packager.api.server.ConfigLoader')
+    @patch('slm_packager.api.manager.get_runtime')
+    @patch('slm_packager.api.manager.ConfigLoader')
     def test_generate_endpoint_success(self, mock_loader, mock_get_runtime, sample_gguf_config):
         """Test POST /generate with successful generation."""
-        client = TestClient(app)
         
-        # Load a model first
+        # Setup mocks
         mock_runtime = MagicMock()
         mock_runtime.is_loaded = True
         mock_runtime.generate.return_value = "Generated response"
         mock_get_runtime.return_value = mock_runtime
         mock_loader.load.return_value = sample_gguf_config
         
-        # Load model
-        client.post("/load", json={"config_path": "/fake/path.yaml"})
-        
-        # Patch the global runtime variable
-        with patch('slm_packager.api.server.runtime', mock_runtime):
-            with patch('slm_packager.api.server.config', sample_gguf_config):
-                response = client.post("/generate", json={
-                    "prompt": "Test prompt",
-                    "params": None
-                })
-        
-                assert response.status_code == 200
-                assert "text" in response.json()
-                assert response.json()["text"] == "Generated response"
+        with TestClient(app) as client:
+            # Load model first
+            client.post("/load", json={"config_path": "/fake/path.yaml"})
+            
+            # Generate
+            response = client.post("/generate", json={
+                "prompt": "Test prompt",
+                "params": None
+            })
+            
+            assert response.status_code == 200
+            assert "text" in response.json()
+            assert response.json()["text"] == "Generated response"
     
     def test_generate_request_validation(self):
         """Test that generate request validates input."""
-        client = TestClient(app)
-        
-        # Missing prompt
-        response = client.post("/generate", json={})
-        
-        assert response.status_code == 422  # Validation error
+        with TestClient(app) as client:
+            # Missing prompt
+            response = client.post("/generate", json={})
+            
+            assert response.status_code == 422  # Validation error
     
-    @patch('slm_packager.api.server.get_runtime')
-    @patch('slm_packager.api.server.ConfigLoader')
+    @patch('slm_packager.api.manager.get_runtime')
+    @patch('slm_packager.api.manager.ConfigLoader')
     def test_info_endpoint_with_loaded_model(self, mock_loader, mock_get_runtime, sample_gguf_config):
         """Test /info endpoint after loading a model."""
-        client = TestClient(app)
         
         mock_runtime = MagicMock()
         mock_get_runtime.return_value = mock_runtime
         mock_loader.load.return_value = sample_gguf_config
         
-        # Load model
-        client.post("/load", json={"config_path": "/fake/path.yaml"})
-        
-        # Check info
-        with patch('slm_packager.api.server.config', sample_gguf_config):
+        with TestClient(app) as client:
+            # Load model
+            client.post("/load", json={"config_path": "/fake/path.yaml"})
+            
+            # Check info
             response = client.get("/info")
             
             assert response.status_code == 200
             data = response.json()
             assert "model" in data
     
-    @patch('slm_packager.api.server.get_runtime')
-    @patch('slm_packager.api.server.ConfigLoader')
+    @patch('slm_packager.api.manager.get_runtime')
+    @patch('slm_packager.api.manager.ConfigLoader')
     def test_generate_streaming(self, mock_loader, mock_get_runtime, sample_gguf_config):
         """Test POST /generate with streaming enabled."""
-        client = TestClient(app)
         
         # Setup streaming mock
         mock_runtime = MagicMock()
@@ -136,39 +130,52 @@ class TestAPIServer:
         streaming_config.params.stream = True
         mock_loader.load.return_value = streaming_config
         
-        # Load model
-        client.post("/load", json={"config_path": "/fake/path.yaml"})
-        
-        # Generate with streaming
-        with patch('slm_packager.api.server.runtime', mock_runtime):
-            with patch('slm_packager.api.server.config', streaming_config):
-                response = client.post("/generate", json={
-                    "prompt": "Test prompt"
-                })
-                
-                assert response.status_code == 200
-                assert response.headers["content-type"] == "text/event-stream; charset=utf-8"
+        with TestClient(app) as client:
+            # Load model
+            client.post("/load", json={"config_path": "/fake/path.yaml"})
+            
+            # Generate with streaming
+            response = client.post("/generate", json={
+                "prompt": "Test prompt"
+            })
+            
+            assert response.status_code == 200
+            assert "text/event-stream" in response.headers["content-type"]
     
-    @patch('slm_packager.api.server.ConfigLoader')
+    @patch('slm_packager.api.manager.ConfigLoader')
     def test_load_endpoint_file_not_found(self, mock_loader):
         """Test /load endpoint with non-existent file."""
-        client = TestClient(app)
         
         mock_loader.load.side_effect = FileNotFoundError("Config not found")
         
-        response = client.post("/load", json={"config_path": "/nonexistent.yaml"})
-        
-        assert response.status_code == 404
-        assert "not found" in response.json()["detail"].lower()
+        with TestClient(app) as client:
+            response = client.post("/load", json={"config_path": "/nonexistent.yaml"})
+            
+            assert response.status_code == 404
+            assert "not found" in response.json()["detail"].lower()
     
-    @patch('slm_packager.api.server.ConfigLoader')
+    @patch('slm_packager.api.manager.ConfigLoader')
     def test_load_endpoint_invalid_config(self, mock_loader):
         """Test /load endpoint with invalid configuration."""
-        client = TestClient(app)
         
         mock_loader.load.side_effect = ValueError("Invalid config")
         
-        response = client.post("/load", json={"config_path": "/invalid.yaml"})
-        
-        assert response.status_code == 400
-        assert "invalid" in response.json()["detail"].lower()
+        with TestClient(app) as client:
+            response = client.post("/load", json={"config_path": "/invalid.yaml"})
+            
+            assert response.status_code == 400
+            assert "invalid" in response.json()["detail"].lower()
+
+    def test_generate_endpoint_returns_409_when_manager_busy(self):
+        """Test POST /generate returns conflict while a model switch is in progress."""
+        with patch('slm_packager.api.server.ModelManager.is_loaded', new_callable=PropertyMock, return_value=True):
+            with patch(
+                'slm_packager.api.server.ModelManager.generate',
+                new_callable=AsyncMock,
+                side_effect=ModelBusyError("Model is busy loading or unloading. Try again shortly.")
+            ):
+                with TestClient(app) as client:
+                    response = client.post("/generate", json={"prompt": "Hello"})
+
+                    assert response.status_code == 409
+                    assert "busy" in response.json()["detail"].lower()

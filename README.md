@@ -4,10 +4,11 @@
 
 SLM Packager is an open-source toolkit for running, packaging, and evaluating Small Language Models (1B-7B parameters) across different formats and runtimes. Think of it as **Terraform for SLMs** — making model deployment simple, reproducible, and developer-friendly.
 
-[![Tests](https://img.shields.io/badge/tests-73%20passing-brightgreen)]()
+[![PyPI](https://img.shields.io/pypi/v/slm-packager?color=blue&label=pypi%20package)](https://pypi.org/project/slm-packager/)
+[![Tests](https://img.shields.io/badge/tests-117%20passing-brightgreen)]()
 [![Coverage](https://img.shields.io/badge/coverage-52%25-yellow)]()
-[![Python](https://img.shields.io/badge/python-3.8%2B-blue)]()
-[![License](https://img.shields.io/badge/license-MIT-blue)]()
+[![Python](https://img.shields.io/badge/python-3.9%2B-blue)]()
+[![License](https://img.shields.io/badge/license-Apache%202.0-blue)](LICENSE)
 
 ## ✨ Features
 
@@ -79,11 +80,13 @@ slm pull <model> --list-variants  # Show quantization options
 slm run <model> --prompt "Your prompt"
 slm run <config.yaml> --prompt "Your prompt"
 
-# Quantization (auto-downloads tool)
+# Quantization
 slm quantize input.gguf output.gguf --type q4_k_m
+slm quantize input.gguf --type q4_k_m  # Auto-generates output filename
 
 # Benchmarking
 slm benchmark <model>
+slm benchmark <config.yaml>
 
 # API server
 slm serve --port 8000
@@ -102,7 +105,7 @@ SLM Packager supports GPU acceleration across different hardware platforms.
 
 ```bash
 # Create GPU-accelerated config
-slm init --name gpt2 --path gpt2 --format transformers --runtime transformers --device mps -o gpt2-gpu.yaml
+slm init --name gpt2 --path gpt2 --format pytorch --runtime transformers --device mps -o gpt2-gpu.yaml
 
 # Run on GPU
 slm run gpt2-gpu.yaml --prompt "Explain quantum computing"
@@ -222,11 +225,14 @@ Choose the right runtime for your use case:
 # 2. Quantize it
 slm quantize my-model.gguf my-model-q4.gguf --type q4_k_m
 
-# 3. Test it
-slm run my-model-q4.gguf --prompt "Test prompt"
+# 3. Create a config for the quantized model
+slm init --name my-model-q4 --path my-model-q4.gguf --format gguf --runtime llama_cpp -o my-model-q4.yaml
 
-# 4. Benchmark it
-slm benchmark my-model-q4.gguf
+# 4. Test it
+slm run my-model-q4.yaml --prompt "Test prompt"
+
+# 5. Benchmark it
+slm benchmark my-model-q4.yaml
 ```
 
 ### Researcher: Compare Runtimes
@@ -248,7 +254,7 @@ slm benchmark tinyllama
 ```bash
 # Zero setup - just run!
 slm pull gpt2
-slm init --name gpt2 --path gpt2 --device mps -o gpt2-gpu.yaml
+slm init --name gpt2 --path gpt2 --format pytorch --runtime transformers --device mps -o gpt2-gpu.yaml
 slm run gpt2-gpu.yaml --prompt "Hello!"
 
 # 2.14x faster than CPU! ⚡
@@ -313,9 +319,6 @@ Start a FastAPI server for HTTP access:
 ```bash
 # Start server
 slm serve --port 8000
-
-# Or with custom config
-slm serve --config my-model.yaml --port 8000
 ```
 
 ### API Usage
@@ -334,15 +337,17 @@ curl -X POST http://localhost:8000/generate \
   -H "Content-Type: application/json" \
   -d '{
     "prompt": "The future of AI is",
-    "max_tokens": 100,
-    "temperature": 0.8
+    "params": {
+      "max_tokens": 100,
+      "temperature": 0.8
+    }
   }'
 
 # Streaming
 curl -X POST http://localhost:8000/generate \
   -H "Content-Type: application/json" \
   -H "Accept: text/event-stream" \
-  -d '{"prompt": "Hello", "stream": true}'
+  -d '{"prompt": "Hello", "params": {"stream": true}}'
 ```
 
 ---
@@ -351,8 +356,9 @@ curl -X POST http://localhost:8000/generate \
 
 Comprehensive guides for each component:
 
-- [Quick Start Guide](docs/V01_QUICKSTART.md) - Complete walkthrough
+- [Quick Start Guide](docs/QUICKSTART.md) - Complete walkthrough
 - [Model Formats Guide](docs/MODEL_FORMATS.md) - GGUF vs PyTorch vs ONNX
+- [GPU Acceleration Guide](docs/GPU_ACCELERATION.md) - MPS, CUDA, and Metal setup
 - [GGUF Setup Guide](docs/GGUF_GUIDE.md) - Using llama.cpp with Metal/CUDA
 - [ONNX Guide](docs/ONNX_GUIDE.md) - Export, run, and optimize ONNX models
 - [Init Guide](docs/INIT_GUIDE.md) - Creating configs manually
@@ -449,6 +455,33 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed development guidelines.
 
 ---
 
+---
+
+## ❓ Troubleshooting & Known Limitations
+
+### Common Issues
+
+**1. "Model not found" or Download Errors**
+- **Cause**: Network issues or incorrect model name.
+- **Fix**: Check your internet. Ensure `huggingface_hub` is installed. Try `slm pull <model>` again.
+- **Tip**: Install `hf_transfer` for 2x faster downloads: `pip install hf_transfer`.
+
+**2. "RuntimeError: MPS backend out of memory" (Mac)**
+- **Cause**: The model is too large for your Unified Memory.
+- **Fix**: Try a smaller model (e.g., `gpt2` or `tinyllama`). Close other apps.
+- **Workaround**: Use `runtime: cpu` in your config to force CPU usage (slower but more stable).
+
+**3. "ONNX model not found"**
+- **Cause**: ONNX models require a specific `.onnx` file structure.
+- **Fix**: You must export models first. Use `optimum-cli` as described in the [ONNX Guide](docs/ONNX_GUIDE.md).
+
+### Known Limitations
+- **Windows**: Fully supported for CPU/CUDA, but file path lengths can be an issue. Enable Long Paths if you encounter errors.
+- **Quantization**: Currently relies on `llama.cpp` tools being available in path for some operations.
+- **vLLM**: Not yet integrated (planned for v1.0).
+
+---
+
 ## 🤝 Contributing
 
 We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for:
@@ -461,7 +494,7 @@ We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for:
 
 ## 📝 License
 
-MIT License - see [LICENSE](LICENSE) for details
+Apache License 2.0 - see [LICENSE](LICENSE) for details
 
 ---
 

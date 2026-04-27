@@ -1,6 +1,7 @@
 from typing import Iterator, Union
 import sys
 
+IMPORT_ERROR = ""
 try:
     from transformers import AutoModelForCausalLM, AutoTokenizer, TextIteratorStreamer
     import torch
@@ -41,9 +42,10 @@ class TransformersRuntime(BaseRuntime):
             device_config = self._configure_device()
             
             print(f"📥 Loading tokenizer from '{self.config.model.path}'...")
+            trust_remote = self.config.runtime.trust_remote_code
             self.tokenizer = AutoTokenizer.from_pretrained(
                 self.config.model.path,
-                trust_remote_code=True
+                trust_remote_code=trust_remote
             )
             
             print(f"📥 Loading model from '{self.config.model.path}'...")
@@ -54,7 +56,7 @@ class TransformersRuntime(BaseRuntime):
                 self.config.model.path,
                 device_map=device_config['device_map'],
                 torch_dtype=device_config['dtype'],
-                trust_remote_code=True
+                trust_remote_code=trust_remote
             )
             
             # Move to MPS if needed (device_map doesn't support MPS yet)
@@ -177,6 +179,7 @@ class TransformersRuntime(BaseRuntime):
                     temperature=params.temperature,
                     top_p=params.top_p,
                     top_k=params.top_k,
+                    repetition_penalty=params.repetition_penalty,
                     do_sample=True
                 )
                 thread = Thread(target=self.model.generate, kwargs=generation_kwargs)
@@ -184,15 +187,18 @@ class TransformersRuntime(BaseRuntime):
                 
                 return self._stream_generator(streamer)
             else:
+                input_length = inputs["input_ids"].shape[1]
                 outputs = self.model.generate(
                     **inputs,
                     max_new_tokens=params.max_tokens,
                     temperature=params.temperature,
                     top_p=params.top_p,
                     top_k=params.top_k,
+                    repetition_penalty=params.repetition_penalty,
                     do_sample=True
                 )
-                return self.tokenizer.decode(outputs[0], skip_special_tokens=True)[len(prompt):]
+                # Strip prompt tokens, not prompt characters, to avoid truncation bugs
+                return self.tokenizer.decode(outputs[0][input_length:], skip_special_tokens=True)
         
         except torch.cuda.OutOfMemoryError as e:
             raise RuntimeError(
@@ -215,14 +221,15 @@ class TransformersRuntime(BaseRuntime):
             yield new_text
 
     def unload(self):
+        if hasattr(self, 'tokenizer') and self.tokenizer:
+            self.tokenizer = None
         if self.model:
             self.model = None
-        if self.tokenizer:
-            self.tokenizer = None
-        
-        # Clear GPU cache
-        if torch.cuda.is_available():
-            torch.cuda.empty_cache()
-        if torch.backends.mps.is_available():
-            torch.mps.empty_cache()
+
+        # Clear GPU cache only if torch was successfully imported
+        if TRANSFORMERS_AVAILABLE:
+            if torch.cuda.is_available():
+                torch.cuda.empty_cache()
+            if torch.backends.mps.is_available():
+                torch.mps.empty_cache()
 

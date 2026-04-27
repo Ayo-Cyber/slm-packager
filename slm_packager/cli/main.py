@@ -7,9 +7,10 @@ from ..config.loader import ConfigLoader
 from ..runtime import get_runtime
 from ..api import start_server
 from ..quantization import Quantizer
-from ..evaluation import Benchmarker
 from ..registry.downloader import ModelDownloader
 from ..registry import ModelRegistry
+
+Benchmarker = None
 
 @click.group()
 def cli():
@@ -21,13 +22,14 @@ def cli():
 @click.option("--path", prompt="Model Path", help="Path to the model file")
 @click.option("--format", type=click.Choice(["gguf", "onnx", "pytorch"]), prompt="Model Format", help="Model format")
 @click.option("--runtime", type=click.Choice(["llama_cpp", "onnx", "transformers"]), prompt="Runtime", help="Runtime to use")
-@click.option("--output", default="slm.yaml", help="Output config file")
-def init(name, path, format, runtime, output):
+@click.option("--device", type=click.Choice(["cpu", "cuda", "mps"]), default="cpu", show_default=True, help="Device to target")
+@click.option("-o", "--output", default="slm.yaml", help="Output config file")
+def init(name, path, format, runtime, device, output):
     """Initialize a new SLM config"""
     try:
         config = SLMConfig(
             model=ModelConfig(name=name, path=path, format=format),
-            runtime=RuntimeConfig(type=runtime)
+            runtime=RuntimeConfig(type=runtime, device=device)
         )
         ConfigLoader.save(config, output)
         click.echo(f"✅ Config saved to {output}")
@@ -42,7 +44,8 @@ def init(name, path, format, runtime, output):
 @click.argument("model_or_config")
 @click.option("--prompt", "-p", help="Prompt to generate from")
 @click.option("--stream/--no-stream", default=True, help="Stream output")
-def run(model_or_config, prompt, stream):
+@click.option("--raw", is_flag=True, help="Disable auto-chat formatting")
+def run(model_or_config, prompt, stream, raw):
     """Run a model from a config file or by name"""
     try:
         # Check if input is a model name or config path
@@ -84,6 +87,24 @@ def run(model_or_config, prompt, stream):
         if not prompt:
             prompt = click.prompt("Enter prompt")
             
+        # Auto-apply chat template if the tokenizer supports it
+        if not raw:
+            try:
+                from transformers import AutoTokenizer
+                tokenizer = AutoTokenizer.from_pretrained(
+                    config.model.path,
+                    trust_remote_code=config.runtime.trust_remote_code
+                )
+                if hasattr(tokenizer, 'chat_template') and tokenizer.chat_template:
+                    messages = [{"role": "user", "content": prompt}]
+                    prompt = tokenizer.apply_chat_template(
+                        messages, tokenize=False, add_generation_prompt=True
+                    )
+                    click.echo("ℹ️  Auto-formatting prompt with chat template (disable with --raw)")
+            except Exception:
+                # If tokenizer can't be loaded here (e.g. GGUF models), skip chat formatting
+                pass
+            
         click.echo("-" * 20)
         
         # Generate
@@ -98,24 +119,12 @@ def run(model_or_config, prompt, stream):
         # Cleanup
         runtime.unload()
         
-    except FileNotFoundError as e:
-        click.echo(f"\n{str(e)}", err=True)
-        sys.exit(1)
-    except ImportError as e:
-        click.echo(f"\n{str(e)}", err=True)
-        sys.exit(1)
-    except ValueError as e:
-        click.echo(f"\n{str(e)}", err=True)
-        sys.exit(1)
-    except RuntimeError as e:
-        click.echo(f"\n{str(e)}", err=True)
-        sys.exit(1)
-    except MemoryError as e:
-        click.echo(f"\n{str(e)}", err=True)
-        sys.exit(1)
     except KeyboardInterrupt:
-        click.echo(f"\n\n⚠️  Interrupted by user (Ctrl+C)", err=True)
+        click.echo("\n\n⚠️  Interrupted by user (Ctrl+C)", err=True)
         sys.exit(130)
+    except (FileNotFoundError, ImportError, ValueError, RuntimeError, MemoryError) as e:
+        click.echo(f"\n{str(e)}", err=True)
+        sys.exit(1)
     except Exception as e:
         click.echo(f"\n❌ Unexpected error running model:", err=True)
         click.echo(f"   {type(e).__name__}: {str(e)}", err=True)
@@ -125,11 +134,50 @@ def run(model_or_config, prompt, stream):
         click.echo(f"   - Python version: {sys.version}", err=True)
         sys.exit(1)
 
+def _resolve_config_path(model_or_config: str) -> Path:
+    """Resolve either a direct config path or an installed model name."""
+    input_path = Path(model_or_config)
+    if input_path.exists():
+        if input_path.suffix not in {".yaml", ".yml", ".json"}:
+            raise ValueError(
+                f"'{model_or_config}' is not a config file.\n"
+                "💡 Benchmark expects a config path or installed model name.\n"
+                "   - Use an installed model: slm benchmark tinyllama\n"
+                "   - Or create a config: slm init --output my-model.yaml"
+            )
+        return input_path
+
+    config_dir = Path.home() / ".slm" / "configs"
+    potential_configs = [
+        config_dir / f"{model_or_config}.yaml",
+        config_dir / f"{model_or_config}.yml",
+        config_dir / f"{model_or_config}.json",
+    ]
+    for potential_config in potential_configs:
+        if potential_config.exists():
+            return potential_config
+
+    raise FileNotFoundError(
+        f"Model or config not found: '{model_or_config}'\n"
+        f"Tried:\n"
+        f"   - Direct path: {input_path}\n"
+        + "\n".join(f"   - Model config: {path}" for path in potential_configs)
+        + "\n"
+        "💡 Benchmark an installed model with: slm benchmark gpt2"
+    )
+
+
 @cli.command()
-@click.argument("config_path", type=click.Path(exists=True))
-def benchmark(config_path):
+@click.argument("model_or_config")
+def benchmark(model_or_config):
     """Benchmark a model"""
     try:
+        global Benchmarker
+        if Benchmarker is None:
+            from ..evaluation import Benchmarker as LoadedBenchmarker
+            Benchmarker = LoadedBenchmarker
+
+        config_path = _resolve_config_path(model_or_config)
         config = ConfigLoader.load(config_path)
         
         click.echo(f"Benchmarking {config.model.name}...")
@@ -156,26 +204,25 @@ def benchmark(config_path):
         sys.exit(1)
 
 @cli.command()
-@click.argument("model_name")
+@click.argument("input_path")
+@click.argument("output_path", required=False)
 @click.option("--type", default="q4_k_m", help="Quantization type (q4_k_m, int8)")
-def quantize(model_name, type):
+def quantize(input_path, output_path, type):
     """Quantize a model"""
     try:
-        # This is a simplified CLI that assumes model_name is a path for now
-        # In a real app, we would look up the model in a registry
-        model_path = model_name
-        
+        model_path = input_path
+
         if not Path(model_path).exists():
             click.echo(f"❌ Model file not found: '{model_path}'", err=True)
             click.echo(f"💡 Provide the full path to the model file", err=True)
             sys.exit(1)
         
         if model_path.endswith(".gguf"):
-            output_path = model_path.replace(".gguf", f"-{type}.gguf")
+            output_path = output_path or model_path.replace(".gguf", f"-{type}.gguf")
             click.echo(f"Quantizing GGUF model to {type}...")
             Quantizer.quantize_gguf(model_path, output_path, type)
         elif model_path.endswith(".onnx"):
-            output_path = model_path.replace(".onnx", f"-{type}.onnx")
+            output_path = output_path or model_path.replace(".onnx", f"-{type}.onnx")
             click.echo(f"Quantizing ONNX model to {type}...")
             Quantizer.quantize_onnx(model_path, output_path, type)
         else:
@@ -189,7 +236,7 @@ def quantize(model_name, type):
         sys.exit(1)
 
 @cli.command()
-@click.option("--host", default="0.0.0.0", help="Host to bind to")
+@click.option("--host", default="127.0.0.1", help="Host to bind to")
 @click.option("--port", default=8000, help="Port to bind to")
 def serve(host, port):
     """Start the API server"""
@@ -251,6 +298,39 @@ def pull(model_name, quant, list_variants):
         click.echo(f"   {str(e)}", err=True)
         sys.exit(1)
 
+@cli.command()
+@click.argument("model_name")
+@click.option("--yes", "-y", is_flag=True, help="Skip confirmation prompt")
+def rm(model_name, yes):
+    """Remove an installed model and its config"""
+    try:
+        downloader = ModelDownloader()
+
+        # Check if model exists
+        config_path = downloader.configs_dir / f"{model_name}.yaml"
+        if not config_path.exists():
+            click.echo(f"❌ Model '{model_name}' is not installed", err=True)
+            click.echo("💡 See installed models with: slm list --installed", err=True)
+            sys.exit(1)
+
+        # Confirm deletion
+        if not yes:
+            if not click.confirm(f"Delete model '{model_name}' and its files?"):
+                click.echo("Cancelled.")
+                sys.exit(0)
+
+        deleted = downloader.delete(model_name)
+        if deleted:
+            click.echo(f"✅ Model '{model_name}' removed")
+        else:
+            click.echo(f"❌ Failed to remove '{model_name}'", err=True)
+            sys.exit(1)
+
+    except Exception as e:
+        click.echo(f"\n❌ Error removing model:", err=True)
+        click.echo(f"   {str(e)}", err=True)
+        sys.exit(1)
+
 @cli.command("list")
 @click.option("--installed", is_flag=True, help="Show only installed models")
 def list_models(installed):
@@ -296,4 +376,3 @@ def list_models(installed):
 
 if __name__ == "__main__":
     cli()
-

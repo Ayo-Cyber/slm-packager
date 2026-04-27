@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "slm-packager"
-version = "0.2.0"
+version = "0.2.1"
 description = "A unified runtime and developer layer for Small Language Models"
 readme = "README.md"
 requires-python = ">=3.9"
@@ -63,6 +63,9 @@ dev = [
 ]
 onnx = [
     "onnxruntime-genai>=0.4.0"  # For proper ONNX generation with KV-cache
+]
+speed = [
+    "hf_transfer>=0.1.4"
 ]
 
 [tool.setuptools.packages.find]

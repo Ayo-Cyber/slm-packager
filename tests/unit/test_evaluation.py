@@ -79,3 +79,26 @@ class TestBenchmarker:
             # Verify custom prompt was used
             call_args = mock_runtime.generate.call_args
             assert call_args[0][0] == custom_prompt
+
+    def test_memory_fallback_without_psutil_or_resource(self, sample_gguf_config, mock_runtime):
+        """If neither psutil nor resource is available, report 0 MB instead of crashing."""
+        with patch('slm_packager.evaluation.benchmark.get_runtime', return_value=mock_runtime):
+            benchmarker = Benchmarker(sample_gguf_config)
+
+            with patch('slm_packager.evaluation.benchmark.psutil', None):
+                with patch('slm_packager.evaluation.benchmark.resource', None):
+                    assert benchmarker._get_memory_mb() == 0.0
+
+    def test_run_restores_stream_and_unloads_on_failure(self, sample_gguf_config, mock_runtime):
+        """Benchmark cleanup should restore config state and unload even when generation fails."""
+        sample_gguf_config.params.stream = True
+        mock_runtime.generate.side_effect = RuntimeError("boom")
+
+        with patch('slm_packager.evaluation.benchmark.get_runtime', return_value=mock_runtime):
+            benchmarker = Benchmarker(sample_gguf_config)
+
+            with pytest.raises(RuntimeError, match="boom"):
+                benchmarker.run()
+
+            assert sample_gguf_config.params.stream is True
+            mock_runtime.unload.assert_called_once()

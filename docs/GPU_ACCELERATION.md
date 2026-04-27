@@ -53,7 +53,7 @@ TinyLlama (1.1B parameters)
 slm init \
   --name gpt2 \
   --path gpt2 \
-  --format transformers \
+  --format pytorch \
   --runtime transformers \
   --device mps \
   --output gpt2-gpu.yaml
