@@ -1,0 +1,21 @@
+model:
+  name: gpt2-mps
+  path: gpt2
+  description: null
+  format: pytorch
+runtime:
+  type: transformers
+  device: mps
+  threads: 4
+  gpu_layers: 0
+  context_size: 2048
+  trust_remote_code: false
+params:
+  temperature: 0.7
+  top_p: 0.9
+  top_k: 40
+  max_tokens: 512
+  stop: []
+  stream: false
+  repetition_penalty: 1.1
+quantization: null
