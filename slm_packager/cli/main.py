@@ -264,14 +264,31 @@ def serve(host, port):
 
 @cli.command()
 @click.argument("model_name")
+@click.argument("filename", required=False, default=None)
 @click.option("--quant", "--quantization", default=None, help="Quantization type (q4_k_m, q8_0, etc.)")
 @click.option("--list-variants", is_flag=True, help="List available variants for this model")
-def pull(model_name, quant, list_variants):
-    """Pull a model from the registry"""
+@click.option("--name", default=None, help="Local alias for the model (used with HF repo pull)")
+def pull(model_name, filename, quant, list_variants, name):
+    """Pull a model from the registry or directly from HuggingFace.
+
+    Registry pull:   slm pull tinyllama
+    Direct HF pull:  slm pull TheBloke/Mistral-7B-GGUF mistral-7b-v0.1.Q4_K_M.gguf
+    """
     try:
         downloader = ModelDownloader()
+
+        # Direct HF repo pull — model_name contains a slash (e.g. "TheBloke/Mistral-7B-GGUF")
+        if "/" in model_name:
+            if not filename:
+                click.echo("❌ A filename is required when pulling directly from a HuggingFace repo.", err=True)
+                click.echo("💡 Usage: slm pull <repo-id> <filename>", err=True)
+                click.echo("   Example: slm pull TheBloke/Mistral-7B-GGUF mistral-7b-v0.1.Q4_K_M.gguf", err=True)
+                sys.exit(1)
+            downloader.pull_from_repo(model_name, filename, name=name)
+            return
+
         registry = ModelRegistry()
-        
+
         # List variants if requested
         if list_variants:
             model = registry.get_model(model_name)
@@ -279,17 +296,17 @@ def pull(model_name, quant, list_variants):
                 click.echo(f"❌ Model '{model_name}' not found", err=True)
                 click.echo(f"💡 See available models with: slm list", err=True)
                 sys.exit(1)
-            
+
             click.echo(f"\nAvailable variants for {model.name}:")
             for variant_name, variant in model.variants.items():
                 recommended = " ⭐" if variant.recommended else ""
                 click.echo(f"  • {variant_name} ({variant.size}){recommended}")
                 click.echo(f"    Speed: {variant.speed}, Quality: {variant.quality}")
             sys.exit(0)
-        
-        # Pull model
+
+        # Registry pull
         downloader.pull(model_name, quant)
-        
+
     except ValueError as e:
         click.echo(f"\n{str(e)}", err=True)
         sys.exit(1)

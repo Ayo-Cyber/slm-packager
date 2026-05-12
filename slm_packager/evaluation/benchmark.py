@@ -23,10 +23,18 @@ class Benchmarker:
     def _count_tokens(self, text: str) -> int:
         """Count tokens using the runtime's tokenizer if available, otherwise estimate."""
         runtime = self.runtime
+        # transformers runtime
         if hasattr(runtime, 'tokenizer') and runtime.tokenizer is not None:
             return len(runtime.tokenizer.encode(text))
-        # Fallback: estimate from characters (flagged as approximate in metrics)
-        return len(text) // 4
+        # llama_cpp runtime — model exposes tokenize()
+        if hasattr(runtime, 'model') and runtime.model is not None:
+            if hasattr(runtime.model, 'tokenize'):
+                try:
+                    return len(runtime.model.tokenize(text.encode()))
+                except Exception:
+                    pass
+        # Fallback: estimate, minimum 1 to avoid zero TPS
+        return max(len(text) // 4, 1)
 
     def run(self, prompt: str = "The quick brown fox jumps over the lazy dog.") -> Dict[str, Any]:
         """

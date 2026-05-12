@@ -188,6 +188,75 @@ class ModelDownloader:
                 "💡 Check internet connection, disk space, or try a different model."
             ) from e
 
+    def pull_from_repo(self, repo_id: str, filename: str, name: Optional[str] = None) -> Path:
+        """
+        Pull any GGUF/ONNX file directly from a HuggingFace repo without a registry entry.
+
+        Args:
+            repo_id:  HuggingFace repo ID, e.g. "TheBloke/Mistral-7B-GGUF"
+            filename: File to download, e.g. "mistral-7b-v0.1.Q4_K_M.gguf"
+            name:     Local alias for the model. Defaults to the repo name (part after "/").
+        """
+        if not HF_AVAILABLE:
+            raise ImportError(
+                "❌ Model downloading requires 'huggingface-hub'\n"
+                "💡 Install with: pip install huggingface-hub\n"
+                f"   Error details: {IMPORT_ERROR}"
+            )
+
+        # Derive a safe local name from the repo if not provided
+        local_name = name or repo_id.split("/")[-1].lower()
+
+        # Auto-detect format and runtime from file extension
+        ext = Path(filename).suffix.lower()
+        if ext == ".gguf":
+            fmt, runtime = "gguf", "llama_cpp"
+        elif ext == ".onnx":
+            fmt, runtime = "onnx", "onnx"
+        else:
+            fmt, runtime = "pytorch", "transformers"
+
+        logger.info(f"📥 Downloading {filename} from {repo_id}")
+
+        try:
+            model_path = hf_hub_download(
+                repo_id=repo_id,
+                filename=filename,
+                cache_dir=str(self.models_dir),
+                resume_download=True,
+            )
+        except (RepositoryNotFoundError, RevisionNotFoundError, LocalEntryNotFoundError) as e:
+            raise ValueError(
+                f"❌ File not found on HuggingFace: {repo_id}/{filename}\n"
+                "💡 Check the repo ID and filename are correct."
+            ) from e
+        except Exception as e:
+            logger.exception("Direct repo download failed")
+            raise RuntimeError(
+                f"❌ Failed to download {filename}: {str(e)}\n"
+                "💡 Check your internet connection and try again."
+            ) from e
+
+        # Build and save config
+        from ..config.models import SLMConfig, ModelConfig, RuntimeConfig
+        config = SLMConfig(
+            model=ModelConfig(
+                name=local_name,
+                path=model_path,
+                format=fmt,
+                description=f"{repo_id} — {filename}",
+            ),
+            runtime=RuntimeConfig(type=runtime),
+        )
+        config_path = self.configs_dir / f"{local_name}.yaml"
+        ConfigLoader.save(config, config_path)
+
+        logger.info(f"✅ Downloaded to: {model_path}")
+        logger.info(f"✅ Config saved: {config_path}")
+        print(f"\n🚀 Ready to use:\n   slm run {local_name} --prompt \"Hello!\"")
+
+        return Path(model_path)
+
     def _create_config(
         self, 
         model_name: str, 
