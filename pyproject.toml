@@ -42,7 +42,7 @@ dependencies = [
 
 [project.urls]
 Homepage = "https://github.com/Ayo-Cyber/slm-packager"
-Documentation = "https://github.com/Ayo-Cyber/slm-packager#readme"
+Documentation = "https://ayo-cyber.github.io/slm-packager"
 Repository = "https://github.com/Ayo-Cyber/slm-packager"
 Issues = "https://github.com/Ayo-Cyber/slm-packager/issues"
 Changelog = "https://github.com/Ayo-Cyber/slm-packager/blob/main/CHANGELOG.md"

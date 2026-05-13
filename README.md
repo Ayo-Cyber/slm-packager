@@ -1,523 +1,183 @@
 # SLM Packager
 
-**A Unified Runtime & Developer Layer for Small Language Models**
+**Run any small language model locally — one command.**
 
-SLM Packager is an open-source toolkit for running, packaging, and evaluating Small Language Models (1B-7B parameters) across different formats and runtimes. Think of it as **Terraform for SLMs** — making model deployment simple, reproducible, and developer-friendly.
+SLM Packager is an open-source toolkit for running, packaging, and benchmarking Small Language Models (1B–7B parameters) across GGUF, PyTorch, and ONNX formats. One unified CLI. Three runtimes. Zero friction.
 
-[![PyPI](https://img.shields.io/pypi/v/slm-packager?color=blue&label=pypi%20package)](https://pypi.org/project/slm-packager/)
+[![PyPI](https://img.shields.io/pypi/v/slm-packager?color=blue&label=pypi)](https://pypi.org/project/slm-packager/)
 [![CI](https://github.com/Ayo-Cyber/slm-packager/actions/workflows/test.yml/badge.svg)](https://github.com/Ayo-Cyber/slm-packager/actions/workflows/test.yml)
 [![Tests](https://img.shields.io/badge/tests-117%20passing-brightgreen)]()
-[![Coverage](https://img.shields.io/badge/coverage-52%25-yellow)]()
 [![Python](https://img.shields.io/badge/python-3.9%2B-blue)]()
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue)](LICENSE)
+[![Docs](https://img.shields.io/badge/docs-GitHub%20Pages-blue)](https://ayo-cyber.github.io/slm-packager)
 
-## ✨ Features
+---
 
-- 🎯 **Model Registry**: One-command downloads from HuggingFace with `slm pull`
-- 🔄 **Multi-Runtime Support**: llama.cpp (GGUF), Transformers (PyTorch), ONNX
-- ⚡ **GPU Acceleration**: MPS (Apple Silicon), CUDA (NVIDIA), Metal (llama.cpp)
-- ⚙️ **Auto-Quantization**: On-device model quantization with automatic tool setup
-- 📊 **Benchmarking**: Measure speed, memory, latency across runtimes
-- 🛠️ **Config-Driven**: YAML configs for reproducible deployments
-- 🌐 **API Server**: FastAPI-based serving with streaming support
-
-## 🚀 Quick Start
-
-### Installation
+## Install
 
 ```bash
 pip install slm-packager
 ```
 
-Or install from source:
+## Quickstart
 
 ```bash
-git clone https://github.com/Ayo-Cyber/slm-packager.git
-cd slm-packager
-pip install -e .
-```
-
-### Pull & Run a Model
-
-```bash
-# List available models
-slm list
-
-# Pull GPT-2 (500MB, fast for testing)
-slm pull gpt2
-
-# Run it
-slm run gpt2 --prompt "Explain AI in one sentence"
-```
-
-That's it! The model downloads, auto-configures, and runs.
-
-### Pull a GGUF Model
-
-```bash
-# Pull TinyLlama with llama.cpp (637MB)
+# Pull a model
 slm pull tinyllama
 
-# Run with different parameters
-slm run tinyllama --prompt "Write a haiku"
-```
+# Run it
+slm run tinyllama --prompt "Explain transformers in one sentence"
 
-## 📦 Available Models
-
-| Model | Size | Runtime | Description |
-|-------|------|---------|-------------|
-| **gpt2** | 500MB | transformers | OpenAI GPT-2, fast to download |
-| **tinyllama** | 637MB | llama.cpp | 1.1B chat model, CPU-optimized |
-| **phi-2** | 1.6GB | llama.cpp | Microsoft's 2.7B reasoning model |
-| **qwen-1.8b** | 1.1GB | llama.cpp | Alibaba's efficient chat model |
-
-View all: `slm list`  
-Pull with specific quantization: `slm pull tinyllama --quant q8_0`
-
-## 🛠️ CLI Commands
-
-```bash
-# Model management
-slm list                    # Show available models
-slm list --installed        # Show downloaded models
-slm pull <model>            # Download a model
-slm pull <model> --list-variants  # Show quantization options
-
-# Running models
-slm run <model> --prompt "Your prompt"
-slm run <config.yaml> --prompt "Your prompt"
-
-# Quantization
-slm quantize input.gguf output.gguf --type q4_k_m
-slm quantize input.gguf --type q4_k_m  # Auto-generates output filename
-
-# Benchmarking
-slm benchmark <model>
-slm benchmark <config.yaml>
-
-# API server
-slm serve --port 8000
-
-# Manual config creation
-slm init
-```
-
-## ⚡ GPU Acceleration
-
-SLM Packager supports GPU acceleration across different hardware platforms.
-
-### Apple Silicon (MPS) - Zero Setup Required! 🍎
-
-**No installation needed** - works out of the box on M1/M2/M3 Macs!
-
-```bash
-# Create GPU-accelerated config
-slm init --name gpt2 --path gpt2 --format pytorch --runtime transformers --device mps -o gpt2-gpu.yaml
-
-# Run on GPU
-slm run gpt2-gpu.yaml --prompt "Explain quantum computing"
-```
-
-**Real Performance (M2 Pro):**
-```
-GPT-2 Performance Comparison
-├─ CPU:  1.3 tokens/sec
-└─ MPS:  2.4 tokens/sec  ⚡ 2.14x faster!
-
-Tested on: M2 Pro, macOS 14.x, GPT-2 (124M parameters)
-```
-
-**Requirements:**
-- macOS 12.3 or later
-- Apple Silicon (M1/M2/M3 series)
-- PyTorch 1.12+ (included with installation)
-
-### NVIDIA GPU (CUDA)
-
-```bash
-# Install llama.cpp with CUDA support
-CMAKE_ARGS="-DLLAMA_CUBLAS=on" pip install llama-cpp-python --no-cache-dir
-
-# Set gpu_layers in config
-runtime:
-  type: llama_cpp
-  device: cuda
-  gpu_layers: 32  # Offload layers to GPU
-```
-
-**Expected Performance:**
-- 2-5x speedup vs CPU
-- Depends on GPU, model size, and layers offloaded
-
-### llama.cpp Metal (Apple Silicon)
-
-For GGUF models with llama.cpp on Apple Silicon:
-
-```bash
-# Rebuild with Metal support
-CMAKE_ARGS="-DLLAMA_METAL=on" pip install llama-cpp-python --no-cache-dir
-
-# Use GPU layers in config
-runtime:
-  type: llama_cpp
-  device: cpu  # Metal auto-detected
-  gpu_layers: 32  # Offload to GPU
-```
-
----
-
-## 📊 Performance Benchmarks
-
-Real-world performance on different hardware:
-
-### GPT-2 (124M parameters)
-
-| Runtime | Device | Tokens/sec | Memory | Notes |
-|---------|--------|-----------|--------|-------|
-| **transformers** | CPU (M2 Pro) | 1.3 | 2.1GB | Baseline |
-| **transformers** | MPS (M2 Pro) | 2.4 | 2.1GB | 2.14x speedup ⚡ |
-| **ONNX** | CPU (M2 Pro) | 13.8 | 600MB | With KV-cache |
-| **llama.cpp** | CPU | ~15-20 | ~400MB | Quantized GGUF |
-
-### TinyLlama (1.1B parameters)
-
-| Runtime | Device | Tokens/sec | Memory | Notes |
-|---------|--------|-----------|--------|-------|
-| **llama.cpp** | CPU | 15-20 | ~800MB | Q4_K_M quantization |
-| **llama.cpp** | Metal (M1) | 40-60 | ~800MB | With GPU layers |
-| **transformers** | CPU | 5-10 | 4GB | Full precision |
-
-*Performance varies based on hardware, model size, and configuration. Benchmarks collected on M2 Pro (Dec 2025).*
-
----
-
-## 📖 Runtime Comparison
-
-Choose the right runtime for your use case:
-
-| Runtime | Best For | Pros | Cons |
-|---------|----------|------|------|
-| **llama.cpp** | Production, efficiency | Fast, low memory, quantized | GGUF format only |
-| **transformers** | Development, flexibility | Latest models, GPU support | Higher memory |
-| **ONNX** | Cross-platform, optimization | Fast, portable, optimized | Requires model export |
-
-### When to Use Each
-
-**llama.cpp (GGUF):**
-- ✅ Production deployments
-- ✅ Limited memory/CPU
-- ✅ Want quantization
-- ✅ Edge devices
-
-**transformers (PyTorch):**
-- ✅ Development & experimentation  
-- ✅ Latest HuggingFace models
-- ✅ Fine-tuning workflows
-- ✅ GPU available
-
-**ONNX:**
-- ✅ Cross-platform deployment
-- ✅ ML pipeline integration
-- ✅ Optimized inference graphs
-- ✅ Already have ONNX models
-
----
-
-## 🎯 Example Workflows
-
-### Developer: Fine-Tune & Quantize
-
-```bash
-# 1. Fine-tune your model (external tool)
-# 2. Quantize it
-slm quantize my-model.gguf my-model-q4.gguf --type q4_k_m
-
-# 3. Create a config for the quantized model
-slm init --name my-model-q4 --path my-model-q4.gguf --format gguf --runtime llama_cpp -o my-model-q4.yaml
-
-# 4. Test it
-slm run my-model-q4.yaml --prompt "Test prompt"
-
-# 5. Benchmark it
-slm benchmark my-model-q4.yaml
-```
-
-### Researcher: Compare Runtimes
-
-```bash
-# Pull same model, different runtimes
-slm pull gpt2              # Transformers
-slm pull tinyllama         # llama.cpp
-
-# Benchmark both
-slm benchmark gpt2
+# Benchmark it
 slm benchmark tinyllama
-
-# Compare results
 ```
 
-### MacBook User: GPU-Accelerated Inference
+That's it. Model downloads, auto-configures, and runs.
+
+---
+
+## Pull Any HuggingFace Model
+
+Not in the registry? Pull any GGUF or ONNX directly:
 
 ```bash
-# Zero setup - just run!
-slm pull gpt2
-slm init --name gpt2 --path gpt2 --format pytorch --runtime transformers --device mps -o gpt2-gpu.yaml
-slm run gpt2-gpu.yaml --prompt "Hello!"
-
-# 2.14x faster than CPU! ⚡
-```
-
-### ONNX User: Export & Run
-
-```bash
-# 1. Export model to ONNX
-pip install "optimum[exporters]"
-optimum-cli export onnx --model gpt2 --task text-generation-with-past models/gpt2-onnx/
-
-# 2. Create config  
-slm init --name gpt2 --path models/gpt2-onnx --format onnx --runtime onnx -o gpt2-onnx.yaml
-
-# 3. Run (13.8 tok/s on CPU!)
-slm run gpt2-onnx.yaml --prompt "Hello world"
+slm pull Qwen/Qwen3-4B-GGUF Qwen3-4B-Q4_K_M.gguf --name qwen3-4b
+slm run qwen3-4b --prompt "Hello!"
 ```
 
 ---
 
-## 📦 Configuration
+## Available Models
 
-### Example Config
+| Model | Size | Runtime | Best For |
+|-------|------|---------|----------|
+| `gpt2` | 500MB | transformers | Fast testing, MPS |
+| `tinyllama` | 637MB | llama.cpp | CPU-efficient chat |
+| `phi-2` | 1.6GB | llama.cpp | Reasoning tasks |
+| `qwen-1.8b` | 1.1GB | llama.cpp | Multilingual chat |
+
+```bash
+slm list                          # all registry models
+slm pull phi-2 --list-variants    # see quantization options
+```
+
+---
+
+## Real Benchmarks (M3 Pro · 18GB)
+
+| Model | Runtime | Device | Tokens/sec |
+|-------|---------|--------|-----------|
+| GPT-2 124M | transformers | CPU | 53.16 |
+| GPT-2 124M | transformers | MPS ⚡ | 28.06 |
+| TinyLlama 1.1B | llama.cpp | CPU | 9.19 |
+| Phi-2 2.7B | llama.cpp | CPU | 33.67 |
+| Qwen3 4B | llama.cpp | CPU | 31.71 |
+
+Run your own: `slm benchmark <model>`
+
+---
+
+## GPU Acceleration
+
+### Apple Silicon (MPS) — zero setup
+
+```bash
+slm init --name gpt2 --path gpt2 --format pytorch \
+         --runtime transformers --device mps -o gpt2-mps.yaml
+slm run gpt2-mps.yaml --prompt "Hello!"
+```
+
+### NVIDIA (CUDA)
+
+```bash
+CMAKE_ARGS="-DLLAMA_CUBLAS=on" pip install llama-cpp-python --no-cache-dir
+# then set gpu_layers in your YAML config
+```
+
+---
+
+## CLI Reference
+
+```bash
+slm list                              # registry models
+slm list --installed                  # downloaded models
+slm pull <model>                      # download from registry
+slm pull <hf-repo> <file> --name x   # pull any HF GGUF/ONNX
+slm run <model> --prompt "..."        # generate text
+slm benchmark <model>                 # speed + memory metrics
+slm serve --port 8000                 # start FastAPI server
+slm quantize input.gguf --type q4_k_m
+slm init                              # create YAML config interactively
+slm rm <model>                        # remove installed model
+```
+
+---
+
+## API Server
+
+```bash
+slm serve --port 8000
+```
+
+```bash
+curl -X POST http://localhost:8000/generate \
+  -H "Content-Type: application/json" \
+  -d '{"prompt": "The future of AI is", "params": {"max_tokens": 100}}'
+```
+
+Supports streaming (`"stream": true`) and async model loading.
+
+---
+
+## YAML Config
 
 ```yaml
-# my-model.yaml
 model:
-  name: my-custom-model
+  name: my-model
   path: /path/to/model.gguf
   format: gguf
-  description: "My quantized model"
 
 runtime:
   type: llama_cpp
   device: cpu
   threads: 8
   context_size: 2048
-  gpu_layers: 0
 
 params:
   temperature: 0.7
-  top_p: 0.9
-  top_k: 40
   max_tokens: 512
   stream: true
-  stop: ["User:", "\n\n"]
-```
-
-### Create Config Interactively
-
-```bash
-slm init  # Guided prompts
 ```
 
 ---
 
-## 🌐 API Server
+## Documentation
 
-Start a FastAPI server for HTTP access:
+Full docs at **[ayo-cyber.github.io/slm-packager](https://ayo-cyber.github.io/slm-packager)**
 
-```bash
-# Start server
-slm serve --port 8000
-```
-
-### API Usage
-
-```bash
-# Health check
-curl http://localhost:8000/health
-
-# Load model
-curl -X POST http://localhost:8000/load \
-  -H "Content-Type: application/json" \
-  -d '{"config_path": "gpt2.yaml"}'
-
-# Generate text
-curl -X POST http://localhost:8000/generate \
-  -H "Content-Type: application/json" \
-  -d '{
-    "prompt": "The future of AI is",
-    "params": {
-      "max_tokens": 100,
-      "temperature": 0.8
-    }
-  }'
-
-# Streaming
-curl -X POST http://localhost:8000/generate \
-  -H "Content-Type: application/json" \
-  -H "Accept: text/event-stream" \
-  -d '{"prompt": "Hello", "params": {"stream": true}}'
-```
+- [Quick Start](https://ayo-cyber.github.io/slm-packager/quickstart/)
+- [CLI Reference](https://ayo-cyber.github.io/slm-packager/cli-reference/)
+- [Runtimes](https://ayo-cyber.github.io/slm-packager/runtimes/)
+- [GPU Acceleration](https://ayo-cyber.github.io/slm-packager/gpu-acceleration/)
+- [Benchmarks](https://ayo-cyber.github.io/slm-packager/benchmarks/)
 
 ---
 
-## 📖 Documentation
-
-Comprehensive guides for each component:
-
-- [Quick Start Guide](docs/QUICKSTART.md) - Complete walkthrough
-- [Model Formats Guide](docs/MODEL_FORMATS.md) - GGUF vs PyTorch vs ONNX
-- [GPU Acceleration Guide](docs/GPU_ACCELERATION.md) - MPS, CUDA, and Metal setup
-- [GGUF Setup Guide](docs/GGUF_GUIDE.md) - Using llama.cpp with Metal/CUDA
-- [ONNX Guide](docs/ONNX_GUIDE.md) - Export, run, and optimize ONNX models
-- [Init Guide](docs/INIT_GUIDE.md) - Creating configs manually
-- [Contributing Guide](CONTRIBUTING.md) - Development setup and guidelines
-
----
-
-## 🧪 Testing & Development
+## Development
 
 ```bash
-# Install dev dependencies
+git clone https://github.com/Ayo-Cyber/slm-packager.git
+cd slm-packager
 pip install -e ".[dev]"
-
-# Run tests
 pytest
-
-# Run with coverage
-pytest --cov=slm_packager --cov-report=html
-
-# Code quality
-black slm_packager tests
-isort slm_packager tests
-mypy slm_packager
 ```
 
-**Test Results:**
-- ✅ 117 tests passing
-- Coverage: 52% overall
-  - API: 82% ⭐
-  - Core runtime: 60%
-  - CLI: 47%
-
-See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed development guidelines.
+117 tests · 52% coverage · CI on every push
 
 ---
 
-## 🗺️ Roadmap
+## License
 
-### v0.2 (Current)
-- [x] Automated test suite (✅ Complete: 117 tests, 52% coverage)
-- [x] MPS GPU support for Apple Silicon (✅ Complete: 2.14x speedup)
-- [x] ONNX runtime with KV-cache (✅ Complete: 13.8 tok/s)
-- [x] API server improvements (✅ Complete: 82% coverage)
-- [ ] CUDA GPU acceleration testing  
-- [ ] Comprehensive benchmark suite
-- [ ] Expand model registry
+Apache 2.0 — see [LICENSE](LICENSE)
 
-### v1.0 (Future)
-- [ ] vLLM integration for high-performance GPU serving
-- [ ] ROCm support (AMD GPUs)
-- [ ] Model conversion utilities
-- [ ] Web UI for model management
-- [ ] Advanced quantization options
-- [ ] Multi-GPU support
-
----
-
-## 🏗️ Architecture
-
-```
-┌─────────────────────────────────┐
-│   CLI / API Server              │
-├─────────────────────────────────┤
-│   Model Registry & Downloader   │
-├─────────────────────────────────┤
-│   Runtime Abstraction Layer     │
-│   ├─ llama.cpp (GGUF)           │
-│   │   └─ Metal/CUDA support     │
-│   ├─ Transformers (PyTorch)     │
-│   │   └─ MPS/CUDA support       │
-│   └─ ONNX Runtime               │
-│       └─ Manual KV-cache        │
-├─────────────────────────────────┤
-│   Quantization & Benchmarking   │
-└─────────────────────────────────┘
-```
-
----
-
-## 💡 Why SLM Packager?
-
-**Problem:** Running small language models involves juggling different formats (GGUF, PyTorch, ONNX), runtimes (llama.cpp, transformers, onnxruntime), and configuration options.
-
-**Solution:** SLM Packager provides:
-- **Unified interface** - One CLI/API for all runtimes
-- **Auto-configuration** - Models work out-of-the-box
-- **GPU acceleration** - Automatic MPS on Mac, easy CUDA setup
-- **Reproducibility** - YAML configs for deployment
-- **Developer-friendly** - Python API, FastAPI server, streaming support
-
----
-
----
-
-## ❓ Troubleshooting & Known Limitations
-
-### Common Issues
-
-**1. "Model not found" or Download Errors**
-- **Cause**: Network issues or incorrect model name.
-- **Fix**: Check your internet. Ensure `huggingface_hub` is installed. Try `slm pull <model>` again.
-- **Tip**: Install `hf_transfer` for 2x faster downloads: `pip install hf_transfer`.
-
-**2. "RuntimeError: MPS backend out of memory" (Mac)**
-- **Cause**: The model is too large for your Unified Memory.
-- **Fix**: Try a smaller model (e.g., `gpt2` or `tinyllama`). Close other apps.
-- **Workaround**: Use `runtime: cpu` in your config to force CPU usage (slower but more stable).
-
-**3. "ONNX model not found"**
-- **Cause**: ONNX models require a specific `.onnx` file structure.
-- **Fix**: You must export models first. Use `optimum-cli` as described in the [ONNX Guide](docs/ONNX_GUIDE.md).
-
-### Known Limitations
-- **Windows**: Fully supported for CPU/CUDA, but file path lengths can be an issue. Enable Long Paths if you encounter errors.
-- **Quantization**: Currently relies on `llama.cpp` tools being available in path for some operations.
-- **vLLM**: Not yet integrated (planned for v1.0).
-
----
-
-## 🤝 Contributing
-
-We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for:
-- Development setup
-- Testing guidelines
-- Code style requirements
-- Pull request process
-
----
-
-## 📝 License
-
-Apache License 2.0 - see [LICENSE](LICENSE) for details
-
----
-
-## 🙏 Acknowledgments
-
-- **llama.cpp** - Efficient GGUF runtime
-- **HuggingFace** - Transformers and model hub
-- **ONNX Runtime** - Optimized inference
-- **FastAPI** - Modern API framework
-
----
-
-## 📞 Support
-
-- **Issues**: [GitHub Issues](https://github.com/Ayo-Cyber/slm-packager/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/Ayo-Cyber/slm-packager/discussions)
-- **GitHub**: [@Ayo-Cyber](https://github.com/Ayo-Cyber)
-
----
-
-**Built with ❤️ for the AI community**
-
-*Making small language models accessible, fast, and easy to deploy.*
+**Issues / Discussions:** [github.com/Ayo-Cyber/slm-packager](https://github.com/Ayo-Cyber/slm-packager)
