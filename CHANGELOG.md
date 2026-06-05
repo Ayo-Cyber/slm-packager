@@ -5,6 +5,20 @@ All notable changes to SLM Packager will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.1] - 2026-06-05
+
+### Added
+- Arbitrary HuggingFace model pull: `slm pull <repo-id> <filename> --name <alias>` works for any GGUF or ONNX model on HuggingFace
+- Article visuals (architecture diagram, benchmark chart) in `article_visuals/`
+
+### Changed
+- Benchmark token counting now uses the runtime's tokenizer when available (transformers) or the llama.cpp `tokenize()` method, falling back to a char-based estimate — fixes inflated TPS numbers on models without an accessible tokenizer
+
+### Fixed
+- `ModelManager` lifecycle orchestration: load/unload sequencing and repetition-penalty support
+- `trust_remote_code` now configurable per-runtime in YAML configs
+- Improved error messages across CLI commands
+
 ## [0.2.0] - 2025-12-24
 
 ### Added

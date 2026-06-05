@@ -196,5 +196,9 @@ gpt2-onnx-test.yaml
 models/
 *.gguf
 *.onnx
-# Local benchmark runs
+
+# Local benchmark / scratch files
 day4_bench/
+benchmark_onnx.py
+test.env
+gpt2-mps.yaml

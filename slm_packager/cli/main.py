@@ -87,8 +87,8 @@ def run(model_or_config, prompt, stream, raw):
         if not prompt:
             prompt = click.prompt("Enter prompt")
             
-        # Auto-apply chat template if the tokenizer supports it
-        if not raw:
+        # Auto-apply chat template for transformers models only
+        if not raw and config.runtime.type == RuntimeType.TRANSFORMERS:
             try:
                 from transformers import AutoTokenizer
                 tokenizer = AutoTokenizer.from_pretrained(
@@ -102,7 +102,6 @@ def run(model_or_config, prompt, stream, raw):
                     )
                     click.echo("ℹ️  Auto-formatting prompt with chat template (disable with --raw)")
             except Exception:
-                # If tokenizer can't be loaded here (e.g. GGUF models), skip chat formatting
                 pass
             
         click.echo("-" * 20)

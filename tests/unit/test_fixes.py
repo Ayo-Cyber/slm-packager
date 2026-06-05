@@ -215,6 +215,7 @@ class TestBenchmarkTokenCounting:
         with patch('slm_packager.evaluation.benchmark.get_runtime') as mock_get:
             mock_runtime = MagicMock()
             mock_runtime.tokenizer = None
+            mock_runtime.model = None
             mock_get.return_value = mock_runtime
 
             benchmarker = Benchmarker(config)

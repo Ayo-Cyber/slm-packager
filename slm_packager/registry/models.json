@@ -51,6 +51,22 @@
         }
       }
     },
+    "phi-3-mini": {
+      "name": "Microsoft Phi-3 Mini 3.8B",
+      "description": "Phi-3 Mini instruction-tuned, strong at reasoning and code",
+      "format": "gguf",
+      "runtime": "llama_cpp",
+      "repo": "microsoft/Phi-3-mini-4k-instruct-gguf",
+      "variants": {
+        "q4_k_m": {
+          "file": "Phi-3-mini-4k-instruct-q4.gguf",
+          "size": "2.2GB",
+          "speed": "fast",
+          "quality": "good",
+          "recommended": true
+        }
+      }
+    },
     "qwen-1.8b": {
       "name": "Qwen 1.8B Chat",
       "description": "Alibaba's efficient chat model",
@@ -64,6 +80,100 @@
           "speed": "fast",
           "quality": "good",
           "recommended": true
+        }
+      }
+    },
+    "qwen2.5-3b": {
+      "name": "Qwen2.5 3B Instruct",
+      "description": "Alibaba's Qwen2.5 — strong multilingual and coding model",
+      "format": "gguf",
+      "runtime": "llama_cpp",
+      "repo": "Qwen/Qwen2.5-3B-Instruct-GGUF",
+      "variants": {
+        "q4_k_m": {
+          "file": "qwen2.5-3b-instruct-q4_k_m.gguf",
+          "size": "1.9GB",
+          "speed": "fast",
+          "quality": "good",
+          "recommended": true
+        },
+        "q8_0": {
+          "file": "qwen2.5-3b-instruct-q8_0.gguf",
+          "size": "3.2GB",
+          "speed": "medium",
+          "quality": "excellent"
+        }
+      }
+    },
+    "mistral-7b": {
+      "name": "Mistral 7B Instruct v0.2",
+      "description": "Mistral AI's 7B instruction model — fast and capable",
+      "format": "gguf",
+      "runtime": "llama_cpp",
+      "repo": "TheBloke/Mistral-7B-Instruct-v0.2-GGUF",
+      "variants": {
+        "q4_k_m": {
+          "file": "mistral-7b-instruct-v0.2.Q4_K_M.gguf",
+          "size": "4.4GB",
+          "speed": "medium",
+          "quality": "good",
+          "recommended": true
+        },
+        "q5_k_m": {
+          "file": "mistral-7b-instruct-v0.2.Q5_K_M.gguf",
+          "size": "5.1GB",
+          "speed": "slower",
+          "quality": "better"
+        },
+        "q8_0": {
+          "file": "mistral-7b-instruct-v0.2.Q8_0.gguf",
+          "size": "7.7GB",
+          "speed": "slow",
+          "quality": "excellent"
+        }
+      }
+    },
+    "llama3-8b": {
+      "name": "Meta Llama 3 8B Instruct",
+      "description": "Meta's Llama 3 8B — excellent instruction following",
+      "format": "gguf",
+      "runtime": "llama_cpp",
+      "repo": "QuantFactory/Meta-Llama-3-8B-Instruct-GGUF",
+      "variants": {
+        "q4_k_m": {
+          "file": "Meta-Llama-3-8B-Instruct.Q4_K_M.gguf",
+          "size": "4.9GB",
+          "speed": "medium",
+          "quality": "good",
+          "recommended": true
+        },
+        "q8_0": {
+          "file": "Meta-Llama-3-8B-Instruct.Q8_0.gguf",
+          "size": "8.5GB",
+          "speed": "slow",
+          "quality": "excellent"
+        }
+      }
+    },
+    "gemma2-2b": {
+      "name": "Google Gemma 2 2B Instruct",
+      "description": "Google's compact Gemma 2 — great quality at small size",
+      "format": "gguf",
+      "runtime": "llama_cpp",
+      "repo": "bartowski/gemma-2-2b-it-GGUF",
+      "variants": {
+        "q4_k_m": {
+          "file": "gemma-2-2b-it-Q4_K_M.gguf",
+          "size": "1.6GB",
+          "speed": "fast",
+          "quality": "good",
+          "recommended": true
+        },
+        "q8_0": {
+          "file": "gemma-2-2b-it-Q8_0.gguf",
+          "size": "2.8GB",
+          "speed": "medium",
+          "quality": "excellent"
         }
       }
     },
