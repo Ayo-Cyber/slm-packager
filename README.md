@@ -6,7 +6,7 @@ SLM Packager is an open-source toolkit for running, packaging, and benchmarking 
 
 [![PyPI](https://img.shields.io/pypi/v/slm-packager?color=blue&label=pypi)](https://pypi.org/project/slm-packager/)
 [![CI](https://github.com/Ayo-Cyber/slm-packager/actions/workflows/test.yml/badge.svg)](https://github.com/Ayo-Cyber/slm-packager/actions/workflows/test.yml)
-[![Tests](https://img.shields.io/badge/tests-117%20passing-brightgreen)]()
+[![Coverage](https://img.shields.io/badge/coverage-117%20tests-brightgreen)](https://github.com/Ayo-Cyber/slm-packager/actions/workflows/test.yml)
 [![Python](https://img.shields.io/badge/python-3.9%2B-blue)]()
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue)](LICENSE)
 [![Docs](https://img.shields.io/badge/docs-GitHub%20Pages-blue)](https://ayo-cyber.github.io/slm-packager)

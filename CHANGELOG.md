@@ -5,6 +5,22 @@ All notable changes to SLM Packager will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.2] - 2026-06-14
+
+### Fixed
+- `slm rm` now correctly removes HuggingFace hub cache for PyTorch/transformers models (previously only deleted the config, leaving model weights on disk)
+- `slm list --installed` now shows all installed models including HF-managed ones (previously silently omitted PyTorch models)
+- Python 3.12 enum rendering: all `str` enums (`RuntimeType`, `DeviceType`, `FormatType`, `QuantizationType`) now correctly display their value in f-strings and CLI output (e.g. `transformers` instead of `RuntimeType.TRANSFORMERS`)
+- `ModelConfig.format` is now a validated `FormatType` enum — invalid format strings are caught at config load time instead of at runtime
+- Duplicate error output in `slm pull` — error message no longer printed twice to stderr
+- `slm run` error tip now gives actionable `slm pull` + `slm run` guidance instead of incorrectly referencing `slm benchmark`
+
+### Changed
+- `slm run` delegates to shared `_resolve_config_path` helper (removes duplicated path resolution logic)
+- `print()` calls in downloader replaced with `click.echo` for consistent CLI output
+- `Benchmarker` is now a top-level import in CLI instead of a module-level `None` mutated at call time
+- Full black + isort formatting pass across all source and test files
+
 ## [0.2.1] - 2026-06-05
 
 ### Added
