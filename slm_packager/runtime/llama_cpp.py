@@ -1,20 +1,22 @@
-from typing import Iterator, Union
 import logging
 import sys
 from pathlib import Path
+from typing import Iterator, Union
 
 IMPORT_ERROR = ""
 try:
     from llama_cpp import Llama
+
     LLAMA_CPP_AVAILABLE = True
 except ImportError as e:
     LLAMA_CPP_AVAILABLE = False
     IMPORT_ERROR = str(e)
 
+from ..config.models import GenerationParams, SLMConfig
 from .base import BaseRuntime
-from ..config.models import SLMConfig, GenerationParams
 
 logger = logging.getLogger(__name__)
+
 
 class LlamaCppRuntime(BaseRuntime):
     def load(self):
@@ -26,15 +28,15 @@ class LlamaCppRuntime(BaseRuntime):
                 "   pip install llama-cpp-python\n"
                 "\n"
                 "   For Metal support (Apple Silicon M1/M2/M3):\n"
-                "   CMAKE_ARGS=\"-DLLAMA_METAL=on\" pip install llama-cpp-python --no-cache-dir\n"
+                '   CMAKE_ARGS="-DLLAMA_METAL=on" pip install llama-cpp-python --no-cache-dir\n'
                 "\n"
                 "   For CUDA support (NVIDIA GPU):\n"
-                "   CMAKE_ARGS=\"-DLLAMA_CUBLAS=on\" pip install llama-cpp-python --no-cache-dir\n"
+                '   CMAKE_ARGS="-DLLAMA_CUBLAS=on" pip install llama-cpp-python --no-cache-dir\n'
                 f"\n   Error details: {IMPORT_ERROR}"
             )
-        
+
         model_path = Path(self.config.model.path)
-        
+
         # Check if model file exists
         if not model_path.exists():
             raise FileNotFoundError(
@@ -47,7 +49,7 @@ class LlamaCppRuntime(BaseRuntime):
                 "   Download GGUF models from:\n"
                 "   https://huggingface.co/TheBloke (search for '[model name] GGUF')"
             )
-        
+
         # Check if it's actually a file (not a directory)
         if model_path.is_dir():
             raise ValueError(
@@ -58,9 +60,9 @@ class LlamaCppRuntime(BaseRuntime):
                 "\n"
                 "   For HuggingFace models, use pytorch format and transformers runtime"
             )
-        
+
         # Check file extension
-        if not str(model_path).endswith('.gguf'):
+        if not str(model_path).endswith(".gguf"):
             raise ValueError(
                 f"File doesn't appear to be a GGUF model: '{self.config.model.path}'\n"
                 "GGUF models must have .gguf extension\n"
@@ -68,13 +70,13 @@ class LlamaCppRuntime(BaseRuntime):
                 "   - For PyTorch models, use 'transformers' runtime instead\n"
                 "   - For ONNX models, use 'onnx' runtime instead"
             )
-        
+
         try:
             logger.info(f"Loading GGUF model from '{self.config.model.path}'")
             logger.debug(f"Context size: {self.config.runtime.context_size}")
             logger.debug(f"GPU layers: {self.config.runtime.gpu_layers}")
             logger.debug(f"Threads: {self.config.runtime.threads}")
-            
+
             import os
             from contextlib import redirect_stderr
 
@@ -87,17 +89,17 @@ class LlamaCppRuntime(BaseRuntime):
                         # Save actual stderr fd
                         stderr_fd = sys.stderr.fileno()
                         saved_stderr_fd = os.dup(stderr_fd)
-                        
+
                         try:
                             # Redirect stderr to devnull
                             os.dup2(fnull.fileno(), stderr_fd)
-                            
+
                             self.model = Llama(
                                 model_path=str(model_path),
                                 n_ctx=self.config.runtime.context_size,
                                 n_gpu_layers=self.config.runtime.gpu_layers,
                                 n_threads=self.config.runtime.threads,
-                                verbose=False
+                                verbose=False,
                             )
                         finally:
                             # Restore stderr
@@ -110,11 +112,11 @@ class LlamaCppRuntime(BaseRuntime):
                             n_ctx=self.config.runtime.context_size,
                             n_gpu_layers=self.config.runtime.gpu_layers,
                             n_threads=self.config.runtime.threads,
-                            verbose=False
+                            verbose=False,
                         )
-            
+
             logger.info("Model loaded successfully")
-            
+
         except ValueError as e:
             error_str = str(e).lower()
             if "invalid" in error_str or "corrupt" in error_str:
@@ -135,7 +137,7 @@ class LlamaCppRuntime(BaseRuntime):
                     "   - Ensure you have enough RAM available\n"
                     "   - Check the quantization type is supported"
                 ) from e
-                
+
         except MemoryError as e:
             raise MemoryError(
                 "Out of memory loading model!\n"
@@ -146,7 +148,7 @@ class LlamaCppRuntime(BaseRuntime):
                 "   - Close other applications\n"
                 f"   - Current context size: {self.config.runtime.context_size}"
             ) from e
-            
+
         except Exception as e:
             raise RuntimeError(
                 f"Unexpected error loading GGUF model\n"
@@ -173,14 +175,14 @@ class LlamaCppRuntime(BaseRuntime):
                 top_k=params.top_k,
                 repeat_penalty=params.repetition_penalty,
                 stop=params.stop,
-                stream=params.stream
+                stream=params.stream,
             )
 
             if params.stream:
                 return self._stream_generator(output)
             else:
                 return output["choices"][0]["text"]
-                
+
         except KeyError as e:
             raise RuntimeError(
                 f"Unexpected model output format\n"
@@ -189,7 +191,7 @@ class LlamaCppRuntime(BaseRuntime):
                 "   - Your model name\n"
                 "   - The command you ran"
             ) from e
-            
+
         except Exception as e:
             error_str = str(e).lower()
             if "out of memory" in error_str or ("cuda" in error_str and "memory" in error_str):

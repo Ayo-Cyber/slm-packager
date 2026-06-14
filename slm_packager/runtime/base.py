@@ -1,6 +1,8 @@
 from abc import ABC, abstractmethod
-from typing import Iterator, Union, Dict, Any
-from ..config.models import SLMConfig, GenerationParams
+from typing import Any, Dict, Iterator, Union
+
+from ..config.models import GenerationParams, SLMConfig
+
 
 class BaseRuntime(ABC):
     def __init__(self, config: SLMConfig):

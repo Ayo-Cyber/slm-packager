@@ -1,11 +1,12 @@
 """Unit tests for API model lifecycle management."""
+
 import asyncio
 import threading
 from unittest.mock import MagicMock, patch
 
 import pytest
 
-from slm_packager.api.manager import ModelManager, ModelBusyError
+from slm_packager.api.manager import ModelBusyError, ModelManager
 from slm_packager.config.models import GenerationParams
 
 

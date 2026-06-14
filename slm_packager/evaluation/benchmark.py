@@ -1,6 +1,7 @@
-import time
 import os
-from typing import Dict, Any
+import time
+from typing import Any, Dict
+
 from ..config.models import SLMConfig
 from ..runtime import get_runtime
 
@@ -24,11 +25,11 @@ class Benchmarker:
         """Count tokens using the runtime's tokenizer if available, otherwise estimate."""
         runtime = self.runtime
         # transformers runtime
-        if hasattr(runtime, 'tokenizer') and runtime.tokenizer is not None:
+        if hasattr(runtime, "tokenizer") and runtime.tokenizer is not None:
             return len(runtime.tokenizer.encode(text))
         # llama_cpp runtime — model exposes tokenize()
-        if hasattr(runtime, 'model') and runtime.model is not None:
-            if hasattr(runtime.model, 'tokenize'):
+        if hasattr(runtime, "model") and runtime.model is not None:
+            if hasattr(runtime.model, "tokenize"):
                 try:
                     return len(runtime.model.tokenize(text.encode()))
                 except Exception:
@@ -65,7 +66,9 @@ class Benchmarker:
 
             # Count tokens using the actual tokenizer when available
             num_tokens = self._count_tokens(output)
-            has_tokenizer = hasattr(self.runtime, 'tokenizer') and self.runtime.tokenizer is not None
+            has_tokenizer = (
+                hasattr(self.runtime, "tokenizer") and self.runtime.tokenizer is not None
+            )
             metrics["token_count_method"] = "tokenizer" if has_tokenizer else "estimate"
             metrics["tokens_per_second"] = num_tokens / metrics["generation_time_sec"]
             metrics["latency_ms"] = metrics["generation_time_sec"] * 1000

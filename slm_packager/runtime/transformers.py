@@ -1,24 +1,28 @@
-from typing import Iterator, Union
 import sys
+from typing import Iterator, Union
 
 IMPORT_ERROR = ""
 try:
-    from transformers import AutoModelForCausalLM, AutoTokenizer, TextIteratorStreamer
     import torch
+    from transformers import AutoModelForCausalLM, AutoTokenizer, TextIteratorStreamer
+
     TRANSFORMERS_AVAILABLE = True
 except ImportError as e:
     TRANSFORMERS_AVAILABLE = False
     IMPORT_ERROR = str(e)
-    
+
 try:
     import accelerate
+
     ACCELERATE_AVAILABLE = True
 except ImportError:
     ACCELERATE_AVAILABLE = False
 
 from threading import Thread
+
+from ..config.models import GenerationParams, SLMConfig
 from .base import BaseRuntime
-from ..config.models import SLMConfig, GenerationParams
+
 
 class TransformersRuntime(BaseRuntime):
     def load(self):
@@ -29,43 +33,42 @@ class TransformersRuntime(BaseRuntime):
                 "💡 Install them with: pip install transformers torch\n"
                 f"   Error details: {IMPORT_ERROR}"
             )
-        
+
         if not ACCELERATE_AVAILABLE:
             raise ImportError(
                 "❌ Transformers runtime requires 'accelerate' package for model loading.\n"
                 "💡 Install it with: pip install accelerate\n"
                 "   Or reinstall slm-packager: pip install -e ."
             )
-        
+
         try:
             # Determine device and configuration
             device_config = self._configure_device()
-            
+
             print(f"📥 Loading tokenizer from '{self.config.model.path}'...")
             trust_remote = self.config.runtime.trust_remote_code
             self.tokenizer = AutoTokenizer.from_pretrained(
-                self.config.model.path,
-                trust_remote_code=trust_remote
+                self.config.model.path, trust_remote_code=trust_remote
             )
-            
+
             print(f"📥 Loading model from '{self.config.model.path}'...")
             print(f"   Device: {device_config['name']}")
             print(f"   This may take a while for large models...")
-            
+
             self.model = AutoModelForCausalLM.from_pretrained(
                 self.config.model.path,
-                device_map=device_config['device_map'],
-                torch_dtype=device_config['dtype'],
-                trust_remote_code=trust_remote
+                device_map=device_config["device_map"],
+                torch_dtype=device_config["dtype"],
+                trust_remote_code=trust_remote,
             )
-            
+
             # Move to MPS if needed (device_map doesn't support MPS yet)
             if self.config.runtime.device == "mps":
-                self.model = self.model.to(device_config['device'])
+                self.model = self.model.to(device_config["device"])
                 print(f"✅ Model loaded successfully on Apple Silicon GPU (MPS)!")
             else:
                 print("✅ Model loaded successfully!")
-            
+
         except FileNotFoundError as e:
             raise FileNotFoundError(
                 f"❌ Model not found: '{self.config.model.path}'\n"
@@ -113,7 +116,7 @@ class TransformersRuntime(BaseRuntime):
     def _configure_device(self):
         """Configure device settings based on runtime config."""
         device = self.config.runtime.device
-        
+
         # MPS (Apple Silicon GPU)
         if device == "mps":
             if not torch.backends.mps.is_available():
@@ -126,12 +129,12 @@ class TransformersRuntime(BaseRuntime):
                     "\n   Falling back to CPU might work - set device: 'cpu' in config"
                 )
             return {
-                'device': torch.device("mps"),
-                'device_map': None,  # MPS doesn't support device_map yet
-                'dtype': torch.float32,  # MPS works best with float32
-                'name': 'MPS (Apple Silicon GPU)'
+                "device": torch.device("mps"),
+                "device_map": None,  # MPS doesn't support device_map yet
+                "dtype": torch.float32,  # MPS works best with float32
+                "name": "MPS (Apple Silicon GPU)",
             }
-        
+
         # CUDA (NVIDIA GPU)
         elif device == "cuda":
             if not torch.cuda.is_available():
@@ -143,21 +146,21 @@ class TransformersRuntime(BaseRuntime):
                     "   - PyTorch CUDA version matches your CUDA version"
                 )
             return {
-                'device': None,
-                'device_map': 'auto',
-                'dtype': torch.float16,  # FP16 for faster GPU inference
-                'name': 'CUDA (NVIDIA GPU)'
+                "device": None,
+                "device_map": "auto",
+                "dtype": torch.float16,  # FP16 for faster GPU inference
+                "name": "CUDA (NVIDIA GPU)",
             }
-        
+
         # CPU (default)
         else:
             return {
-                'device': torch.device("cpu"),
-                'device_map': None,
-                'dtype': 'auto',
-                'name': 'CPU'
+                "device": torch.device("cpu"),
+                "device_map": None,
+                "dtype": "auto",
+                "name": "CPU",
             }
-    
+
     def generate(self, prompt: str, params: GenerationParams) -> Union[str, Iterator[str]]:
         if not self.is_loaded:
             raise RuntimeError(
@@ -167,9 +170,9 @@ class TransformersRuntime(BaseRuntime):
 
         try:
             # Determine device for inputs
-            device = self.model.device if hasattr(self.model, 'device') else 'cpu'
+            device = self.model.device if hasattr(self.model, "device") else "cpu"
             inputs = self.tokenizer(prompt, return_tensors="pt").to(device)
-            
+
             if params.stream:
                 streamer = TextIteratorStreamer(self.tokenizer, skip_prompt=True)
                 generation_kwargs = dict(
@@ -180,11 +183,11 @@ class TransformersRuntime(BaseRuntime):
                     top_p=params.top_p,
                     top_k=params.top_k,
                     repetition_penalty=params.repetition_penalty,
-                    do_sample=True
+                    do_sample=True,
                 )
                 thread = Thread(target=self.model.generate, kwargs=generation_kwargs)
                 thread.start()
-                
+
                 return self._stream_generator(streamer)
             else:
                 input_length = inputs["input_ids"].shape[1]
@@ -195,11 +198,11 @@ class TransformersRuntime(BaseRuntime):
                     top_p=params.top_p,
                     top_k=params.top_k,
                     repetition_penalty=params.repetition_penalty,
-                    do_sample=True
+                    do_sample=True,
                 )
                 # Strip prompt tokens, not prompt characters, to avoid truncation bugs
                 return self.tokenizer.decode(outputs[0][input_length:], skip_special_tokens=True)
-        
+
         except torch.cuda.OutOfMemoryError as e:
             raise RuntimeError(
                 "❌ GPU out of memory!\n"
@@ -221,7 +224,7 @@ class TransformersRuntime(BaseRuntime):
             yield new_text
 
     def unload(self):
-        if hasattr(self, 'tokenizer') and self.tokenizer:
+        if hasattr(self, "tokenizer") and self.tokenizer:
             self.tokenizer = None
         if self.model:
             self.model = None
@@ -232,4 +235,3 @@ class TransformersRuntime(BaseRuntime):
                 torch.cuda.empty_cache()
             if torch.backends.mps.is_available():
                 torch.mps.empty_cache()
-

@@ -1,16 +1,22 @@
 """Tests for the bug fixes and new features added during code review."""
-import pytest
-import json
+
 import asyncio
+import json
 from pathlib import Path
-from unittest.mock import MagicMock, patch, AsyncMock
+from unittest.mock import AsyncMock, MagicMock, patch
+
+import pytest
 from pydantic import ValidationError
 
-from slm_packager.config.models import (
-    SLMConfig, ModelConfig, RuntimeConfig, RuntimeType,
-    DeviceType, GenerationParams
-)
 from slm_packager.config.loader import ConfigLoader
+from slm_packager.config.models import (
+    DeviceType,
+    GenerationParams,
+    ModelConfig,
+    RuntimeConfig,
+    RuntimeType,
+    SLMConfig,
+)
 
 
 @pytest.mark.unit
@@ -56,6 +62,7 @@ class TestVersionSingleSource:
 
     def test_version_exists(self):
         from slm_packager import __version__
+
         assert isinstance(__version__, str)
         assert len(__version__) > 0
 
@@ -75,27 +82,29 @@ class TestStreamingDetection:
         """Strings should not be treated as streaming iterators."""
         result = "hello world"
         # The server checks __next__ or __aiter__, strings have neither
-        assert not hasattr(result, '__next__')
-        assert not hasattr(result, '__aiter__')
+        assert not hasattr(result, "__next__")
+        assert not hasattr(result, "__aiter__")
 
     def test_generator_detected_as_stream(self):
         """Generators should be detected as streaming."""
+
         def gen():
             yield "chunk1"
             yield "chunk2"
+
         result = gen()
-        assert hasattr(result, '__next__')
+        assert hasattr(result, "__next__")
 
     def test_iterator_detected_as_stream(self):
         """Iterators should be detected as streaming."""
         result = iter(["chunk1", "chunk2"])
-        assert hasattr(result, '__next__')
+        assert hasattr(result, "__next__")
 
     def test_list_not_detected_as_stream(self):
         """Lists should not be treated as streaming (they lack __next__)."""
         result = ["chunk1", "chunk2"]
-        assert not hasattr(result, '__next__')
-        assert not hasattr(result, '__aiter__')
+        assert not hasattr(result, "__next__")
+        assert not hasattr(result, "__aiter__")
 
 
 @pytest.mark.unit
@@ -105,6 +114,7 @@ class TestManagerFixes:
     def test_lifecycle_typo_fixed(self):
         """Docstring should say 'lifecycle', not 'lifestyle'."""
         from slm_packager.api.manager import ModelManager
+
         assert "lifecycle" in ModelManager.__doc__
         assert "lifestyle" not in ModelManager.__doc__
 
@@ -116,10 +126,14 @@ class TestModelDelete:
     def test_delete_nonexistent_model(self, temp_dir):
         """Deleting a non-existent model should return False."""
         with patch.object(
-            __import__('slm_packager.registry.downloader', fromlist=['ModelDownloader']).ModelDownloader,
-            '__init__', lambda self: None
+            __import__(
+                "slm_packager.registry.downloader", fromlist=["ModelDownloader"]
+            ).ModelDownloader,
+            "__init__",
+            lambda self: None,
         ):
             from slm_packager.registry.downloader import ModelDownloader
+
             downloader = ModelDownloader.__new__(ModelDownloader)
             downloader.configs_dir = temp_dir / "configs"
             downloader.configs_dir.mkdir(parents=True, exist_ok=True)
@@ -162,13 +176,16 @@ class TestDefaultBindAddress:
     def test_server_defaults_to_localhost(self):
         """start_server should default to 127.0.0.1, not 0.0.0.0."""
         import inspect
+
         from slm_packager.api.server import start_server
+
         sig = inspect.signature(start_server)
-        assert sig.parameters['host'].default == "127.0.0.1"
+        assert sig.parameters["host"].default == "127.0.0.1"
 
     def test_cli_serve_defaults_to_localhost(self):
         """CLI serve command should default to 127.0.0.1."""
         from slm_packager.cli.main import serve
+
         # Click stores defaults in the params
         for param in serve.params:
             if param.name == "host":
@@ -191,7 +208,7 @@ class TestBenchmarkTokenCounting:
             runtime=RuntimeConfig(type=RuntimeType.LLAMA_CPP),
         )
 
-        with patch('slm_packager.evaluation.benchmark.get_runtime') as mock_get:
+        with patch("slm_packager.evaluation.benchmark.get_runtime") as mock_get:
             mock_runtime = MagicMock()
             mock_tokenizer = MagicMock()
             mock_tokenizer.encode.return_value = [1, 2, 3, 4, 5]
@@ -212,7 +229,7 @@ class TestBenchmarkTokenCounting:
             runtime=RuntimeConfig(type=RuntimeType.LLAMA_CPP),
         )
 
-        with patch('slm_packager.evaluation.benchmark.get_runtime') as mock_get:
+        with patch("slm_packager.evaluation.benchmark.get_runtime") as mock_get:
             mock_runtime = MagicMock()
             mock_runtime.tokenizer = None
             mock_runtime.model = None
@@ -231,11 +248,13 @@ class TestSlmRmCommand:
     def test_rm_command_registered(self):
         """The rm command should be registered on the CLI group."""
         from slm_packager.cli.main import cli
+
         command_names = [cmd for cmd in cli.commands]
         assert "rm" in command_names
 
     def test_rm_has_yes_flag(self):
         """The rm command should have a --yes/-y skip-confirmation flag."""
         from slm_packager.cli.main import rm
+
         param_names = [p.name for p in rm.params]
         assert "yes" in param_names

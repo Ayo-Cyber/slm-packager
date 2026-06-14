@@ -1,12 +1,13 @@
-import subprocess
 import logging
 import os
+import subprocess
 from pathlib import Path
 from typing import Optional
 
 from .binary_manager import BinaryManager
 
 logger = logging.getLogger(__name__)
+
 
 class Quantizer:
     @staticmethod
@@ -17,26 +18,21 @@ class Quantizer:
         try:
             # Auto-download binary
             binary = BinaryManager.get_quantize_binary()
-            
+
             logger.info(f"Quantizing {Path(model_path).name} to {type}")
             logger.debug(f"Output: {output_path}")
-            
+
             cmd = [str(binary), model_path, output_path, type]
-            
-            result = subprocess.run(
-                cmd, 
-                capture_output=True, 
-                text=True, 
-                check=True
-            )
-            
+
+            result = subprocess.run(cmd, capture_output=True, text=True, check=True)
+
             if result.stdout:
                 print(result.stdout)
-            
+
             logger.info(f"Quantized successfully: {output_path}")
             print(f"Quantization complete: {output_path}")
             print(f"Use with: slm run {output_path}")
-            
+
         except subprocess.CalledProcessError as e:
             raise RuntimeError(
                 f"Quantization failed\n"
@@ -60,27 +56,21 @@ class Quantizer:
         Quantize an ONNX model using onnxruntime.quantization.
         """
         try:
-            from onnxruntime.quantization import quantize_dynamic, QuantType
+            from onnxruntime.quantization import QuantType, quantize_dynamic
         except ImportError:
             raise ImportError(
-                "ONNX quantization requires 'onnxruntime'\n"
-                "Install with: pip install onnxruntime"
+                "ONNX quantization requires 'onnxruntime'\n" "Install with: pip install onnxruntime"
             )
 
         logger.info(f"Quantizing ONNX model to {type}")
-        
+
         quant_type = QuantType.QUInt8 if type == "int8" else QuantType.QInt8
-        
+
         try:
             quantize_dynamic(
-                model_input=Path(model_path),
-                model_output=Path(output_path),
-                weight_type=quant_type
+                model_input=Path(model_path), model_output=Path(output_path), weight_type=quant_type
             )
             logger.info(f"Successfully quantized to {output_path}")
             print(f"Quantization complete: {output_path}")
         except Exception as e:
-            raise RuntimeError(
-                f"ONNX quantization failed\n"
-                f"   {str(e)}"
-            ) from e
+            raise RuntimeError(f"ONNX quantization failed\n" f"   {str(e)}") from e

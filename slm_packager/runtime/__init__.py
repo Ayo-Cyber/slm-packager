@@ -1,8 +1,9 @@
+from ..config.models import RuntimeType, SLMConfig
 from .base import BaseRuntime
 from .llama_cpp import LlamaCppRuntime
 from .onnx import OnnxRuntime
 from .transformers import TransformersRuntime
-from ..config.models import SLMConfig, RuntimeType
+
 
 def get_runtime(config: SLMConfig) -> BaseRuntime:
     if config.runtime.type == RuntimeType.LLAMA_CPP:

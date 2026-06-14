@@ -1,15 +1,17 @@
-from fastapi import FastAPI, HTTPException, Body, Request
+import asyncio
+import json
+from contextlib import asynccontextmanager
+from typing import AsyncIterator, List, Optional
+
+import uvicorn
+from fastapi import Body, FastAPI, HTTPException, Request
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
-from typing import Optional, List, AsyncIterator
-from contextlib import asynccontextmanager
-import uvicorn
-import json
-import asyncio
 
 from .. import __version__
 from ..config.models import GenerationParams
-from .manager import ModelManager, ModelBusyError
+from .manager import ModelBusyError, ModelManager
+
 
 # Define lifespan context manager
 @asynccontextmanager
@@ -21,15 +23,14 @@ async def lifespan(app: FastAPI):
     if hasattr(app.state, "model_manager"):
         await app.state.model_manager.unload()
 
-app = FastAPI(
-    title="SLM Packager API",
-    version=__version__,
-    lifespan=lifespan
-)
+
+app = FastAPI(title="SLM Packager API", version=__version__, lifespan=lifespan)
+
 
 class GenerateRequest(BaseModel):
     prompt: str
     params: Optional[GenerationParams] = None
+
 
 @app.post("/load")
 async def load_model(request: Request, config_path: str = Body(..., embed=True)):
@@ -43,6 +44,7 @@ async def load_model(request: Request, config_path: str = Body(..., embed=True))
         raise HTTPException(status_code=400, detail=f"Invalid configuration: {str(e)}")
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to load model: {str(e)}")
+
 
 @app.post("/generate")
 async def generate(request: Request, body: GenerateRequest):
@@ -58,11 +60,8 @@ async def generate(request: Request, body: GenerateRequest):
             return {"text": result}
 
         # Check if result is a generator/iterator (streaming) — exclude strings
-        if hasattr(result, '__next__') or hasattr(result, '__aiter__'):
-            return StreamingResponse(
-                _stream_wrapper(result),
-                media_type="text/event-stream"
-            )
+        if hasattr(result, "__next__") or hasattr(result, "__aiter__"):
+            return StreamingResponse(_stream_wrapper(result), media_type="text/event-stream")
 
         return {"text": result}
 
@@ -72,6 +71,7 @@ async def generate(request: Request, body: GenerateRequest):
         raise HTTPException(status_code=409, detail=str(e))
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Generation failed: {str(e)}")
+
 
 async def _stream_wrapper(iterator) -> AsyncIterator[str]:
     """Wrap streaming iterators for SSE responses."""
@@ -96,6 +96,7 @@ async def _stream_wrapper(iterator) -> AsyncIterator[str]:
         yield f"data: {json.dumps({'error': str(e)})}\n\n"
         yield "data: [DONE]\n\n"
 
+
 @app.get("/info")
 async def info(request: Request):
     manager: ModelManager = request.app.state.model_manager
@@ -103,9 +104,11 @@ async def info(request: Request):
         return manager.config.model_dump()
     return {"status": "no model loaded"}
 
+
 @app.get("/health")
 async def health():
     return {"status": "ok"}
+
 
 def start_server(host: str = "127.0.0.1", port: int = 8000):
     uvicorn.run(app, host=host, port=port)

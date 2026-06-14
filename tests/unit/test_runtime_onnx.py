@@ -1,10 +1,12 @@
-import pytest
-import numpy as np
-from unittest.mock import patch, MagicMock, ANY
 from pathlib import Path
+from unittest.mock import ANY, MagicMock, patch
 
+import numpy as np
+import pytest
+
+from slm_packager.config.models import GenerationParams, ModelConfig, RuntimeConfig, SLMConfig
 from slm_packager.runtime.onnx import OnnxRuntime
-from slm_packager.config.models import SLMConfig, ModelConfig, RuntimeConfig, GenerationParams
+
 
 @pytest.fixture
 def mock_onnx_config(tmp_path):
@@ -13,15 +15,12 @@ def mock_onnx_config(tmp_path):
             name="test-model",
             path=str(tmp_path / "model.onnx"),
             format="onnx",
-            description="Test ONNX model"
+            description="Test ONNX model",
         ),
-        runtime=RuntimeConfig(
-            type="onnx",
-            device="cpu",
-            threads=1
-        )
+        runtime=RuntimeConfig(type="onnx", device="cpu", threads=1),
     )
     return config
+
 
 @pytest.fixture
 def mock_ort_session():
@@ -34,6 +33,7 @@ def mock_ort_session():
         session.get_outputs.return_value = []
         yield session
 
+
 @pytest.fixture
 def onnx_runtime(mock_onnx_config, mock_ort_session):
     # Mock existence of model file
@@ -45,6 +45,7 @@ def onnx_runtime(mock_onnx_config, mock_ort_session):
                 runtime.load()
                 return runtime
 
+
 @pytest.mark.unit
 class TestOnnxRuntime:
     def test_load_raises_import_error_when_onnx_deps_missing(self, mock_onnx_config):
@@ -55,27 +56,26 @@ class TestOnnxRuntime:
             with pytest.raises(ImportError, match="onnxruntime"):
                 runtime.load()
 
-    
     def test_forward_success(self, onnx_runtime):
         """Test successful forward pass."""
         input_ids = np.array([[1, 2, 3]])
         attention_mask = np.ones_like(input_ids)
-        
+
         # Mock session run return
         onnx_runtime.session.run.return_value = [np.random.randn(1, 3, 50257)]
-        onnx_runtime.output_names = ['logits']
-        
+        onnx_runtime.output_names = ["logits"]
+
         outputs = onnx_runtime._forward(input_ids, attention_mask)
-        assert 'logits' in outputs
-        
+        assert "logits" in outputs
+
     def test_forward_failure(self, onnx_runtime):
         """Test forward pass failure handling."""
         input_ids = np.array([[1, 2, 3]])
         attention_mask = np.ones_like(input_ids)
-        
+
         # Mock failure
         onnx_runtime.session.run.side_effect = Exception("Runtime Error")
-        
+
         with pytest.raises(RuntimeError, match="Model inference failed"):
             onnx_runtime._forward(input_ids, attention_mask)
 
@@ -83,16 +83,16 @@ class TestOnnxRuntime:
         """Test that NaNs in logits are handled."""
         logits = np.array([-1.0, np.nan, 2.0])
         params = GenerationParams(temperature=1.0)
-        
+
         # Should not raise error
         token = onnx_runtime._sample(logits, params)
         assert isinstance(token, (int, np.integer))
 
     def test_sample_zeros_probability(self, onnx_runtime):
         """Test fallback when probability sum is zero (underflow)."""
-        logits = np.array([-1000.0, -1000.0]) # Very small numbers
+        logits = np.array([-1000.0, -1000.0])  # Very small numbers
         params = GenerationParams(temperature=1.0)
-        
+
         # Should fall back to uniform distribution
         token = onnx_runtime._sample(logits, params)
         assert isinstance(token, (int, np.integer))

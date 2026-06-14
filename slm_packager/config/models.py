@@ -1,16 +1,35 @@
 from enum import Enum
-from typing import Optional, Dict, Any, List
+from typing import Any, Dict, List, Optional
+
 from pydantic import BaseModel, Field, field_validator
+
 
 class RuntimeType(str, Enum):
     LLAMA_CPP = "llama_cpp"
     ONNX = "onnx"
     TRANSFORMERS = "transformers"
 
+    def __str__(self):
+        return self.value
+
+
 class DeviceType(str, Enum):
     CPU = "cpu"
     CUDA = "cuda"
     MPS = "mps"
+
+    def __str__(self):
+        return self.value
+
+
+class FormatType(str, Enum):
+    GGUF = "gguf"
+    ONNX = "onnx"
+    PYTORCH = "pytorch"
+
+    def __str__(self):
+        return self.value
+
 
 class QuantizationType(str, Enum):
     # GGUF types
@@ -22,11 +41,16 @@ class QuantizationType(str, Enum):
     INT8 = "int8"
     NONE = "none"
 
+    def __str__(self):
+        return self.value
+
+
 class ModelConfig(BaseModel):
     name: str
     path: str
     description: Optional[str] = None
-    format: str = Field(..., description="Model format: gguf, onnx, pytorch")
+    format: FormatType = Field(..., description="Model format: gguf, onnx, pytorch")
+
 
 class RuntimeConfig(BaseModel):
     type: RuntimeType
@@ -34,7 +58,10 @@ class RuntimeConfig(BaseModel):
     threads: int = Field(default=4, ge=1)
     gpu_layers: int = Field(default=0, ge=0)
     context_size: int = Field(default=2048, ge=512)
-    trust_remote_code: bool = Field(default=False, description="Allow running custom code from model repos (security risk)")
+    trust_remote_code: bool = Field(
+        default=False, description="Allow running custom code from model repos (security risk)"
+    )
+
 
 class GenerationParams(BaseModel):
     temperature: float = Field(default=0.7, ge=0.0, le=2.0)
@@ -44,6 +71,7 @@ class GenerationParams(BaseModel):
     stop: List[str] = Field(default_factory=list)
     stream: bool = False
     repetition_penalty: float = Field(default=1.1, ge=1.0)
+
 
 class SLMConfig(BaseModel):
     model: ModelConfig

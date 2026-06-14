@@ -1,18 +1,23 @@
 import asyncio
-from typing import Optional, Union, Any, AsyncIterator
-from ..config.models import SLMConfig, GenerationParams
+from typing import Any, AsyncIterator, Optional, Union
+
 from ..config.loader import ConfigLoader
-from ..runtime import get_runtime, BaseRuntime
+from ..config.models import GenerationParams, SLMConfig
+from ..runtime import BaseRuntime, get_runtime
+
 
 class ModelBusyError(RuntimeError):
     """Raised when the manager is temporarily unavailable during a model switch."""
+
     pass
+
 
 class ModelManager:
     """
     Singleton-like manager for model state and lifecycle.
     Ensures thread-safe loading and unloading of models.
     """
+
     def __init__(self):
         self._runtime: Optional[BaseRuntime] = None
         self._config: Optional[SLMConfig] = None
@@ -48,14 +53,14 @@ class ModelManager:
                     loop = asyncio.get_running_loop()
                     await loop.run_in_executor(None, self._runtime.unload)
                     self._runtime = None
-                
+
                 # Initialize new runtime
                 runtime = get_runtime(config)
-                
+
                 # Run load in executor because it blocks (IO/CPU heavy)
                 loop = asyncio.get_running_loop()
                 await loop.run_in_executor(None, runtime.load)
-                
+
                 self._runtime = runtime
                 self._config = config
                 return config
@@ -88,7 +93,9 @@ class ModelManager:
                 self._switching = False
                 self._state_changed.notify_all()
 
-    async def generate(self, prompt: str, params: Optional[GenerationParams] = None) -> Union[str, Any]:
+    async def generate(
+        self, prompt: str, params: Optional[GenerationParams] = None
+    ) -> Union[str, Any]:
         """
         Generate text from the loaded model.
         Returns a string (non-stream) or a generator (stream).

@@ -1,18 +1,21 @@
-import yaml
 import json
 import logging
 from pathlib import Path
-from typing import Union, Dict
+from typing import Dict, Union
+
+import yaml
 from pydantic import ValidationError
+
 from .models import SLMConfig
 
 logger = logging.getLogger(__name__)
+
 
 class ConfigLoader:
     @staticmethod
     def load(path: Union[str, Path]) -> SLMConfig:
         path = Path(path)
-        
+
         if not path.exists():
             raise FileNotFoundError(
                 f"Config file not found: '{path}'\n"
@@ -67,8 +70,7 @@ class ConfigLoader:
             )
         except Exception as e:
             raise RuntimeError(
-                f"Error reading config file: '{path}'\n"
-                f"   {type(e).__name__}: {str(e)}"
+                f"Error reading config file: '{path}'\n" f"   {type(e).__name__}: {str(e)}"
             ) from e
 
         # Validate config structure
@@ -80,16 +82,14 @@ class ConfigLoader:
             # Format validation errors nicely
             error_details = []
             for error in e.errors():
-                field = " -> ".join(str(x) for x in error['loc'])
-                msg = error['msg']
+                field = " -> ".join(str(x) for x in error["loc"])
+                msg = error["msg"]
                 error_details.append(f"   • {field}: {msg}")
-            
+
             raise ValueError(
                 f"Invalid config structure in: '{path}'\n"
                 f"\n"
-                f"Validation errors:\n" +
-                "\n".join(error_details) +
-                f"\n\n"
+                f"Validation errors:\n" + "\n".join(error_details) + f"\n\n"
                 f"Required fields:\n"
                 f"   - model.name (string)\n"
                 f"   - model.path (string)\n"
@@ -108,19 +108,18 @@ class ConfigLoader:
     @staticmethod
     def save(config: SLMConfig, path: Union[str, Path]):
         path = Path(path)
-        
+
         try:
             data = config.model_dump(mode="json")
         except Exception as e:
             raise RuntimeError(
-                f"Error serializing config\n"
-                f"   {type(e).__name__}: {str(e)}"
+                f"Error serializing config\n" f"   {type(e).__name__}: {str(e)}"
             ) from e
-        
+
         try:
             # Create parent directory if it doesn't exist
             path.parent.mkdir(parents=True, exist_ok=True)
-            
+
             with open(path, "w") as f:
                 if path.suffix in [".yaml", ".yml"]:
                     yaml.dump(data, f, sort_keys=False, default_flow_style=False)
@@ -145,6 +144,5 @@ class ConfigLoader:
             )
         except Exception as e:
             raise RuntimeError(
-                f"Error writing config file: '{path}'\n"
-                f"   {type(e).__name__}: {str(e)}"
+                f"Error writing config file: '{path}'\n" f"   {type(e).__name__}: {str(e)}"
             ) from e

@@ -1,15 +1,21 @@
 """Shared pytest fixtures for SLM Packager tests."""
+
 import json
-import pytest
-from pathlib import Path
-from typing import Dict, Any
-from unittest.mock import MagicMock, patch
-import tempfile
 import shutil
+import tempfile
+from pathlib import Path
+from typing import Any, Dict
+from unittest.mock import MagicMock, patch
+
+import pytest
 
 from slm_packager.config.models import (
-    SLMConfig, ModelConfig, RuntimeConfig, RuntimeType, 
-    DeviceType, GenerationParams
+    DeviceType,
+    GenerationParams,
+    ModelConfig,
+    RuntimeConfig,
+    RuntimeType,
+    SLMConfig,
 )
 
 
@@ -49,16 +55,16 @@ def sample_registry_data() -> Dict[str, Any]:
                         "size": "100MB",
                         "speed": "fast",
                         "quality": "good",
-                        "recommended": True
+                        "recommended": True,
                     },
                     "q8_0": {
                         "file": "test-model.Q8_0.gguf",
                         "size": "200MB",
                         "speed": "medium",
                         "quality": "excellent",
-                        "recommended": False
-                    }
-                }
+                        "recommended": False,
+                    },
+                },
             },
             "test-pytorch": {
                 "name": "Test PyTorch Model",
@@ -72,11 +78,11 @@ def sample_registry_data() -> Dict[str, Any]:
                         "size": "50MB",
                         "speed": "slow",
                         "quality": "good",
-                        "recommended": True
+                        "recommended": True,
                     }
-                }
-            }
-        }
+                },
+            },
+        },
     }
 
 
@@ -84,7 +90,7 @@ def sample_registry_data() -> Dict[str, Any]:
 def mock_registry_file(temp_dir, sample_registry_data):
     """Create a temporary registry JSON file."""
     registry_path = temp_dir / "models.json"
-    with open(registry_path, 'w') as f:
+    with open(registry_path, "w") as f:
         json.dump(sample_registry_data, f)
     return registry_path
 
@@ -97,19 +103,12 @@ def sample_gguf_config() -> SLMConfig:
             name="test-gguf",
             path="/path/to/test.gguf",
             format="gguf",
-            description="Test GGUF model"
+            description="Test GGUF model",
         ),
         runtime=RuntimeConfig(
-            type=RuntimeType.LLAMA_CPP,
-            device=DeviceType.CPU,
-            threads=4,
-            context_size=2048
+            type=RuntimeType.LLAMA_CPP, device=DeviceType.CPU, threads=4, context_size=2048
         ),
-        params=GenerationParams(
-            temperature=0.7,
-            max_tokens=512,
-            stream=False
-        )
+        params=GenerationParams(temperature=0.7, max_tokens=512, stream=False),
     )
 
 
@@ -121,17 +120,10 @@ def sample_transformers_config() -> SLMConfig:
             name="test-transformers",
             path="gpt2",
             format="pytorch",
-            description="Test Transformers model"
+            description="Test Transformers model",
         ),
-        runtime=RuntimeConfig(
-            type=RuntimeType.TRANSFORMERS,
-            device=DeviceType.CPU
-        ),
-        params=GenerationParams(
-            temperature=0.8,
-            max_tokens=256,
-            stream=False
-        )
+        runtime=RuntimeConfig(type=RuntimeType.TRANSFORMERS, device=DeviceType.CPU),
+        params=GenerationParams(temperature=0.8, max_tokens=256, stream=False),
     )
 
 
@@ -139,7 +131,7 @@ def sample_transformers_config() -> SLMConfig:
 def sample_config_yaml(temp_dir, sample_gguf_config) -> Path:
     """Create a sample YAML config file for testing."""
     from slm_packager.config.loader import ConfigLoader
-    
+
     config_path = temp_dir / "test-config.yaml"
     ConfigLoader.save(sample_gguf_config, config_path)
     return config_path
