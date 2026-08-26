@@ -2,6 +2,38 @@
 
 This guide walks you through initializing and running your first Small Language Model using SLM Packager.
 
+## Installation
+
+Inference engines are optional extras, so install the one matching the models you
+plan to run. This guide uses GGUF models, so:
+
+```bash
+pipx install "slm-packager[gguf]"
+```
+
+Inside a virtual environment, plain pip works too:
+```bash
+python3 -m venv .venv && source .venv/bin/activate
+pip install "slm-packager[gguf]"
+```
+
+Other options: `[torch]` for PyTorch/HuggingFace models, `[onnx]` for ONNX
+(experimental), `[all]` for everything. Core on its own (`pip install slm-packager`)
+installs in seconds and is enough for `slm list`, `slm pull`, `slm init`, and
+`slm serve` — you can add an engine later.
+
+> `[gguf]` builds `llama-cpp-python` from source, so it needs cmake and a C/C++
+> toolchain (`xcode-select --install` on macOS, `build-essential cmake` on
+> Debian/Ubuntu). `[torch]` and `[onnx]` install from prebuilt wheels.
+
+> **macOS / Homebrew users:** if you get an *externally-managed-environment* error with `pip`, use `pipx`:
+> ```bash
+> brew install pipx
+> pipx install "slm-packager[gguf]"
+> ```
+
+---
+
 ## 📋 Understanding `slm init`
 
 The `slm init` command creates a YAML configuration file that defines:
@@ -35,8 +67,9 @@ When you run `slm init`, you'll be asked:
      - `onnx` → `onnx`
      - `pytorch` → `transformers`
 
-5. **Output** (optional)
-   - Name of the config file (default: `slm.yaml`)
+These four are prompted interactively. `--device` (default `cpu`) and `-o/--output`
+(default `slm.yaml`) are options rather than prompts — pass them on the command line
+if you want to change them.
 
 ---
 
@@ -216,12 +249,18 @@ slm benchmark slm.yaml
 
 Output:
 ```
-Load Time: 2.34s
-Generation Time: 1.45s
-Memory Usage: 1234.56 MB
-Latency: 23.45 ms
-Estimated TPS: 45.67
+📊 Benchmark Results:
+   Load Time: 0.81s
+   Memory Usage (process RSS): 1369.19 MB
+   Tokens Generated: 700 over 5 run(s)
+   Generation Time (mean): 0.98s
+   Tokens/sec (median): 142.92
+   Time per Token: 7.00 ms
 ```
+
+By default this runs a discarded warmup pass plus 3 timed runs of 128 tokens and
+reports the median. Use `--runs` and `--max-tokens` to change that, and `--prompt` to
+benchmark with your own input.
 
 ### Start API Server
 
@@ -229,7 +268,16 @@ Estimated TPS: 45.67
 slm serve --port 8000
 ```
 
-Then test with curl:
+The server starts empty — load a model before generating, or `/generate` returns
+`400 Model not loaded`:
+
+```bash
+curl -X POST http://localhost:8000/load \
+  -H "Content-Type: application/json" \
+  -d '{"config_path": "~/.slm/configs/tinyllama.yaml"}'
+```
+
+Then generate:
 ```bash
 curl -X POST http://localhost:8000/generate \
   -H "Content-Type: application/json" \
@@ -239,6 +287,9 @@ curl -X POST http://localhost:8000/generate \
   }'
 ```
 
+Other endpoints: `GET /info` (active model config) and `GET /health`. Full
+interactive docs are at `http://localhost:8000/docs`.
+
 ---
 
 ## 🎓 Recommended Models for Beginners
@@ -247,7 +298,7 @@ curl -X POST http://localhost:8000/generate \
 |-------|------|--------|----------|---------------|
 | **TinyLlama** | 1.1B | GGUF | CPU testing, learning | [HuggingFace](https://huggingface.co/TheBloke/TinyLlama-1.1B-Chat-v1.0-GGUF) |
 | **Phi-2** | 2.7B | PyTorch | Reasoning, coding | `microsoft/phi-2` (HF ID) |
-| **Qwen-1.8B** | 1.8B | GGUF/PyTorch | Multilingual | [HuggingFace](https://huggingface.co/Qwen/Qwen-1_8B-Chat) |
+| **Qwen2.5 1.5B** | 1.5B | GGUF | Multilingual | [HuggingFace](https://huggingface.co/Qwen/Qwen2.5-1.5B-Instruct-GGUF) |
 
 ---
 
@@ -259,8 +310,8 @@ curl -X POST http://localhost:8000/generate \
 - For HuggingFace models, ensure you have internet connection
 
 ### "Runtime not found" or import errors
-- Ensure all dependencies are installed: `pip install -e .`
-- For GGUF: `llama-cpp-python` must be compiled correctly
+- Ensure the engine extra is installed: `pip install "slm-packager[gguf]"` for GGUF models, `"slm-packager[torch]"` for PyTorch
+- For GGUF: install `"slm-packager[gguf]"`; llama-cpp-python must compile successfully
 - For GPU: Make sure CUDA/Metal is installed
 
 ### Model runs slowly

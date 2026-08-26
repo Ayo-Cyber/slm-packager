@@ -1,7 +1,7 @@
 import logging
 import sys
 from pathlib import Path
-from typing import Iterator, Union
+from typing import Iterator, Optional, Union
 
 IMPORT_ERROR = ""
 try:
@@ -23,15 +23,20 @@ class LlamaCppRuntime(BaseRuntime):
         # Check for llama-cpp-python dependency
         if not LLAMA_CPP_AVAILABLE:
             raise ImportError(
-                "llama.cpp runtime requires 'llama-cpp-python' package.\n"
+                "The GGUF runtime requires 'llama-cpp-python'.\n"
                 "Install it with:\n"
-                "   pip install llama-cpp-python\n"
+                "   pip install 'slm-packager[gguf]'\n"
+                "\n"
+                "   It builds from source, so you need cmake and a C/C++ toolchain:\n"
+                "     macOS         xcode-select --install\n"
+                "     Debian/Ubuntu sudo apt install build-essential cmake\n"
+                "     Windows       MSVC Build Tools\n"
                 "\n"
                 "   For Metal support (Apple Silicon M1/M2/M3):\n"
-                '   CMAKE_ARGS="-DLLAMA_METAL=on" pip install llama-cpp-python --no-cache-dir\n'
+                '   CMAKE_ARGS="-DGGML_METAL=on" pip install llama-cpp-python --no-cache-dir\n'
                 "\n"
                 "   For CUDA support (NVIDIA GPU):\n"
-                '   CMAKE_ARGS="-DLLAMA_CUBLAS=on" pip install llama-cpp-python --no-cache-dir\n'
+                '   CMAKE_ARGS="-DGGML_CUDA=on" pip install llama-cpp-python --no-cache-dir\n'
                 f"\n   Error details: {IMPORT_ERROR}"
             )
 
@@ -209,14 +214,60 @@ class LlamaCppRuntime(BaseRuntime):
                     "Check your generation parameters in the config"
                 ) from e
 
+    def apply_chat_template(self, prompt: str) -> Optional[str]:
+        """Format ``prompt`` with the chat template embedded in the GGUF metadata."""
+        if self.model is None:
+            return None
+
+        metadata = getattr(self.model, "metadata", None) or {}
+        template = metadata.get("tokenizer.chat_template")
+        if not template:
+            return None
+
+        try:
+            from jinja2 import Environment
+        except ImportError:
+            logger.debug("jinja2 unavailable; skipping chat template")
+            return None
+
+        try:
+            eos_id = metadata.get("tokenizer.ggml.eos_token_id")
+            bos_id = metadata.get("tokenizer.ggml.bos_token_id")
+            rendered = (
+                Environment()
+                .from_string(template)
+                .render(
+                    messages=[{"role": "user", "content": prompt}],
+                    add_generation_prompt=True,
+                    eos_token=self._token_text(eos_id),
+                    bos_token=self._token_text(bos_id),
+                )
+            )
+        except Exception as e:
+            logger.debug(f"Could not render chat template: {e}")
+            return None
+
+        return rendered or None
+
+    def _token_text(self, token_id) -> str:
+        """Best-effort text for a token id from GGUF metadata."""
+        if token_id is None:
+            return ""
+        try:
+            return self.model.detokenize([int(token_id)]).decode("utf-8", "ignore")
+        except Exception:
+            return ""
+
     def _stream_generator(self, output_stream) -> Iterator[str]:
         try:
             for chunk in output_stream:
                 text = chunk["choices"][0]["text"]
                 yield text
         except Exception as e:
+            # Never yield the error as content — callers cannot tell it apart from
+            # generated text. Raise so the CLI and API can report a real failure.
             logger.error(f"Stream error: {str(e)}")
-            yield f"\nStream error: {str(e)}\n"
+            raise RuntimeError(f"Error during streaming generation: {str(e)}") from e
 
     def unload(self):
         if self.model:

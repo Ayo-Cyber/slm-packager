@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 
 class Quantizer:
     @staticmethod
-    def quantize_gguf(model_path: str, output_path: str, type: str = "q4_k_m"):
+    def quantize_gguf(model_path: str, output_path: str, quant_type: str = "q4_k_m"):
         """
         Quantize a GGUF model - downloads tool automatically if needed
         """
@@ -19,10 +19,10 @@ class Quantizer:
             # Auto-download binary
             binary = BinaryManager.get_quantize_binary()
 
-            logger.info(f"Quantizing {Path(model_path).name} to {type}")
+            logger.info(f"Quantizing {Path(model_path).name} to {quant_type}")
             logger.debug(f"Output: {output_path}")
 
-            cmd = [str(binary), model_path, output_path, type]
+            cmd = [str(binary), model_path, output_path, quant_type]
 
             result = subprocess.run(cmd, capture_output=True, text=True, check=True)
 
@@ -51,7 +51,7 @@ class Quantizer:
             ) from e
 
     @staticmethod
-    def quantize_onnx(model_path: str, output_path: str, type: str = "int8"):
+    def quantize_onnx(model_path: str, output_path: str, quant_type: str = "int8"):
         """
         Quantize an ONNX model using onnxruntime.quantization.
         """
@@ -59,16 +59,19 @@ class Quantizer:
             from onnxruntime.quantization import QuantType, quantize_dynamic
         except ImportError:
             raise ImportError(
-                "ONNX quantization requires 'onnxruntime'\n" "Install with: pip install onnxruntime"
+                "ONNX quantization requires 'onnxruntime'\n"
+                "Install with: pip install 'slm-packager[onnx]'"
             )
 
-        logger.info(f"Quantizing ONNX model to {type}")
+        logger.info(f"Quantizing ONNX model to {quant_type}")
 
-        quant_type = QuantType.QUInt8 if type == "int8" else QuantType.QInt8
+        weight_type = QuantType.QUInt8 if quant_type == "int8" else QuantType.QInt8
 
         try:
             quantize_dynamic(
-                model_input=Path(model_path), model_output=Path(output_path), weight_type=quant_type
+                model_input=Path(model_path),
+                model_output=Path(output_path),
+                weight_type=weight_type,
             )
             logger.info(f"Successfully quantized to {output_path}")
             print(f"Quantization complete: {output_path}")

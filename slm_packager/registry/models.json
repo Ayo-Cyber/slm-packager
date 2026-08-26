@@ -1,5 +1,5 @@
 {
-  "version": "0.2.2",
+  "version": "0.3.0",
   "models": {
     "tinyllama": {
       "name": "TinyLlama 1.1B Chat",
@@ -67,25 +67,31 @@
         }
       }
     },
-    "qwen-1.8b": {
-      "name": "Qwen 1.8B Chat",
-      "description": "Alibaba's efficient chat model",
+    "qwen2.5-1.5b": {
+      "name": "Qwen 2.5 1.5B Instruct",
+      "description": "Alibaba's compact instruct model \u2014 multilingual, strong for its size",
       "format": "gguf",
       "runtime": "llama_cpp",
-      "repo": "Qwen/Qwen-1_8B-Chat-GGUF",
+      "repo": "Qwen/Qwen2.5-1.5B-Instruct-GGUF",
       "variants": {
         "q4_k_m": {
-          "file": "qwen-1_8b-chat-q4_k_m.gguf",
+          "file": "qwen2.5-1.5b-instruct-q4_k_m.gguf",
           "size": "1.1GB",
           "speed": "fast",
           "quality": "good",
           "recommended": true
+        },
+        "q8_0": {
+          "file": "qwen2.5-1.5b-instruct-q8_0.gguf",
+          "size": "1.9GB",
+          "speed": "medium",
+          "quality": "excellent"
         }
       }
     },
     "qwen2.5-3b": {
       "name": "Qwen2.5 3B Instruct",
-      "description": "Alibaba's Qwen2.5 — strong multilingual and coding model",
+      "description": "Alibaba's Qwen2.5 \u2014 strong multilingual and coding model",
       "format": "gguf",
       "runtime": "llama_cpp",
       "repo": "Qwen/Qwen2.5-3B-Instruct-GGUF",
@@ -107,7 +113,7 @@
     },
     "mistral-7b": {
       "name": "Mistral 7B Instruct v0.2",
-      "description": "Mistral AI's 7B instruction model — fast and capable",
+      "description": "Mistral AI's 7B instruction model \u2014 fast and capable",
       "format": "gguf",
       "runtime": "llama_cpp",
       "repo": "TheBloke/Mistral-7B-Instruct-v0.2-GGUF",
@@ -135,7 +141,7 @@
     },
     "llama3-8b": {
       "name": "Meta Llama 3 8B Instruct",
-      "description": "Meta's Llama 3 8B — excellent instruction following",
+      "description": "Meta's Llama 3 8B \u2014 excellent instruction following",
       "format": "gguf",
       "runtime": "llama_cpp",
       "repo": "QuantFactory/Meta-Llama-3-8B-Instruct-GGUF",
@@ -157,7 +163,7 @@
     },
     "gemma2-2b": {
       "name": "Google Gemma 2 2B Instruct",
-      "description": "Google's compact Gemma 2 — great quality at small size",
+      "description": "Google's compact Gemma 2 \u2014 great quality at small size",
       "format": "gguf",
       "runtime": "llama_cpp",
       "repo": "bartowski/gemma-2-2b-it-GGUF",

@@ -1,7 +1,7 @@
 model:
   name: "gpt2"
   description: "GPT-2 124M on Apple Silicon GPU"
-  format: "transformers"
+  format: "pytorch"
   path: "gpt2"
 
 runtime:

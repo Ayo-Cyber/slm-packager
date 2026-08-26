@@ -179,6 +179,10 @@ class TestCLICommands:
             "tokens_per_second": 25.0,
             "memory_mb": 512.0,
             "latency_ms": 2000.0,
+            "ms_per_token": 40.0,
+            "tokens_generated": 128,
+            "runs": 3,
+            "token_count_method": "tokenizer",
         }
         mock_benchmarker_class.return_value = mock_benchmarker
 
@@ -209,6 +213,10 @@ class TestCLICommands:
             "tokens_per_second": 5.0,
             "memory_mb": 512.0,
             "latency_ms": 2000.0,
+            "ms_per_token": 40.0,
+            "tokens_generated": 128,
+            "runs": 3,
+            "token_count_method": "tokenizer",
         }
         mock_benchmarker_class.return_value = mock_benchmarker
 
@@ -239,6 +247,10 @@ class TestCLICommands:
             "tokens_per_second": 5.0,
             "memory_mb": 512.0,
             "latency_ms": 2000.0,
+            "ms_per_token": 40.0,
+            "tokens_generated": 128,
+            "runs": 3,
+            "token_count_method": "tokenizer",
         }
         mock_benchmarker_class.return_value = mock_benchmarker
 

@@ -2,15 +2,42 @@
 
 **Run any small language model locally — one command.**
 
-SLM Packager is an open-source toolkit for running, packaging, and benchmarking Small Language Models (1B–7B parameters) across GGUF, PyTorch, and ONNX formats. One unified CLI. Three runtimes. Zero friction.
+SLM Packager is an open-source toolkit for running, packaging, and benchmarking Small Language Models (1B–7B parameters). One CLI over llama.cpp and transformers, plus an ONNX path for exported models — so switching runtime or quantization is a config change, not a rewrite. GGUF and PyTorch are the well-tested routes; **ONNX is experimental**.
 
 ---
 
 ## Install
 
+Install the engine you need. Core is small and pure-Python (~50MB, seconds, no
+compiler):
+
 ```bash
-pip install slm-packager
+pip install "slm-packager[gguf]"    # GGUF via llama.cpp — best on CPU
+pip install "slm-packager[torch]"   # PyTorch/HuggingFace via transformers
+pip install "slm-packager[onnx]"    # ONNX Runtime (experimental)
+pip install "slm-packager[all]"     # everything
 ```
+
+| Extra | Pulls | Notes |
+|-------|-------|-------|
+| *(core)* | click, pydantic, fastapi, huggingface-hub | CLI, config, registry, API server |
+| `[gguf]` | llama-cpp-python | **Builds from source** — needs cmake and a C/C++ toolchain |
+| `[torch]` | torch, transformers, accelerate | Multi-GB download |
+| `[onnx]` | onnxruntime, transformers, numpy | Prebuilt wheels, no compiler |
+| `[speed]` | hf_transfer | Faster model downloads |
+
+Core alone is enough for `slm list`, `slm pull`, `slm init`, and `slm serve`. Add an
+engine when you want to actually generate; running a model without the matching
+engine names the extra to install.
+
+With `pipx` (no venv setup needed):
+```bash
+pipx install "slm-packager[gguf]"
+```
+
+!!! tip "macOS users"
+    If `pip install` gives an *externally-managed-environment* error, use `pipx` instead:
+    `brew install pipx && pipx install "slm-packager[gguf]"`
 
 ## Quickstart
 
@@ -76,8 +103,8 @@ Three runtimes — one interface. Switch runtimes by changing one line in your Y
 
 ## Next Steps
 
-- [Quick Start](QUICKSTART.md) — full walkthrough from install to serving
+- [Quick Start](quickstart.md) — full walkthrough from install to serving
 - [CLI Reference](cli-reference.md) — every command and flag
 - [Runtimes](runtimes.md) — choosing between llama.cpp, transformers, and ONNX
-- [GPU Acceleration](GPU_ACCELERATION.md) — MPS, CUDA, Metal setup
+- [GPU Acceleration](gpu-acceleration.md) — MPS, CUDA, Metal setup
 - [Benchmarks](benchmarks.md) — methodology and full results

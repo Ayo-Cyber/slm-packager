@@ -99,8 +99,8 @@ You can use any HuggingFace model ID in the `path` field:
 # Phi-2 (2.7B)
 path: microsoft/phi-2
 
-# Qwen 1.8B
-path: Qwen/Qwen-1_8B-Chat
+# Qwen2.5 1.5B Instruct
+path: Qwen/Qwen2.5-1.5B-Instruct
 
 # Gemma 2B
 path: google/gemma-2b-it

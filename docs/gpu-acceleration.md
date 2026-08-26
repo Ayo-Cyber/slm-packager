@@ -67,7 +67,7 @@ slm run gpt2-gpu.yaml --prompt "Explain quantum computing"
 model:
   name: "gpt2"
   path: "gpt2"
-  format: "transformers"
+  format: "pytorch"
 
 runtime:
   type: "transformers"
@@ -124,7 +124,7 @@ CUDA provides the fastest inference on NVIDIA GPUs with 3-5x speedup vs CPU.
 **Installation:**
 ```bash
 # Reinstall llama-cpp-python with CUDA support
-CMAKE_ARGS="-DLLAMA_CUBLAS=on" pip install llama-cpp-python --no-cache-dir
+CMAKE_ARGS="-DGGML_CUDA=on" pip install llama-cpp-python --no-cache-dir
 ```
 
 **Configuration:**
@@ -165,7 +165,7 @@ python -c "import torch; print(f'CUDA available: {torch.cuda.is_available()}')"
 model:
   name: "gpt2"
   path: "gpt2"
-  format: "transformers"
+  format: "pytorch"
 
 runtime:
   type: "transformers"
@@ -245,7 +245,7 @@ Metal provides the **fastest inference** on Apple Silicon when using GGUF models
 
 ```bash
 # Rebuild llama-cpp-python with Metal support
-CMAKE_ARGS="-DLLAMA_METAL=on" pip install llama-cpp-python --no-cache-dir
+CMAKE_ARGS="-DGGML_METAL=on" pip install llama-cpp-python --no-cache-dir
 ```
 
 ### Configuration
@@ -277,7 +277,7 @@ python -c "import llama_cpp; print('Metal support:', hasattr(llama_cpp.llama_cpp
 1. Rebuild with Metal:
 ```bash
 pip uninstall llama-cpp-python -y
-CMAKE_ARGS="-DLLAMA_METAL=on" pip install llama-cpp-python --no-cache-dir --force-reinstall
+CMAKE_ARGS="-DGGML_METAL=on" pip install llama-cpp-python --no-cache-dir --force-reinstall
 ```
 
 2. Check build output for "Metal: ON"
@@ -292,28 +292,26 @@ CMAKE_ARGS="-DLLAMA_METAL=on" pip install llama-cpp-python --no-cache-dir --forc
 
 ## Performance Comparison Table
 
-Real-world benchmarks on different hardware:
+Measured numbers live in one place: **[Benchmarks](benchmarks.md)**, with the exact
+command used to produce them. Rather than repeat figures here (and let them drift out
+of sync), here is what to expect qualitatively:
 
-### GPT-2 (124M parameters)
+| Situation | What GPU offload does |
+|-----------|----------------------|
+| Small PyTorch model (~100M params) on MPS | **Roughly nothing.** Per-step dispatch overhead cancels the compute win. Measured: GPT-2 is 79.7 tok/s on CPU vs 77.0 on MPS. |
+| Larger PyTorch model (1B+) on MPS | Meaningful gain — the overhead amortizes over more compute per step. |
+| GGUF on Metal (`gpu_layers`) | Usually a solid gain, and lets you fit more context. Requires a Metal-enabled `llama-cpp-python` build. |
+| CUDA, either runtime | The largest gains, especially with all layers offloaded. |
 
-| Platform | Runtime | Config | Tokens/sec | Memory |
-|----------|---------|--------|-----------|---------|
-| M2 Pro | transformers CPU | `device: cpu` | 1.3 | 2.1GB |
-| M2 Pro | transformers MPS | `device: mps` | 2.4 | 2.1GB |
-| M2 Pro | onnx CPU | `device: cpu` | 13.8 | 600MB |
-| RTX 3080 | transformers CUDA | `device: cuda` | ~40-60 | 1GB VRAM |
-| RTX 3080 | llama.cpp CUDA | `gpu_layers: 32` | ~80-120 | 400MB VRAM |
+Two caveats that shape the ceiling: the transformers runtime uses **float32 on MPS**
+and float16 on CUDA, and the llama.cpp runtime **ignores `runtime.device`** entirely —
+only `gpu_layers` controls offload there.
 
-### TinyLlama (1.1B parameters)
+Benchmark your own setup rather than trusting any table:
 
-| Platform | Runtime | Config | Tokens/sec | Memory |
-|----------|---------|--------|-----------|---------|
-| M2 Pro | llama.cpp CPU | Q4_K_M | 15-20 | 800MB |
-| M2 Pro | llama.cpp Metal | `gpu_layers: 32` | 40-60 | 800MB |
-| M2 Pro | transformers MPS | `device: mps` | 28 | 1.8GB |
-| RTX 3080 | llama.cpp CUDA | `gpu_layers: 32` | 100-150 | 600MB VRAM |
-
-*Benchmarks collected December 2025. Performance varies by hardware, model, and config.*
+```bash
+slm benchmark <model> --runs 5 --max-tokens 128
+```
 
 ---
 
@@ -391,9 +389,9 @@ if torch.backends.mps.is_available():
 
 ## Additional Resources
 
-- [GGUF Guide](GGUF_GUIDE.md) - llama.cpp with Metal/CUDA setup
-- [ONNX Guide](ONNX_GUIDE.md) - ONNX runtime with GPU
-- [Model Formats](MODEL_FORMATS.md) - Choosing the right format
+- [GGUF Guide](gguf-guide.md) - llama.cpp with Metal/CUDA setup
+- [ONNX Guide](onnx-guide.md) - ONNX runtime with GPU
+- [Model Formats](model-formats.md) - Choosing the right format
 
 ---
 

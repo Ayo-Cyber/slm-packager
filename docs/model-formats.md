@@ -27,7 +27,7 @@ A beginner's guide to choosing the right model format and runtime for your use c
 - Single-file format with model + metadata
 
 **Pros:**
-- ⚡ **5-10x faster** on CPU than PyTorch
+- ⚡ **Much faster on CPU** than PyTorch (see [Benchmarks](benchmarks.md))
 - 💾 **Much smaller** files (4-bit = ~4x smaller)
 - 🚀 **Low memory usage** 
 - 🔧 **CPU-optimized** with SIMD instructions
@@ -155,17 +155,25 @@ A beginner's guide to choosing the right model format and runtime for your use c
 
 ---
 
-## 📊 Performance Comparison (Example: TinyLlama)
+## 📊 Choosing a Format
 
-| Format | Runtime | Size | CPU Speed | Memory | GPU Speed |
-|--------|---------|------|-----------|--------|-----------|
-| GGUF Q4_K_M | llama.cpp | 600MB | **35 tok/s** ⚡ | 800MB | 25 tok/s |
-| GGUF Q8_0 | llama.cpp | 1.1GB | 30 tok/s | 1.2GB | 28 tok/s |
-| PyTorch FP16 | transformers | 2.2GB | 7 tok/s 🐌 | 3GB | **150 tok/s** ⚡ |
+| Format | Best for | Trade-off |
+|--------|----------|-----------|
+| **GGUF** (llama.cpp) | CPU inference, laptops, smallest memory footprint | Quantization costs some quality; needs a GGUF conversion of the model |
+| **PyTorch** (transformers) | Widest model support, GPU/CUDA, anything brand new on the Hub | Largest download and memory use; slowest on CPU |
+| **ONNX** | Exported models where you specifically need ONNX Runtime | **Experimental** — see the caveats in [ONNX](onnx-guide.md) |
 
-*On M1 MacBook Pro. tok/s = tokens per second*
+**Rule of thumb:** on a laptop without a discrete GPU, GGUF with llama.cpp is the
+fastest route by a wide margin. With CUDA available, PyTorch becomes competitive and
+supports more models.
 
-**Key Takeaway:** GGUF with llama.cpp is **5x faster** on CPU but transformers is **5x faster** on GPU.
+For measured numbers on real hardware — and the exact command to reproduce them —
+see [Benchmarks](benchmarks.md). Speed depends heavily on your machine, so benchmark
+rather than trusting any table:
+
+```bash
+slm benchmark <model> --runs 5 --max-tokens 128
+```
 
 ---
 
@@ -226,9 +234,10 @@ When you see model names like `Q4_K_M`, here's what it means:
 
 ## 🚀 Next Steps
 
-1. Read [QUICKSTART.md](QUICKSTART.md) for setup instructions
+1. Read [quickstart.md](quickstart.md) for setup instructions
 2. Try both runtimes to see the difference
 3. Benchmark your specific use case with `slm benchmark`
 4. Choose the format that best fits your needs
 
-**Questions?** Check the main [README.md](../README.md) or open an issue!
+**Questions?** Start at the [documentation home](index.md), or
+[open an issue](https://github.com/Ayo-Cyber/slm-packager/issues).

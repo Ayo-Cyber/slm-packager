@@ -119,7 +119,6 @@ class TestModelDownloader:
             repo_id="test/repo",
             filename="model.gguf",
             cache_dir=str(downloader.models_dir),
-            resume_download=True,
         )
 
         # Verify config created
@@ -192,3 +191,69 @@ runtime:
         assert len(installed) == 1
         assert installed[0]["name"] == "test"
         assert installed[0]["format"] == "gguf"
+
+    def test_hf_repo_id_recovered_only_inside_the_cache(self, downloader):
+        """Repo id resolution must be scoped to our own cache directory."""
+        inside = (
+            downloader.models_dir
+            / "models--TheBloke--TinyLlama-1.1B-Chat-v1.0-GGUF"
+            / "snapshots"
+            / "abc123"
+            / "model.gguf"
+        )
+        assert downloader._hf_repo_id_for_path(inside) == "TheBloke/TinyLlama-1.1B-Chat-v1.0-GGUF"
+
+        # A lookalike directory elsewhere on disk must not be treated as cache.
+        outside = Path("/tmp/models--Someone--Repo/snapshots/abc/model.gguf")
+        assert downloader._hf_repo_id_for_path(outside) is None
+
+        # An ordinary user path is not cache either.
+        assert downloader._hf_repo_id_for_path(Path("/home/me/models/mine.gguf")) is None
+
+    def test_delete_user_managed_symlink_does_not_touch_its_target(self, downloader, temp_dir):
+        """Deleting a model must never follow a symlink out to the user's real file.
+
+        `slm rm` removes the entry it was given. Resolving the link and deleting the
+        target could destroy a multi-GB file the user manages themselves.
+        """
+        real_weights = temp_dir / "my-real-model.gguf"
+        real_weights.write_text("weights")
+
+        link = temp_dir / "current.gguf"
+        link.symlink_to(real_weights)
+
+        config_path = downloader.configs_dir / "linked.yaml"
+        config_path.write_text(
+            f"model:\n  name: linked\n  path: {link}\n  format: gguf\n"
+            "runtime:\n  type: llama_cpp\n"
+        )
+
+        assert downloader.delete("linked") is True
+
+        assert not link.exists(), "the symlink itself should be removed"
+        assert real_weights.exists(), "the user's real file must survive"
+        assert not config_path.exists()
+
+    def test_delete_cached_model_uses_refcounted_hub_api(self, downloader):
+        """Cache deletion must go through delete_revisions, which refcounts blobs."""
+        cached = (
+            downloader.models_dir
+            / "models--TheBloke--phi-2-GGUF"
+            / "snapshots"
+            / "rev1"
+            / "phi-2.Q4_K_M.gguf"
+        )
+        cached.parent.mkdir(parents=True)
+        cached.write_text("weights")
+
+        config_path = downloader.configs_dir / "phi.yaml"
+        config_path.write_text(
+            f"model:\n  name: phi\n  path: {cached}\n  format: gguf\n"
+            "runtime:\n  type: llama_cpp\n"
+        )
+
+        with patch.object(downloader, "_delete_hf_cache") as mock_delete:
+            assert downloader.delete("phi") is True
+
+        mock_delete.assert_called_once_with("TheBloke/phi-2-GGUF")
+        assert not config_path.exists()

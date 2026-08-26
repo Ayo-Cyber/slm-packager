@@ -1,12 +1,12 @@
 # SLM Packager
 
-**Run any small language model locally — one command.**
+**Run small language models locally with one consistent CLI.**
 
-SLM Packager is an open-source toolkit for running, packaging, and benchmarking Small Language Models (1B–7B parameters) across GGUF, PyTorch, and ONNX formats. One unified CLI. Three runtimes. Zero friction.
+SLM Packager is an open-source toolkit for running, packaging, and benchmarking Small Language Models (1B–7B parameters). One CLI over llama.cpp and transformers, plus an ONNX path for exported models — so switching runtime or quantization is a config change, not a rewrite. GGUF and PyTorch are the well-tested routes; **ONNX is experimental**.
 
 [![PyPI](https://img.shields.io/pypi/v/slm-packager?color=blue&label=pypi)](https://pypi.org/project/slm-packager/)
 [![CI](https://github.com/Ayo-Cyber/slm-packager/actions/workflows/test.yml/badge.svg)](https://github.com/Ayo-Cyber/slm-packager/actions/workflows/test.yml)
-[![Coverage](https://img.shields.io/badge/coverage-117%20tests-brightgreen)](https://github.com/Ayo-Cyber/slm-packager/actions/workflows/test.yml)
+[![Tests](https://img.shields.io/badge/tests-148%20passing-brightgreen)](https://github.com/Ayo-Cyber/slm-packager/actions/workflows/test.yml)
 [![Python](https://img.shields.io/badge/python-3.9%2B-blue)]()
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue)](LICENSE)
 [![Docs](https://img.shields.io/badge/docs-GitHub%20Pages-blue)](https://ayo-cyber.github.io/slm-packager)
@@ -15,13 +15,48 @@ SLM Packager is an open-source toolkit for running, packaging, and benchmarking 
 
 ## Install
 
+Pick the engine you actually need — the core install is small and pure-Python
+(~50MB, a few seconds, no compiler):
+
 ```bash
-pip install slm-packager
+pip install "slm-packager[gguf]"    # GGUF via llama.cpp — best on CPU
+pip install "slm-packager[torch]"   # PyTorch/HuggingFace via transformers
+pip install "slm-packager[onnx]"    # ONNX Runtime (experimental)
+pip install "slm-packager[all]"     # everything
 ```
+
+With `pipx` (no venv setup needed on macOS, Linux, or Windows):
+
+```bash
+pipx install "slm-packager[gguf]"
+```
+
+| Extra | Pulls | Notes |
+|-------|-------|-------|
+| *(core)* | click, pydantic, fastapi, huggingface-hub | CLI, config, registry, API server. Seconds to install. |
+| `[gguf]` | llama-cpp-python | **Builds from source** — needs cmake and a C/C++ toolchain |
+| `[torch]` | torch, transformers, accelerate | Multi-GB download |
+| `[onnx]` | onnxruntime, transformers, numpy | Prebuilt wheels, no compiler |
+| `[speed]` | hf_transfer | Faster model downloads |
+
+`[gguf]` is the only one needing a compiler: `xcode-select --install` on macOS,
+`build-essential` + `cmake` on Debian/Ubuntu,
+[MSVC Build Tools](https://visualstudio.microsoft.com/visual-cpp-build-tools/) on
+Windows. If you'd rather skip that, `[torch]` and `[onnx]` install from prebuilt
+wheels.
+
+You can install core first and add an engine later — `slm list`, `slm pull`,
+`slm init` and `slm serve` all work without one, and running a model without the
+matching engine tells you exactly which extra to install.
+
+> macOS users: if `pip install` gives an "externally-managed-environment" error, use `pipx` (install with `brew install pipx`).
 
 ## Quickstart
 
 ```bash
+# Install the GGUF engine (tinyllama is a GGUF model)
+pip install "slm-packager[gguf]"
+
 # Pull a model
 slm pull tinyllama
 
@@ -32,7 +67,10 @@ slm run tinyllama --prompt "Explain transformers in one sentence"
 slm benchmark tinyllama
 ```
 
-That's it. Model downloads, auto-configures, and runs.
+`pull` downloads the recommended quantization and writes a config; `run` loads it and
+generates. Prompts are automatically wrapped in the model's own chat template (pass
+`--raw` to skip), which is what stops an instruction-tuned model from replying to a
+bare prompt with nothing at all.
 
 ---
 
@@ -53,8 +91,13 @@ slm run qwen3-4b --prompt "Hello!"
 |-------|------|---------|----------|
 | `gpt2` | 500MB | transformers | Fast testing, MPS |
 | `tinyllama` | 637MB | llama.cpp | CPU-efficient chat |
+| `qwen2.5-1.5b` | 1.1GB | llama.cpp | Multilingual chat |
+| `gemma2-2b` | 1.6GB | llama.cpp | Quality at small size |
 | `phi-2` | 1.6GB | llama.cpp | Reasoning tasks |
-| `qwen-1.8b` | 1.1GB | llama.cpp | Multilingual chat |
+| `phi-3-mini` | 2.2GB | llama.cpp | Reasoning, longer context |
+| `qwen2.5-3b` | 1.9GB | llama.cpp | Multilingual + coding |
+| `mistral-7b` | 4.4GB | llama.cpp | Fast general-purpose |
+| `llama3-8b` | 4.9GB | llama.cpp | Best instruction following |
 
 ```bash
 slm list                          # all registry models
@@ -63,17 +106,24 @@ slm pull phi-2 --list-variants    # see quantization options
 
 ---
 
-## Real Benchmarks (M3 Pro · 18GB)
+## Benchmarks (M3 Pro · 18GB)
 
 | Model | Runtime | Device | Tokens/sec |
 |-------|---------|--------|-----------|
-| GPT-2 124M | transformers | CPU | 53.16 |
-| GPT-2 124M | transformers | MPS ⚡ | 28.06 |
-| TinyLlama 1.1B | llama.cpp | CPU | 9.19 |
-| Phi-2 2.7B | llama.cpp | CPU | 33.67 |
-| Qwen3 4B | llama.cpp | CPU | 31.71 |
+| TinyLlama 1.1B Q4_K_M | llama.cpp | CPU | 142.9 |
+| GPT-2 124M | transformers | CPU | 79.7 |
+| GPT-2 124M | transformers | MPS | 77.0 |
+| Phi-2 2.7B Q4_K_M | llama.cpp | CPU | 30.9 |
+| Qwen3 4B Q4_K_M | llama.cpp | CPU | 27.4 |
 
-Run your own: `slm benchmark <model>`
+Measured with `slm benchmark <model> --runs 5 --max-tokens 128` — median of 5 timed
+runs after a discarded warmup, tokens counted with the model's own tokenizer. One
+machine, so treat these as a starting point rather than a leaderboard; run your own.
+
+Two things worth knowing: MPS and CPU are within noise for a 124M model, because the
+GPU dispatch overhead isn't amortized at that size — expect MPS to pull ahead on
+larger PyTorch models. And memory figures from `slm benchmark` are whole-process RSS
+including Python and the framework, so they're an upper bound, not weight size.
 
 ---
 
@@ -90,7 +140,7 @@ slm run gpt2-mps.yaml --prompt "Hello!"
 ### NVIDIA (CUDA)
 
 ```bash
-CMAKE_ARGS="-DLLAMA_CUBLAS=on" pip install llama-cpp-python --no-cache-dir
+CMAKE_ARGS="-DGGML_CUDA=on" pip install llama-cpp-python --no-cache-dir
 # then set gpu_layers in your YAML config
 ```
 
@@ -115,17 +165,40 @@ slm rm <model>                        # remove installed model
 
 ## API Server
 
+The server starts with no model loaded, so load one first, then generate:
+
 ```bash
 slm serve --port 8000
 ```
 
 ```bash
+# 1. Load a model (required before generating)
+curl -X POST http://localhost:8000/load \
+  -H "Content-Type: application/json" \
+  -d '{"config_path": "~/.slm/configs/tinyllama.yaml"}'
+
+# 2. Generate
 curl -X POST http://localhost:8000/generate \
   -H "Content-Type: application/json" \
   -d '{"prompt": "The future of AI is", "params": {"max_tokens": 100}}'
 ```
 
-Supports streaming (`"stream": true`) and async model loading.
+| Endpoint | Method | Purpose |
+|----------|--------|---------|
+| `/load` | POST | Load a model from a config path (`{"config_path": "..."}`) |
+| `/generate` | POST | Generate text; returns `{"text": ...}` or an SSE stream |
+| `/info` | GET | Active model's config, or `{"status": "no model loaded"}` |
+| `/health` | GET | Liveness check |
+
+Set `"stream": true` in `params` for Server-Sent Events. Streamed chunks arrive as
+`data: {"text": "..."}`, failures as a named `error` event, and the stream ends with
+`data: [DONE]`. Loading a new model waits for in-flight generations to finish;
+requests during a switch get HTTP 409. Interactive docs: `http://localhost:8000/docs`.
+
+Prompts are wrapped in the model's chat template by default, so `/generate` returns
+the same thing `slm run` would. Pass `"raw": true` to send the prompt verbatim.
+Generations are serialized per model, so concurrent requests queue rather than
+corrupting shared model state.
 
 ---
 
@@ -172,7 +245,7 @@ pip install -e ".[dev]"
 pytest
 ```
 
-117 tests · 52% coverage · CI on every push
+148 tests · 59% coverage · CI on every push
 
 ---
 

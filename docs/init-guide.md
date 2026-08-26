@@ -219,15 +219,15 @@ A: Yes! Use relative paths (e.g., `./models/...`) and commit the config to git.
 A: No! Just use the model ID (e.g., `gpt2`) and it auto-downloads.
 
 **Q: Which is faster: GGUF or PyTorch?**
-A: GGUF is ~5-10x faster on CPU. PyTorch is faster on GPU.
+A: GGUF is considerably faster on CPU; PyTorch is stronger on GPU and supports more models. See [Benchmarks](benchmarks.md).
 
 ---
 
 ## 📚 Next Steps
 
 1. ✅ Create your first config with `slm init`
-2. 📖 Read [GGUF_GUIDE.md](GGUF_GUIDE.md) for detailed GGUF setup
-3. 📖 Read [MODEL_FORMATS.md](MODEL_FORMATS.md) to understand the differences
+2. 📖 Read [gguf-guide.md](gguf-guide.md) for detailed GGUF setup
+3. 📖 Read [model-formats.md](model-formats.md) to understand the differences
 4. 🚀 Run `slm benchmark` to compare different configs
 
 Happy experimenting! 🎯

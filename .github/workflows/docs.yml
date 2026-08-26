@@ -1,4 +1,4 @@
-name: Deploy Docs
+name: Docs
 
 on:
   push:
@@ -6,23 +6,63 @@ on:
     paths:
       - "docs/**"
       - "mkdocs.yml"
-      - "README.md"
+  pull_request:
+    branches: [main]
+    paths:
+      - "docs/**"
+      - "mkdocs.yml"
 
 permissions:
   contents: write
 
+concurrency:
+  group: docs-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  deploy:
+  build:
+    name: Build (strict)
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
 
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+          cache: pip
 
       - name: Install MkDocs
         run: pip install mkdocs-material
 
-      - name: Deploy to GitHub Pages
+      # --strict turns broken internal links and orphaned pages into failures,
+      # so they surface on the PR instead of after deploy.
+      - name: Build site
+        run: mkdocs build --strict
+
+  deploy:
+    name: Deploy to GitHub Pages
+    needs: build
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install MkDocs
+        run: pip install mkdocs-material
+
+      - name: Configure git identity
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Deploy
         run: mkdocs gh-deploy --force

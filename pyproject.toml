@@ -1,14 +1,15 @@
 [build-system]
-requires = ["setuptools>=61.0"]
+requires = ["setuptools>=77.0"]  # >=77 required for the SPDX `license` field below
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "slm-packager"
-version = "0.2.2"
+# Single-sourced from slm_packager/__init__.py — see [tool.setuptools.dynamic]
+dynamic = ["version"]
 description = "A unified runtime and developer layer for Small Language Models"
 readme = "README.md"
 requires-python = ">=3.9"
-license = {text = "Apache-2.0"}
+license = "Apache-2.0"
 authors = [
     {name = "SLM Packager Team"}
 ]
@@ -26,18 +27,16 @@ classifiers = [
     "Topic :: Software Development :: Libraries :: Python Modules",
     "Operating System :: OS Independent",
 ]
+# Core stays lean and pure-Python: the CLI, config layer, model registry, and API
+# server install in seconds on any machine. Inference engines are extras, because
+# each one is large and llama-cpp-python needs a C/C++ toolchain to build.
 dependencies = [
     "fastapi>=0.109.0",
     "uvicorn>=0.27.0",
     "click>=8.1.7",
     "pydantic>=2.6.0",
-    "llama-cpp-python>=0.2.55",
-    "onnxruntime>=1.17.0",
-    "transformers>=4.37.0",
-    "torch>=2.2.0",
     "pyyaml>=6.0.1",
     "psutil>=5.9.0",
-    "accelerate>=0.25.0",
     "huggingface-hub>=0.19.0"
 ]
 
@@ -52,6 +51,41 @@ Changelog = "https://github.com/Ayo-Cyber/slm-packager/blob/main/CHANGELOG.md"
 slm = "slm_packager.cli.main:cli"
 
 [project.optional-dependencies]
+# Runtime engines. Install only the one(s) you need:
+#   pip install "slm-packager[gguf]"   -> GGUF via llama.cpp
+#   pip install "slm-packager[torch]"  -> PyTorch/HuggingFace via transformers
+#   pip install "slm-packager[all]"    -> everything
+gguf = [
+    "llama-cpp-python>=0.2.55"  # builds from source; needs cmake + a C/C++ toolchain
+]
+torch = [
+    # Floors are security-relevant, not arbitrary: torch 2.6 made torch.load
+    # weights_only the default, and transformers 4.48 carries the deserialization
+    # fixes. Tested against torch 2.11 / transformers 5.x.
+    "torch>=2.6.0",
+    "transformers>=4.48.0",
+    "accelerate>=0.25.0"
+]
+onnx = [
+    "onnxruntime>=1.17.0",
+    "transformers>=4.48.0",  # tokenizer only
+    "numpy>=1.24.0"
+]
+# Self-referencing extra, so version constraints live in exactly one place and
+# cannot drift. Verified to resolve every engine from a local wheel as well as from
+# the index.
+all = [
+    "slm-packager[gguf,torch,onnx,speed]"
+]
+# No `gpu` extra: onnxruntime-gpu must *replace* onnxruntime, and pip cannot express
+# that — installing both breaks ONNX Runtime. See docs/onnx-guide.md for the
+# uninstall-then-install steps.
+speed = [
+    "hf_transfer>=0.1.4"
+]
+# Test tooling only — deliberately does NOT pull the engines, so CI and most
+# contributors get a fast install. The suite is fully mocked and passes without
+# them. For end-to-end work against real models: pip install -e ".[all,dev]"
 dev = [
     "pytest>=8.0.0",
     "pytest-cov>=4.1.0",
@@ -60,14 +94,13 @@ dev = [
     "black>=24.0.0",
     "isort>=5.13.0",
     "mypy>=1.8.0",
-    "httpx>=0.26.0"
+    "types-PyYAML>=6.0.0",
+    "httpx>=0.26.0",
+    "pytest-timeout>=2.2.0"
 ]
-onnx = [
-    "onnxruntime-genai>=0.4.0"  # For proper ONNX generation with KV-cache
-]
-speed = [
-    "hf_transfer>=0.1.4"
-]
+
+[tool.setuptools.dynamic]
+version = {attr = "slm_packager.__version__"}
 
 [tool.setuptools.packages.find]
 where = ["."]
@@ -95,10 +128,33 @@ profile = "black"
 line_length = 100
 skip_gitignore = true
 
+[tool.coverage.run]
+source = ["slm_packager"]
+omit = ["*/tests/*", "*/venv/*", "*/__pycache__/*"]
+
+[tool.coverage.report]
+precision = 2
+show_missing = true
+skip_covered = false
+
+[tool.coverage.html]
+directory = "htmlcov"
+
 [tool.mypy]
 python_version = "3.9"
 warn_return_any = true
 warn_unused_configs = true
 disallow_untyped_defs = false
 ignore_missing_imports = true
+exclude = '^(venv|\.venv|build|dist)/'
+# Only report problems in our own code.
+follow_imports = "silent"
+
+# Dependencies get parsed against python_version above, which flags newer syntax
+# in their source (match statements in huggingface_hub) that says nothing about
+# this codebase. Skip descending into them entirely.
+[[tool.mypy.overrides]]
+module = ["huggingface_hub.*", "transformers.*", "torch.*", "onnxruntime.*", "llama_cpp.*"]
+follow_imports = "skip"
+follow_imports_for_stubs = true
 

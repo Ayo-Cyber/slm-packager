@@ -1,7 +1,9 @@
 """Generate Substack article visuals for SLM Packager."""
+
+from pathlib import Path
+
 import matplotlib.pyplot as plt
 from matplotlib.patches import FancyBboxPatch
-from pathlib import Path
 
 OUTPUT_DIR = Path(__file__).parent / "article_visuals"
 OUTPUT_DIR.mkdir(exist_ok=True)
@@ -20,6 +22,7 @@ TEAL = "#39d353"
 
 # ── 1. ARCHITECTURE DIAGRAM ──────────────────────────────────────────────────
 
+
 def draw_architecture():
     fig, ax = plt.subplots(figsize=(10, 7))
     fig.patch.set_facecolor(BG)
@@ -29,28 +32,60 @@ def draw_architecture():
     ax.axis("off")
 
     def box(x, y, w, h, color, label, sublabel=None, fontsize=13, radius=0.3):
-        rect = FancyBboxPatch((x, y), w, h,
-                              boxstyle=f"round,pad=0,rounding_size={radius}",
-                              linewidth=1.5, edgecolor=color,
-                              facecolor=SURFACE)
+        rect = FancyBboxPatch(
+            (x, y),
+            w,
+            h,
+            boxstyle=f"round,pad=0,rounding_size={radius}",
+            linewidth=1.5,
+            edgecolor=color,
+            facecolor=SURFACE,
+        )
         ax.add_patch(rect)
         cy = y + h / 2 + (0.15 if sublabel else 0)
-        ax.text(x + w / 2, cy, label, color=color,
-                fontsize=fontsize, fontweight="bold",
-                ha="center", va="center", fontfamily="monospace")
+        ax.text(
+            x + w / 2,
+            cy,
+            label,
+            color=color,
+            fontsize=fontsize,
+            fontweight="bold",
+            ha="center",
+            va="center",
+            fontfamily="monospace",
+        )
         if sublabel:
-            ax.text(x + w / 2, y + h / 2 - 0.25, sublabel, color=MUTED,
-                    fontsize=9, ha="center", va="center", fontfamily="monospace")
+            ax.text(
+                x + w / 2,
+                y + h / 2 - 0.25,
+                sublabel,
+                color=MUTED,
+                fontsize=9,
+                ha="center",
+                va="center",
+                fontfamily="monospace",
+            )
 
     def arrow(x1, y1, x2, y2, color=MUTED):
-        ax.annotate("", xy=(x2, y2), xytext=(x1, y1),
-                    arrowprops=dict(arrowstyle="-|>", color=color,
-                                   lw=1.5, mutation_scale=14))
+        ax.annotate(
+            "",
+            xy=(x2, y2),
+            xytext=(x1, y1),
+            arrowprops=dict(arrowstyle="-|>", color=color, lw=1.5, mutation_scale=14),
+        )
 
     # Title
-    ax.text(5, 9.4, "SLM Packager — Architecture",
-            color=TEXT, fontsize=15, fontweight="bold",
-            ha="center", va="center", fontfamily="monospace")
+    ax.text(
+        5,
+        9.4,
+        "SLM Packager — Architecture",
+        color=TEXT,
+        fontsize=15,
+        fontweight="bold",
+        ha="center",
+        va="center",
+        fontfamily="monospace",
+    )
 
     # Top layer — user entry points
     box(0.5, 7.8, 3.8, 0.9, BLUE, "CLI", "slm run / pull / serve", fontsize=12)
@@ -61,8 +96,16 @@ def draw_architecture():
     arrow(7.6, 7.8, 7.6, 7.1)
 
     # Middle — abstraction layer
-    box(0.5, 6.0, 9.0, 1.0, GREEN, "Runtime Abstraction Layer",
-        "load()  ·  generate()  ·  unload()", fontsize=13)
+    box(
+        0.5,
+        6.0,
+        9.0,
+        1.0,
+        GREEN,
+        "Runtime Abstraction Layer",
+        "load()  ·  generate()  ·  unload()",
+        fontsize=13,
+    )
 
     # Arrows down to runtimes
     arrow(2.4, 6.0, 2.4, 5.2)
@@ -97,6 +140,7 @@ def draw_architecture():
 
 # ── 2. BENCHMARK BAR CHART ───────────────────────────────────────────────────
 
+
 def draw_benchmark():
     labels = [
         "GPT-2\ntransformers CPU",
@@ -113,23 +157,32 @@ def draw_benchmark():
     fig.patch.set_facecolor(BG)
     ax.set_facecolor(BG)
 
-    bars = ax.barh(labels, values, color=colors, height=0.5,
-                   edgecolor=BG, linewidth=1.5)
+    bars = ax.barh(labels, values, color=colors, height=0.5, edgecolor=BG, linewidth=1.5)
 
     # Value labels
     for bar, val, hl in zip(bars, values, highlights):
-        ax.text(val + 0.3, bar.get_y() + bar.get_height() / 2,
-                f"{val} tok/s", color=TEXT if hl else MUTED,
-                va="center", fontsize=12,
-                fontweight="bold" if hl else "normal",
-                fontfamily="monospace")
+        ax.text(
+            val + 0.3,
+            bar.get_y() + bar.get_height() / 2,
+            f"{val} tok/s",
+            color=TEXT if hl else MUTED,
+            va="center",
+            fontsize=12,
+            fontweight="bold" if hl else "normal",
+            fontfamily="monospace",
+        )
 
-
-    ax.set_xlabel("Tokens per second  (higher is better)",
-                  color=MUTED, fontsize=11, fontfamily="monospace")
-    ax.set_title("SLM Packager — Runtime Performance\nM3 Pro · 18GB · Real Benchmarks",
-                 color=TEXT, fontsize=14, fontweight="bold",
-                 fontfamily="monospace", pad=16)
+    ax.set_xlabel(
+        "Tokens per second  (higher is better)", color=MUTED, fontsize=11, fontfamily="monospace"
+    )
+    ax.set_title(
+        "SLM Packager — Runtime Performance\nM3 Pro · 18GB · Real Benchmarks",
+        color=TEXT,
+        fontsize=14,
+        fontweight="bold",
+        fontfamily="monospace",
+        pad=16,
+    )
 
     ax.tick_params(colors=TEXT, labelsize=11)
     ax.spines[:].set_visible(False)
@@ -148,9 +201,17 @@ def draw_benchmark():
     multipliers = [None, None, None, None, None]
     for bar, mult in zip(bars, multipliers):
         if mult:
-            ax.text(bar.get_width() / 2, bar.get_y() + bar.get_height() / 2,
-                    mult, color=BG, va="center", ha="center",
-                    fontsize=10, fontweight="bold", fontfamily="monospace")
+            ax.text(
+                bar.get_width() / 2,
+                bar.get_y() + bar.get_height() / 2,
+                mult,
+                color=BG,
+                va="center",
+                ha="center",
+                fontsize=10,
+                fontweight="bold",
+                fontfamily="monospace",
+            )
 
     plt.tight_layout()
     out = OUTPUT_DIR / "benchmark.png"
