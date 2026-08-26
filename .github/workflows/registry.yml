@@ -1,0 +1,28 @@
+name: Registry Health
+
+on:
+  schedule:
+    # Weekly. Model repos get renamed, gated, or retired without warning, which
+    # silently breaks `slm pull <model>`.
+    - cron: "0 6 * * 1"
+  pull_request:
+    branches: [main]
+    paths:
+      - "slm_packager/registry/models.json"
+      - "scripts/check_registry.py"
+  workflow_dispatch:
+
+jobs:
+  check:
+    name: Check registry targets resolve
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Check every registry model
+        run: python scripts/check_registry.py

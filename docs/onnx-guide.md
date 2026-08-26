@@ -4,30 +4,40 @@ Using ONNX models with SLM Packager for optimized inference.
 
 ## Overview
 
-ONNX Runtime provides optimized inference for ONNX models exported from frameworks like PyTorch or TensorFlow. As of v0.2, SLM Packager supports **proper ONNX text generation** with KV-cache through `onnxruntime-genai`.
+ONNX Runtime provides optimized inference for ONNX models exported from frameworks
+like PyTorch or TensorFlow. SLM Packager runs ONNX text generation with KV-cache on
+plain `onnxruntime` plus `transformers` for tokenization, both provided by the
+optional `[onnx]` extra.
+
+!!! note "onnxruntime-genai is no longer used"
+    Releases before v0.2.0 required `onnxruntime-genai`. It was dropped because the
+    generation path didn't work reliably; do **not** install it. The ONNX runtime is
+    still the least mature of the three — prefer llama.cpp for GGUF models.
 
 ## Installation
 
-### Basic ONNX Support (CPU)
+Install the ONNX extra — prebuilt wheels, no compiler needed:
+
 ```bash
-pip install -e ".[onnx]"
-# Or manually:
-pip install onnxruntime-genai
+pip install "slm-packager[onnx]"
 ```
 
 ### GPU Support (CUDA)
-```bash
-pip install onnxruntime-genai-cuda
-```
 
-> **Note**: onnxruntime-genai requires Python 3.8-3.11
+```bash
+pip install onnxruntime-gpu
+
+# Verify the CUDA provider is visible
+python -c "import onnxruntime as ort; print(ort.get_available_providers())"
+# Should include: CUDAExecutionProvider
+```
 
 ## Model Requirements
 
-ONNX models for text generation must be in the **onnxruntime-genai format**:
-- Directory containing `.onnx` model files
-- `config.json` with model configuration
-- Tokenizer files
+An ONNX model directory needs:
+- One or more `.onnx` model files (exported with past-key-value support)
+- `config.json` with the model configuration
+- Tokenizer files loadable by `transformers.AutoTokenizer`
 
 ### Supported Model Formats
 
@@ -88,19 +98,12 @@ slm benchmark phi2-onnx.yaml
 ## Performance
 
 ONNX Runtime with KV-cache provides:
-- **Efficient inference**: Optimized operators
-- **Low latency**: ~20-40 tokens/sec on CPU
-- **Small memory footprint**: Comparable to GGUF
-- **GPU acceleration**: Via CUDA execution provider
+- **Optimized operators** via ONNX Runtime
+- **GPU acceleration** via the CUDA execution provider
 
-### Expected Performance (Approximate)
-
-| Model Size | Device | Tokens/sec | Memory |
-|------------|--------|------------|---------|
-| 1-2B params | CPU | 20-30 | 2-3GB |
-| 1-2B params | CUDA | 60-100 | 2GB VRAM |
-| 7B params | CPU | 5-10 | 8-10GB |
-| 7B params | CUDA | 30-50 | 7GB VRAM |
+No throughput figures are published for this runtime: it is experimental and has no
+benchmark coverage. Measure your own model with `slm benchmark`, and prefer llama.cpp
+for GGUF or transformers for PyTorch if you have the choice.
 
 ## Exporting Models to ONNX
 
@@ -135,8 +138,9 @@ Models that export well to ONNX:
 ### CUDA Setup
 
 ```bash
-# Install CUDA-enabled onnxruntime-genai
-pip install onnxruntime-genai-cuda
+# Replace the CPU build with the GPU build
+pip uninstall -y onnxruntime
+pip install onnxruntime-gpu
 
 # Verify CUDA is available
 python -c "import onnxruntime as ort; print(ort.get_available_providers())"
@@ -161,13 +165,11 @@ runtime:
 - Use absolute path or path relative to current directory
 
 ### Import Error
-**Error**: `onnxruntime-genai not installed`
+**Error**: `onnxruntime not installed` or `transformers not installed`
 
-**Solution**:
+**Solution**: install the ONNX extra, which provides both:
 ```bash
-pip install onnxruntime-genai
-# Or for CUDA:
-pip install onnxruntime-genai-cuda
+pip install "slm-packager[onnx]"
 ```
 
 ### Generation Issues
@@ -182,9 +184,9 @@ pip install onnxruntime-genai-cuda
 **Error**: `CUDA provider not available`
 
 **Solution**:
-- Install `onnxruntime-genai-cuda` (not regular onnxruntime-genai)
-- Verify CUDA installation
-- Set `device: cpu` in config as fallback
+- Install `onnxruntime-gpu` in place of `onnxruntime`
+- Verify your CUDA installation
+- Set `device: cpu` in config as a fallback
 
 ## Comparison with Other Runtimes
 
@@ -249,7 +251,7 @@ for prompt in prompts:
 
 ## Links
 
-- [onnxruntime-genai Documentation](https://github.com/microsoft/onnxruntime-genai)
+- [ONNX Runtime Documentation](https://onnxruntime.ai/docs/)
 - [Optimum ONNX Export Guide](https://huggingface.co/docs/optimum/exporters/onnx/usage_guides/export_a_model)
 - [ONNX Model Zoo](https://github.com/onnx/models)
-- [SLM Packager GitHub](https://github.com/YOUR_USERNAME/slm-packager)
+- [SLM Packager GitHub](https://github.com/Ayo-Cyber/slm-packager)

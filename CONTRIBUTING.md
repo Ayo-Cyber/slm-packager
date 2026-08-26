@@ -6,16 +6,24 @@ Thank you for your interest in contributing to SLM Packager! This document provi
 
 ### 1. Clone the Repository
 
+Fork [Ayo-Cyber/slm-packager](https://github.com/Ayo-Cyber/slm-packager) on GitHub,
+then clone your fork:
+
 ```bash
-git clone https://github.com/YOUR_USERNAME/slm-packager.git
+git clone https://github.com/<your-username>/slm-packager.git
 cd slm-packager
+git remote add upstream https://github.com/Ayo-Cyber/slm-packager.git
 ```
 
 ### 2. Install in Development Mode
 
 ```bash
-# Install with dev dependencies
+# Test tooling only — fast, no engines. Enough for the whole test suite.
 pip install -e ".[dev]"
+
+# With every inference engine, for end-to-end work against real models.
+# Note: [gguf] builds llama-cpp-python from source and needs cmake.
+pip install -e ".[all,dev]"
 ```
 
 ### 3. Set Up Pre-commit Hooks
@@ -87,7 +95,10 @@ isort slm_packager tests
 
 ### Type Checking
 
-We use **mypy** for static type checking (optional in v0.1).
+We use **mypy** for static type checking. It runs in CI but is currently advisory —
+there is a known backlog of ~35 errors, mostly from the `Union[str, Iterator[str]]`
+runtime return type being redesigned in v0.3. Don't add new errors; fixing existing
+ones is welcome.
 
 ```bash
 mypy slm_packager
@@ -96,9 +107,12 @@ mypy slm_packager
 ### Run All Quality Checks
 
 ```bash
-# This is what CI runs
+# Blocking in CI
 black --check slm_packager tests
 isort --check-only slm_packager tests
+pytest tests/ --cov=slm_packager --cov-fail-under=50
+
+# Advisory in CI
 mypy slm_packager
 ```
 
@@ -209,8 +223,8 @@ class TestMyFeature:
 All PRs must:
 - ✅ Pass all existing tests
 - ✅ Add new tests for new features
-- ✅ Maintain or improve code coverage (target: ≥70%)
-- ✅ Pass all code quality checks (black, isort, mypy)
+- ✅ Keep coverage above the 50% CI floor (long-term target: ≥70%)
+- ✅ Pass black and isort; don't add new mypy errors
 
 ## Questions?
 

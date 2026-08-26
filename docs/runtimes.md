@@ -10,7 +10,7 @@ SLM Packager supports three inference runtimes. They all share the same interfac
 |---------|--------|----------|------|------|
 | **llama.cpp** | GGUF | Production, CPU-constrained | Low memory, fast quantized inference, Metal/CUDA | GGUF format only |
 | **transformers** | PyTorch (HF) | Development, latest models | Widest model support, MPS/CUDA, streaming | Higher memory usage |
-| **ONNX** | `.onnx` | Cross-platform, optimized pipelines | Fast CPU inference, portable | Requires model export first |
+| **ONNX** ⚠️ | `.onnx` | Existing ONNX pipelines | Portable | **Experimental** — see caveats below |
 
 ---
 
@@ -73,7 +73,17 @@ slm init --name gpt2 --path gpt2 --format pytorch \
 
 ## ONNX Runtime
 
-Best choice when you have an exported ONNX model or need to integrate with an existing ML pipeline.
+!!! warning "Experimental"
+    Use this only if you specifically need ONNX Runtime. Current known limitations:
+
+    - KV-cache tensors are initialized as float32, so fp16 exports fail
+    - `context_size` is not enforced
+    - No benchmark coverage, and no ONNX model is exercised in the test suite
+
+    For GGUF models prefer llama.cpp, and for PyTorch models prefer transformers.
+    Both are considerably better exercised.
+
+Reasonable when you have an exported ONNX model or need to integrate with an existing ML pipeline.
 
 ```yaml
 runtime:
@@ -98,4 +108,4 @@ slm init --name gpt2-onnx --path models/gpt2-onnx --format onnx --runtime onnx
 slm run gpt2-onnx --prompt "Hello!"
 ```
 
-→ See the [ONNX Guide](ONNX_GUIDE.md) for the full export workflow.
+→ See the [ONNX Guide](onnx-guide.md) for the full export workflow.

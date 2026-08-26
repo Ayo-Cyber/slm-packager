@@ -4,16 +4,31 @@ This guide shows you how to use GGUF models with llama.cpp for **fast CPU infere
 
 ## 🚀 Why GGUF?
 
-GGUF models with llama.cpp are **5-10x faster** on CPU than PyTorch models:
+Quantized GGUF weights are much smaller than the fp16 PyTorch originals — TinyLlama
+1.1B is 637MB at Q4_K_M versus ~2.2GB — and llama.cpp's CPU kernels are built for
+exactly this. On a laptop without a discrete GPU it is the fastest option by a wide
+margin.
 
-- **TinyLlama PyTorch**: ~7 tokens/sec on CPU, 2.2GB
-- **TinyLlama GGUF Q4**: ~35 tokens/sec on CPU, 600MB
+For measured throughput on real hardware, and the command to reproduce it, see
+[Benchmarks](benchmarks.md). Speed depends heavily on your machine, so measure yours:
 
-That's **5x faster** and **4x smaller!**
+```bash
+slm benchmark tinyllama --runs 5 --max-tokens 128
+```
 
 ---
 
 ## 📥 Step-by-Step: Using GGUF Models
+
+### Step 0: Install the GGUF engine
+
+```bash
+pip install "slm-packager[gguf]"
+```
+
+This builds `llama-cpp-python` from source, so you need cmake and a C/C++ toolchain
+(`xcode-select --install` on macOS, `build-essential cmake` on Debian/Ubuntu). See
+below for Metal/CUDA-enabled builds.
 
 ### Step 1: Download a GGUF Model
 
@@ -80,9 +95,11 @@ slm run slm.yaml --prompt "Explain quantum computing in simple terms"
 ```
 
 **You should see:**
-- Model loads in <1 second (vs 5-10 seconds for PyTorch)
-- **Fast token generation** (~30-50 tokens/sec on decent CPU)
+- A fast load (sub-second for a 1B model)
+- Noticeably faster generation than the same model in PyTorch on CPU
 - Low memory usage
+
+See [Benchmarks](benchmarks.md) for measured figures on specific hardware.
 
 ---
 
@@ -115,9 +132,9 @@ slm init --name tinyllama-pytorch \
 slm benchmark pytorch-config.yaml
 ```
 
-**Compare the results!** You should see:
-- GGUF: ~30-50 tokens/sec, ~800MB memory
-- PyTorch: ~5-10 tokens/sec, ~3GB memory
+**Compare the results.** On CPU, expect GGUF to generate faster and use several
+times less memory. The exact ratio depends on your hardware and the quantization —
+that's why the comparison is a command rather than a table.
 
 ---
 
@@ -181,16 +198,14 @@ GGUF models are **incredibly fast** on Apple Silicon with Metal acceleration:
 ```yaml
 runtime:
   type: llama_cpp
-  device: mps  # Use Metal
-  gpu_layers: 32  # Offload layers to GPU
+  gpu_layers: 32  # Offload layers to the GPU (Metal is auto-detected)
 ```
 
 ### Windows/Linux with NVIDIA GPU
 ```yaml
 runtime:
   type: llama_cpp
-  device: cuda
-  gpu_layers: 32
+  gpu_layers: 32  # Requires a CUDA-enabled llama-cpp-python build
 ```
 
 ### CPU-Only (Any Platform)
@@ -212,17 +227,18 @@ The `llama-cpp-python` package needs to be compiled. Try:
 ```bash
 # Force reinstall with compilation
 pip uninstall llama-cpp-python -y
-CMAKE_ARGS="-DLLAMA_METAL=on" pip install llama-cpp-python --no-cache-dir
+CMAKE_ARGS="-DGGML_METAL=on" pip install llama-cpp-python --no-cache-dir
 
 # For CUDA support on Linux/Windows
-CMAKE_ARGS="-DLLAMA_CUBLAS=on" pip install llama-cpp-python --no-cache-dir
+CMAKE_ARGS="-DGGML_CUDA=on" pip install llama-cpp-python --no-cache-dir
 ```
 
 ### Model loads but is slow
 
 - Increase `threads` in your config (e.g., `threads: 8`)
-- On Apple Silicon, set `device: mps` and `gpu_layers: 32`
-- On NVIDIA GPU, set `device: cuda` and `gpu_layers: 32`
+- Set `gpu_layers: 32` to offload to the GPU (the llama.cpp runtime reads
+  `gpu_layers`, not `device` — Metal/CUDA support comes from how
+  `llama-cpp-python` was built)
 
 ### File not found
 
@@ -234,8 +250,8 @@ CMAKE_ARGS="-DLLAMA_CUBLAS=on" pip install llama-cpp-python --no-cache-dir
 
 ## 📚 Learn More
 
-- [MODEL_FORMATS.md](MODEL_FORMATS.md) - Deep dive into formats and runtimes
-- [QUICKSTART.md](QUICKSTART.md) - General getting started guide
+- [model-formats.md](model-formats.md) - Deep dive into formats and runtimes
+- [quickstart.md](quickstart.md) - General getting started guide
 - [llama.cpp GitHub](https://github.com/ggerganov/llama.cpp) - The underlying engine
 
 ---

@@ -172,7 +172,6 @@ class ModelDownloader:
                 repo_id=model_info.repo,
                 filename=variant.file,
                 cache_dir=str(self.models_dir),
-                resume_download=True,
             )
 
             logger.info(f"✅ Model downloaded to: {model_path}")
@@ -233,7 +232,6 @@ class ModelDownloader:
                 repo_id=repo_id,
                 filename=filename,
                 cache_dir=str(self.models_dir),
-                resume_download=True,
             )
         except (RepositoryNotFoundError, RevisionNotFoundError, LocalEntryNotFoundError) as e:
             raise ValueError(
@@ -312,14 +310,18 @@ class ModelDownloader:
                 if model_file.is_dir():
                     shutil.rmtree(model_file)
                     logger.info(f"Deleted model directory: {model_file}")
+                elif self._hf_repo_id_for_path(model_file):
+                    # Inside our hub cache: a snapshots/<rev>/<file> symlink whose
+                    # target blob may be shared with other revisions. Deleting the
+                    # symlink alone leaves the multi-GB blob behind, and deleting the
+                    # blob by hand would break anything else pointing at it — so let
+                    # the hub's refcounted deletion handle both.
+                    self._delete_hf_cache(self._hf_repo_id_for_path(model_file))
                 else:
+                    # A path the user manages. Only ever remove the entry itself,
+                    # never follow it out to a symlink target elsewhere on disk.
                     model_file.unlink()
                     logger.info(f"Deleted model file: {model_file}")
-
-                    # Clean up the parent HF cache directory if it's now empty
-                    parent = model_file.parent
-                    if parent != self.models_dir and not any(parent.iterdir()):
-                        shutil.rmtree(parent, ignore_errors=True)
             elif "/" in model_path_str or not model_file.is_absolute():
                 # HF repo ID (e.g. "gpt2" or "TheBloke/TinyLlama-GGUF") — delete from HF cache
                 self._delete_hf_cache(model_path_str)
@@ -331,23 +333,47 @@ class ModelDownloader:
         logger.info(f"Deleted config: {config_path}")
         return True
 
+    def _hf_repo_id_for_path(self, path: Path) -> Optional[str]:
+        """Return the repo id if ``path`` lives inside our hub cache, else None.
+
+        The hub lays out ``<cache>/models--<org>--<name>/snapshots/<rev>/<file>``, so
+        the repo id is recoverable from the directory name.
+        """
+        try:
+            resolved_dir = self.models_dir.resolve()
+            candidates = [p for p in path.resolve().parents if p.name.startswith("models--")]
+        except OSError:
+            return None
+
+        for repo_dir in candidates:
+            if resolved_dir not in repo_dir.parents and repo_dir.parent != resolved_dir:
+                continue
+            parts = repo_dir.name.split("--")[1:]
+            if parts:
+                return "/".join(parts)
+        return None
+
     def _delete_hf_cache(self, repo_id: str) -> None:
         """Remove a model from the HuggingFace hub cache."""
         if not HF_AVAILABLE:
             logger.warning("huggingface-hub not available; cannot clean HF cache")
             return
         try:
-            from huggingface_hub import scan_cache_info
+            from huggingface_hub import scan_cache_dir
 
-            cache_info = scan_cache_info()
+            cache_info = scan_cache_dir(self.models_dir)
             for repo in cache_info.repos:
                 if repo.repo_id == repo_id:
-                    # Delete all revisions for this repo
+                    # delete_revisions refcounts shared blobs, so revisions of other
+                    # repos that reference the same file keep working.
                     delete_strategy = cache_info.delete_revisions(
                         *[rev.commit_hash for rev in repo.revisions]
                     )
                     delete_strategy.execute()
-                    logger.info(f"Deleted HF cache for repo: {repo_id}")
+                    logger.info(
+                        f"Deleted HF cache for repo: {repo_id} "
+                        f"(freed ~{delete_strategy.expected_freed_size_str})"
+                    )
                     return
             logger.debug(f"No HF cache found for repo: {repo_id}")
         except Exception as e:

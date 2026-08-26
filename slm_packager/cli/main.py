@@ -91,22 +91,14 @@ def run(model_or_config, prompt, stream, raw):
         if not prompt:
             prompt = click.prompt("Enter prompt")
 
-        # Auto-apply chat template for transformers models only
-        if not raw and config.runtime.type == RuntimeType.TRANSFORMERS:
-            try:
-                from transformers import AutoTokenizer
-
-                tokenizer = AutoTokenizer.from_pretrained(
-                    config.model.path, trust_remote_code=config.runtime.trust_remote_code
-                )
-                if hasattr(tokenizer, "chat_template") and tokenizer.chat_template:
-                    messages = [{"role": "user", "content": prompt}]
-                    prompt = tokenizer.apply_chat_template(
-                        messages, tokenize=False, add_generation_prompt=True
-                    )
-                    click.echo("ℹ️  Auto-formatting prompt with chat template (disable with --raw)")
-            except Exception:
-                pass
+        # Auto-apply the model's chat format. Instruction-tuned models answer a bare
+        # prompt with an immediate end-of-sequence, so without this a chat GGUF
+        # often returns nothing at all.
+        if not raw:
+            formatted = runtime.apply_chat_template(prompt)
+            if formatted:
+                prompt = formatted
+                click.echo("ℹ️  Auto-formatting prompt with chat template (disable with --raw)")
 
         click.echo("-" * 20)
 
@@ -174,7 +166,11 @@ def _resolve_config_path(model_or_config: str) -> Path:
 
 @cli.command()
 @click.argument("model_or_config")
-def benchmark(model_or_config):
+@click.option("--prompt", "-p", default=None, help="Prompt to benchmark with")
+@click.option("--runs", default=3, show_default=True, help="Timed runs to median over")
+@click.option("--max-tokens", default=128, show_default=True, help="Tokens to generate per run")
+@click.option("--warmup/--no-warmup", default=True, help="Discard an initial warmup run")
+def benchmark(model_or_config, prompt, runs, max_tokens, warmup):
     """Benchmark a model"""
     try:
         config_path = _resolve_config_path(model_or_config)
@@ -183,14 +179,22 @@ def benchmark(model_or_config):
         click.echo(f"Benchmarking {config.model.name}...")
 
         benchmarker = Benchmarker(config)
-        metrics = benchmarker.run()
+        kwargs = {"runs": runs, "max_tokens": max_tokens, "warmup": warmup}
+        if prompt:
+            kwargs["prompt"] = prompt
+        metrics = benchmarker.run(**kwargs)
 
         click.echo(f"\n📊 Benchmark Results:")
         click.echo(f"   Load Time: {metrics['load_time_sec']:.2f}s")
-        click.echo(f"   Generation Time: {metrics['generation_time_sec']:.2f}s")
-        click.echo(f"   Memory Usage: {metrics['memory_mb']:.2f} MB")
-        click.echo(f"   Latency: {metrics['latency_ms']:.2f} ms")
-        click.echo(f"   Estimated TPS: {metrics['tokens_per_second']:.2f}")
+        click.echo(f"   Memory Usage (process RSS): {metrics['memory_mb']:.2f} MB")
+        click.echo(
+            f"   Tokens Generated: {metrics['tokens_generated']}" f" over {metrics['runs']} run(s)"
+        )
+        click.echo(f"   Generation Time (mean): {metrics['generation_time_sec']:.2f}s")
+        click.echo(f"   Tokens/sec (median): {metrics['tokens_per_second']:.2f}")
+        click.echo(f"   Time per Token: {metrics['ms_per_token']:.2f} ms")
+        if metrics["token_count_method"] == "estimate":
+            click.echo("   ⚠️  Token count estimated (no tokenizer available)")
 
     except FileNotFoundError as e:
         click.echo(f"\n{str(e)}", err=True)
@@ -207,25 +211,26 @@ def benchmark(model_or_config):
 @cli.command()
 @click.argument("input_path")
 @click.argument("output_path", required=False)
-@click.option("--type", default="q4_k_m", help="Quantization type (q4_k_m, int8)")
-def quantize(input_path, output_path, type):
+@click.option("--type", "quant_type", default="q4_k_m", help="Quantization type (q4_k_m, int8)")
+def quantize(input_path, output_path, quant_type):
     """Quantize a model"""
     try:
         model_path = input_path
+        source = Path(model_path)
 
-        if not Path(model_path).exists():
+        if not source.exists():
             click.echo(f"❌ Model file not found: '{model_path}'", err=True)
             click.echo(f"💡 Provide the full path to the model file", err=True)
             sys.exit(1)
 
-        if model_path.endswith(".gguf"):
-            output_path = output_path or model_path.replace(".gguf", f"-{type}.gguf")
-            click.echo(f"Quantizing GGUF model to {type}...")
-            Quantizer.quantize_gguf(model_path, output_path, type)
-        elif model_path.endswith(".onnx"):
-            output_path = output_path or model_path.replace(".onnx", f"-{type}.onnx")
-            click.echo(f"Quantizing ONNX model to {type}...")
-            Quantizer.quantize_onnx(model_path, output_path, type)
+        if source.suffix == ".gguf":
+            output_path = output_path or str(source.with_name(f"{source.stem}-{quant_type}.gguf"))
+            click.echo(f"Quantizing GGUF model to {quant_type}...")
+            Quantizer.quantize_gguf(model_path, output_path, quant_type)
+        elif source.suffix == ".onnx":
+            output_path = output_path or str(source.with_name(f"{source.stem}-{quant_type}.onnx"))
+            click.echo(f"Quantizing ONNX model to {quant_type}...")
+            Quantizer.quantize_onnx(model_path, output_path, quant_type)
         else:
             click.echo(f"❌ Unsupported file extension: '{Path(model_path).suffix}'", err=True)
             click.echo(f"💡 Only .gguf and .onnx are supported", err=True)

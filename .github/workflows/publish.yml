@@ -6,13 +6,41 @@ on:
       - "v*"
 
 jobs:
-  publish:
-    name: Build and publish
+  test:
+    name: Test before release
     runs-on: ubuntu-latest
-    environment: release
-    permissions:
-      id-token: write  # required for trusted publishing
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
 
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install CPU-only torch
+        run: pip install torch --index-url https://download.pytorch.org/whl/cpu
+
+      # Engines included so the release gate exercises the real imports, minus the
+      # gguf extra which would build llama-cpp-python from source.
+      - name: Install package and dev dependencies
+        run: pip install -e ".[torch,onnx,dev]"
+
+      # black/isort come from [dev]; reinstalling them unpinned here would let a new
+      # black release block a release tag on unchanged code.
+      - name: Check formatting
+        run: |
+          black --check slm_packager tests
+          isort --check-only slm_packager tests
+
+      - name: Run tests
+        run: pytest tests/ -q
+
+  build:
+    name: Build and verify distribution
+    needs: test
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
 
@@ -21,10 +49,68 @@ jobs:
           python-version: "3.11"
 
       - name: Install build tools
-        run: pip install build
+        run: pip install build twine
+
+      - name: Verify tag matches package version
+        run: |
+          tag_version="${GITHUB_REF_NAME#v}"
+          # Version is single-sourced in slm_packager/__init__.py (pyproject reads it
+          # via [tool.setuptools.dynamic]), so read it straight from there.
+          package_version="$(python -c 'import re,pathlib; print(re.search(r"__version__\s*=\s*\"([^\"]+)\"", pathlib.Path("slm_packager/__init__.py").read_text()).group(1))')"
+          echo "Tag version:     $tag_version"
+          echo "Package version: $package_version"
+          if [ "$tag_version" != "$package_version" ]; then
+            echo "::error::Tag $GITHUB_REF_NAME does not match package version $package_version"
+            exit 1
+          fi
 
       - name: Build distribution
         run: python -m build
+
+      - name: Check distribution metadata
+        run: twine check dist/*
+
+      - name: Verify built artifacts carry the tagged version
+        run: |
+          tag_version="${GITHUB_REF_NAME#v}"
+          if ! ls dist/slm_packager-"$tag_version"-py3-none-any.whl >/dev/null 2>&1; then
+            echo "::error::No wheel built for version $tag_version"
+            ls -la dist/
+            exit 1
+          fi
+
+      - name: Verify wheel ships the model registry
+        run: |
+          python - <<'PY'
+          import glob, zipfile
+          wheel = glob.glob("dist/*.whl")[0]
+          names = zipfile.ZipFile(wheel).namelist()
+          required = "slm_packager/registry/models.json"
+          if required not in names:
+              raise SystemExit(f"::error::{required} missing from {wheel} - 'slm list' would fail at runtime")
+          print(f"OK: {required} present in {wheel}")
+          PY
+
+      - name: Upload distribution
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+  publish:
+    name: Publish to PyPI
+    needs: build
+    runs-on: ubuntu-latest
+    environment: release
+    permissions:
+      id-token: write  # required for trusted publishing
+
+    steps:
+      - name: Download distribution
+        uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
 
       - name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1

@@ -1,12 +1,15 @@
+# Annotations are strings so `np.ndarray` in signatures is not evaluated at import
+# time — this module must stay importable when numpy is not installed.
+from __future__ import annotations
+
 import logging
 from pathlib import Path
 from types import SimpleNamespace
-from typing import Any, Dict, Iterator, Union
-
-import numpy as np
+from typing import Any, Dict, Iterator, List, Optional, Sequence, Union
 
 IMPORT_ERROR = ""
 try:
+    import numpy as np
     import onnxruntime as ort
     from transformers import AutoTokenizer
 
@@ -15,15 +18,17 @@ except ImportError as e:
     IMPORT_ERROR = str(e)
     ONNX_AVAILABLE = False
 
+    np = None  # type: ignore[assignment]
+
     class _SessionOptions:
         def __init__(self):
             self.intra_op_num_threads = 0
 
     def _missing_inference_session(*args, **kwargs):
         raise ImportError(
-            "ONNX runtime requires 'onnxruntime' and 'transformers'\n"
+            "The ONNX runtime requires 'onnxruntime', 'transformers' and 'numpy'\n"
             "Install with:\n"
-            "  pip install onnxruntime transformers\n"
+            "  pip install 'slm-packager[onnx]'\n"
             f"\nError: {IMPORT_ERROR}"
         )
 
@@ -31,9 +36,9 @@ except ImportError as e:
         @staticmethod
         def from_pretrained(*args, **kwargs):
             raise ImportError(
-                "ONNX runtime requires 'onnxruntime' and 'transformers'\n"
+                "The ONNX runtime requires 'onnxruntime', 'transformers' and 'numpy'\n"
                 "Install with:\n"
-                "  pip install onnxruntime transformers\n"
+                "  pip install 'slm-packager[onnx]'\n"
                 f"\nError: {IMPORT_ERROR}"
             )
 
@@ -43,7 +48,7 @@ except ImportError as e:
     )
 
 from ..config.models import GenerationParams, SLMConfig
-from .base import BaseRuntime
+from .base import BaseRuntime, _truncate_at_stop
 
 logger = logging.getLogger(__name__)
 
@@ -54,9 +59,9 @@ class OnnxRuntime(BaseRuntime):
     def load(self):
         if not ONNX_AVAILABLE:
             raise ImportError(
-                "ONNX runtime requires 'onnxruntime' and 'transformers'\n"
+                "The ONNX runtime requires 'onnxruntime', 'transformers' and 'numpy'\n"
                 "Install with:\n"
-                "  pip install onnxruntime transformers\n"
+                "  pip install 'slm-packager[onnx]'\n"
                 f"\nError: {IMPORT_ERROR}"
             )
 
@@ -225,15 +230,40 @@ class OnnxRuntime(BaseRuntime):
 
         return cache
 
-    def _sample(self, logits: np.ndarray, params: GenerationParams) -> int:
+    def _sample(
+        self,
+        logits: np.ndarray,
+        params: GenerationParams,
+        generated: Optional[Sequence[int]] = None,
+    ) -> int:
         """Sample next token from logits distribution."""
         # Check for NaNs
         if np.isnan(logits).any():
             logger.warning("NaNs detected in logits, replacing with -inf")
             logits = np.nan_to_num(logits, nan=-np.inf)
 
+        # Repetition penalty, applied to logits before any temperature scaling —
+        # matching the convention used by transformers and llama.cpp.
+        if generated and params.repetition_penalty and params.repetition_penalty != 1.0:
+            logits = logits.astype(np.float64, copy=True)
+            for token_id in set(generated):
+                if 0 <= token_id < len(logits):
+                    score = logits[token_id]
+                    # Divide positive scores, multiply negative ones, so the penalty
+                    # always pushes the token *down*.
+                    logits[token_id] = (
+                        score / params.repetition_penalty
+                        if score > 0
+                        else score * params.repetition_penalty
+                    )
+
+        # temperature == 0 means greedy decoding: take the most likely token rather
+        # than sampling at temperature 1.0.
+        if not params.temperature or params.temperature <= 0:
+            return int(np.argmax(logits))
+
         # Apply temperature
-        if params.temperature > 0 and params.temperature != 1.0:
+        if params.temperature != 1.0:
             logits = logits / params.temperature
 
         # Convert to probabilities (with numerical stability)
@@ -308,8 +338,10 @@ class OnnxRuntime(BaseRuntime):
             if next_token == self.tokenizer.eos_token_id:
                 break
             if params.stop:
-                token_text = self.tokenizer.decode([next_token])
-                if any(stop_seq in token_text for stop_seq in params.stop):
+                # Check the decoded text so far, not the latest token alone: a stop
+                # sequence usually spans several tokens and would never match here.
+                text_so_far = self.tokenizer.decode(generated_tokens, skip_special_tokens=True)
+                if _truncate_at_stop(text_so_far, params.stop) != text_so_far:
                     break
 
             # Prepare next input
@@ -326,11 +358,12 @@ class OnnxRuntime(BaseRuntime):
                 past_kv = self._extract_kv_cache(outputs)
 
             # Sample next token
-            next_token = self._sample(logits[0, -1, :], params)
+            next_token = self._sample(logits[0, -1, :], params, generated_tokens)
             generated_tokens.append(next_token)
 
-        # Decode
-        return self.tokenizer.decode(generated_tokens, skip_special_tokens=True)
+        # Decode, trimming anything at or past a stop sequence
+        text = self.tokenizer.decode(generated_tokens, skip_special_tokens=True)
+        return _truncate_at_stop(text, params.stop)
 
     def _generate_stream(self, prompt: str, params: GenerationParams) -> Iterator[str]:
         """Generate text with streaming."""
@@ -348,18 +381,34 @@ class OnnxRuntime(BaseRuntime):
             past_kv = self._extract_kv_cache(outputs)
 
         # Generate and stream tokens
+        generated_tokens: List[int] = []
+        emitted = 0  # characters of the decoded text already yielded
+        longest_stop = max((len(s) for s in params.stop if s), default=0)
+
         for _ in range(params.max_tokens):
-            next_token = self._sample(logits[0, -1, :], params)
+            next_token = self._sample(logits[0, -1, :], params, generated_tokens)
+            generated_tokens.append(next_token)
 
-            # Decode and yield
-            token_text = self.tokenizer.decode([next_token], skip_special_tokens=True)
-            yield token_text
-
-            # Check stopping
             if next_token == self.tokenizer.eos_token_id:
                 break
-            if params.stop and any(stop_seq in token_text for stop_seq in params.stop):
-                break
+
+            text = self.tokenizer.decode(generated_tokens, skip_special_tokens=True)
+
+            if params.stop:
+                truncated = _truncate_at_stop(text, params.stop)
+                if truncated != text:
+                    # Emit up to the stop sequence and finish without ever showing it.
+                    if len(truncated) > emitted:
+                        yield truncated[emitted:]
+                    return
+                # Hold back a possible partial stop sequence straddling chunks.
+                safe_len = max(len(text) - (longest_stop - 1), emitted)
+            else:
+                safe_len = len(text)
+
+            if safe_len > emitted:
+                yield text[emitted:safe_len]
+                emitted = safe_len
 
             # Continue generation
             input_ids = np.array([[next_token]], dtype=np.int64)
@@ -372,6 +421,13 @@ class OnnxRuntime(BaseRuntime):
 
             if self.has_kv_cache:
                 past_kv = self._extract_kv_cache(outputs)
+
+        # Flush whatever was held back for stop-sequence matching.
+        if generated_tokens:
+            text = self.tokenizer.decode(generated_tokens, skip_special_tokens=True)
+            text = _truncate_at_stop(text, params.stop)
+            if len(text) > emitted:
+                yield text[emitted:]
 
     def unload(self):
         import gc

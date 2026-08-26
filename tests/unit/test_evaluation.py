@@ -38,11 +38,43 @@ class TestBenchmarker:
         with patch("slm_packager.evaluation.benchmark.get_runtime", return_value=mock_runtime):
             benchmarker = Benchmarker(sample_gguf_config)
 
-            benchmarker.run()
+            benchmarker.run(runs=1, warmup=False)
 
             mock_runtime.load.assert_called_once()
             mock_runtime.generate.assert_called_once()
             mock_runtime.unload.assert_called_once()
+
+    def test_run_warms_up_then_times_each_run(self, sample_gguf_config, mock_runtime):
+        """One discarded warmup plus one generation per timed run."""
+        with patch("slm_packager.evaluation.benchmark.get_runtime", return_value=mock_runtime):
+            benchmarker = Benchmarker(sample_gguf_config)
+
+            metrics = benchmarker.run(runs=3, warmup=True)
+
+            assert mock_runtime.generate.call_count == 4
+            assert metrics["runs"] == 3
+
+    def test_run_raises_when_model_generates_nothing(self, sample_gguf_config, mock_runtime):
+        """Reporting throughput for an empty generation would invent data."""
+        mock_runtime.generate.return_value = ""
+
+        with patch("slm_packager.evaluation.benchmark.get_runtime", return_value=mock_runtime):
+            benchmarker = Benchmarker(sample_gguf_config)
+
+            with pytest.raises(RuntimeError, match="no tokens"):
+                benchmarker.run(runs=1, warmup=False)
+
+    def test_run_applies_chat_template_when_available(self, sample_gguf_config, mock_runtime):
+        """Chat-tuned models need their turn markers or they return nothing."""
+        mock_runtime.apply_chat_template.return_value = "<|user|>\nhi\n<|assistant|>\n"
+
+        with patch("slm_packager.evaluation.benchmark.get_runtime", return_value=mock_runtime):
+            benchmarker = Benchmarker(sample_gguf_config)
+
+            metrics = benchmarker.run(prompt="hi", runs=1, warmup=False)
+
+            assert metrics["chat_template_applied"] is True
+            assert mock_runtime.generate.call_args[0][0] == "<|user|>\nhi\n<|assistant|>\n"
 
     def test_run_disables_streaming(self, sample_gguf_config, mock_runtime):
         """Test that streaming is disabled during benchmarking."""
@@ -51,10 +83,11 @@ class TestBenchmarker:
         with patch("slm_packager.evaluation.benchmark.get_runtime", return_value=mock_runtime):
             benchmarker = Benchmarker(sample_gguf_config)
 
-            benchmarker.run()
+            benchmarker.run(runs=1, warmup=False)
 
             # Verify generate was called (streaming handled internally by benchmarker)
             mock_runtime.generate.assert_called_once()
+            assert mock_runtime.generate.call_args[0][1].stream is False
 
     def test_run_measures_timing(self, sample_gguf_config, mock_runtime):
         """Test that timing metrics are reasonable."""

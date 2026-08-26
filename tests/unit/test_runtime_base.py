@@ -85,3 +85,47 @@ class TestRuntimeFactory:
 
         with pytest.raises((ValueError, KeyError, AttributeError)):
             get_runtime(sample_gguf_config)
+
+    def test_runtime_modules_are_not_imported_eagerly(self):
+        """Importing the package must not pull torch, llama_cpp, or onnxruntime.
+
+        These are optional extras. If `slm_packager.runtime` imported them at import
+        time, a lean install (`pip install slm-packager`) could not even run `slm
+        list` — which is exactly the failure this lazy factory prevents.
+        """
+        import subprocess
+        import sys
+
+        # A clean interpreter, so nothing another test imported can mask a regression.
+        code = (
+            "import slm_packager.runtime, sys;"
+            "heavy=[m for m in ('torch','llama_cpp','onnxruntime') if m in sys.modules];"
+            "print(','.join(heavy))"
+        )
+        result = subprocess.run([sys.executable, "-c", code], capture_output=True, text=True)
+
+        assert result.returncode == 0, result.stderr
+        assert result.stdout.strip() == "", f"eagerly imported: {result.stdout.strip()}"
+
+    def test_missing_engine_names_the_extra_to_install(self, sample_gguf_config):
+        """The error must tell the user which extra provides the missing engine."""
+        import slm_packager.runtime as runtime_pkg
+
+        with patch.object(
+            runtime_pkg.importlib, "import_module", side_effect=ImportError("No module named x")
+        ):
+            with pytest.raises(ImportError) as exc:
+                get_runtime(sample_gguf_config)
+
+        message = str(exc.value)
+        assert "slm-packager[gguf]" in message
+        assert "No module named x" in message
+
+    def test_every_runtime_type_maps_to_an_extra(self):
+        """A new RuntimeType must come with an install target, or errors are useless."""
+        from slm_packager.config.models import RuntimeType as RT
+        from slm_packager.runtime import _RUNTIMES
+
+        assert set(_RUNTIMES) == set(RT)
+        for _module, _cls, extra in _RUNTIMES.values():
+            assert extra in {"gguf", "torch", "onnx"}

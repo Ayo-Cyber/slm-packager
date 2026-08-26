@@ -1,5 +1,8 @@
+import logging
 import sys
-from typing import Iterator, Union
+from typing import Iterator, List, Optional, Union
+
+logger = logging.getLogger(__name__)
 
 IMPORT_ERROR = ""
 try:
@@ -21,7 +24,7 @@ except ImportError:
 from threading import Thread
 
 from ..config.models import GenerationParams, SLMConfig
-from .base import BaseRuntime
+from .base import BaseRuntime, _truncate_at_stop
 
 
 class TransformersRuntime(BaseRuntime):
@@ -30,15 +33,14 @@ class TransformersRuntime(BaseRuntime):
         if not TRANSFORMERS_AVAILABLE:
             raise ImportError(
                 "❌ Transformers runtime requires 'transformers' and 'torch' packages.\n"
-                "💡 Install them with: pip install transformers torch\n"
+                "💡 Install them with: pip install 'slm-packager[torch]'\n"
                 f"   Error details: {IMPORT_ERROR}"
             )
 
         if not ACCELERATE_AVAILABLE:
             raise ImportError(
                 "❌ Transformers runtime requires 'accelerate' package for model loading.\n"
-                "💡 Install it with: pip install accelerate\n"
-                "   Or reinstall slm-packager: pip install -e ."
+                "💡 Install it with: pip install 'slm-packager[torch]'"
             )
 
         try:
@@ -173,35 +175,24 @@ class TransformersRuntime(BaseRuntime):
             device = self.model.device if hasattr(self.model, "device") else "cpu"
             inputs = self.tokenizer(prompt, return_tensors="pt").to(device)
 
+            sampling = self._sampling_kwargs(params)
+
             if params.stream:
-                streamer = TextIteratorStreamer(self.tokenizer, skip_prompt=True)
-                generation_kwargs = dict(
-                    **inputs,
-                    streamer=streamer,
-                    max_new_tokens=params.max_tokens,
-                    temperature=params.temperature,
-                    top_p=params.top_p,
-                    top_k=params.top_k,
-                    repetition_penalty=params.repetition_penalty,
-                    do_sample=True,
+                streamer = TextIteratorStreamer(
+                    self.tokenizer, skip_prompt=True, skip_special_tokens=True
                 )
+                generation_kwargs = dict(**inputs, streamer=streamer, **sampling)
                 thread = Thread(target=self.model.generate, kwargs=generation_kwargs)
                 thread.start()
 
-                return self._stream_generator(streamer)
+                return self._stream_generator(streamer, params.stop)
             else:
                 input_length = inputs["input_ids"].shape[1]
-                outputs = self.model.generate(
-                    **inputs,
-                    max_new_tokens=params.max_tokens,
-                    temperature=params.temperature,
-                    top_p=params.top_p,
-                    top_k=params.top_k,
-                    repetition_penalty=params.repetition_penalty,
-                    do_sample=True,
-                )
+                outputs = self.model.generate(**inputs, **sampling)
                 # Strip prompt tokens, not prompt characters, to avoid truncation bugs
-                return self.tokenizer.decode(outputs[0][input_length:], skip_special_tokens=True)
+                text = self.tokenizer.decode(outputs[0][input_length:], skip_special_tokens=True)
+                # generate() halts *after* emitting the stop string, so trim it.
+                return _truncate_at_stop(text, params.stop)
 
         except torch.cuda.OutOfMemoryError as e:
             raise RuntimeError(
@@ -219,9 +210,76 @@ class TransformersRuntime(BaseRuntime):
                 "💡 Check your generation parameters in the config"
             ) from e
 
-    def _stream_generator(self, streamer) -> Iterator[str]:
+    def _sampling_kwargs(self, params: GenerationParams) -> dict:
+        """Build generate() kwargs, honouring every documented parameter.
+
+        ``temperature=0`` means greedy decoding. Passing it through as a sampling
+        temperature makes transformers raise ("has to be a strictly positive
+        float"), and passing top_p/top_k alongside do_sample=False warns.
+        """
+        kwargs: dict = {
+            "max_new_tokens": params.max_tokens,
+            "repetition_penalty": params.repetition_penalty,
+        }
+
+        if params.temperature and params.temperature > 0:
+            kwargs.update(
+                do_sample=True,
+                temperature=params.temperature,
+                top_p=params.top_p,
+                top_k=params.top_k,
+            )
+        else:
+            kwargs["do_sample"] = False
+
+        if params.stop:
+            # Native multi-token stop handling; a plain per-token check would miss a
+            # stop string that spans a token boundary.
+            kwargs["stop_strings"] = list(params.stop)
+            kwargs["tokenizer"] = self.tokenizer
+
+        return kwargs
+
+    def apply_chat_template(self, prompt: str) -> Optional[str]:
+        """Format ``prompt`` using the tokenizer's chat template, if it has one."""
+        tokenizer = getattr(self, "tokenizer", None)
+        if tokenizer is None or not getattr(tokenizer, "chat_template", None):
+            return None
+        try:
+            return tokenizer.apply_chat_template(
+                [{"role": "user", "content": prompt}],
+                tokenize=False,
+                add_generation_prompt=True,
+            )
+        except Exception as e:
+            logger.debug(f"Could not apply chat template: {e}")
+            return None
+
+    def _stream_generator(self, streamer, stop: Optional[List[str]] = None) -> Iterator[str]:
+        if not stop:
+            for new_text in streamer:
+                yield new_text
+            return
+
+        # Generation halts on the stop string, but the streamer has already emitted
+        # it — and it may straddle two chunks. Hold back the longest possible partial
+        # match so a stop string is never shown to the caller.
+        longest = max(len(s) for s in stop)
+        buffer = ""
         for new_text in streamer:
-            yield new_text
+            buffer += new_text
+            truncated = _truncate_at_stop(buffer, stop)
+            if truncated != buffer:
+                if truncated:
+                    yield truncated
+                return
+            # Emit everything that can no longer be part of a stop sequence.
+            safe = buffer[: -(longest - 1)] if longest > 1 else buffer
+            if safe:
+                yield safe
+                buffer = buffer[len(safe) :]
+        if buffer:
+            yield buffer
 
     def unload(self):
         if hasattr(self, "tokenizer") and self.tokenizer:

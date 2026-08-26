@@ -145,6 +145,11 @@ def mock_runtime():
     mock.load.return_value = None
     mock.unload.return_value = None
     mock.generate.return_value = "This is a test output from the mock runtime."
+    # A bare MagicMock tokenizer reports len() == 0, which reads as "generated
+    # nothing". Give it a plausible token count so benchmarks measure something.
+    mock.tokenizer.encode.return_value = list(range(10))
+    # Default to no chat template, so tests assert on the prompt they passed in.
+    mock.apply_chat_template.return_value = None
     return mock
 
 

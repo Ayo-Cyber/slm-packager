@@ -27,16 +27,15 @@ theme:
 
 nav:
   - Home: index.md
-  - Getting Started:
-      - Quick Start: QUICKSTART.md
-      - Installation: index.md#install
+  - Quick Start: quickstart.md
   - CLI Reference: cli-reference.md
   - Runtimes: runtimes.md
-  - GPU Acceleration: GPU_ACCELERATION.md
+  - GPU Acceleration: gpu-acceleration.md
   - Guides:
-      - GGUF / llama.cpp: GGUF_GUIDE.md
-      - ONNX: ONNX_GUIDE.md
-      - Config Reference: INIT_GUIDE.md
+      - GGUF / llama.cpp: gguf-guide.md
+      - ONNX: onnx-guide.md
+      - Model Formats: model-formats.md
+      - Creating Configs: init-guide.md
   - Benchmarks: benchmarks.md
 
 markdown_extensions:

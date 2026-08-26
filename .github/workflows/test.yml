@@ -6,10 +6,16 @@ on:
   pull_request:
     branches: [main]
 
+# Cancel superseded runs on the same ref.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   lint:
     name: Lint
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
 
@@ -18,16 +24,24 @@ jobs:
           python-version: '3.11'
 
       - name: Install lint tools
-        run: pip install black isort
+        run: pip install black isort mypy
 
       - name: Check formatting
         run: |
           black --check slm_packager tests
           isort --check-only slm_packager tests
 
+      # Advisory for now: there are ~35 known errors, most of them symptoms of the
+      # Union[str, Iterator[str]] runtime return type slated for redesign in v0.3.
+      # Flip continue-on-error off once that count reaches zero.
+      - name: Type check (advisory)
+        continue-on-error: true
+        run: mypy slm_packager
+
   test:
     name: Test (Python ${{ matrix.python-version }})
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     strategy:
       fail-fast: false
       matrix:
@@ -41,18 +55,104 @@ jobs:
           python-version: ${{ matrix.python-version }}
           cache: pip
 
-      - name: Install CPU-only torch
-        run: pip install torch --index-url https://download.pytorch.org/whl/cpu
-
+      # [dev] is test tooling only — no torch, no llama-cpp-python compile. The
+      # suite is fully mocked, so this leg stays fast across the whole matrix.
+      # The `with-engines` job below covers the real imports.
       - name: Install package and dev dependencies
         run: pip install -e ".[dev]"
 
       - name: Run tests with coverage
         run: pytest tests/ --cov=slm_packager --cov-report=xml -q
 
+  with-engines:
+    name: Test with engines installed
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+
+      - name: Install CPU-only torch
+        run: pip install torch --index-url https://download.pytorch.org/whl/cpu
+
+      # torch + onnx extras exercise the real engine imports and the ONNX tests.
+      # The gguf extra is excluded on purpose: llama-cpp-python builds from source
+      # and would add many minutes to every run.
+      - name: Install package with engines
+        run: pip install -e ".[torch,onnx,dev]"
+
+      - name: Run tests with coverage
+        run: pytest tests/ --cov=slm_packager --cov-report=xml -q
+
+      - name: Enforce coverage floor
+        run: coverage report --fail-under=50
+
       - name: Upload coverage report
-        if: matrix.python-version == '3.11'
         uses: actions/upload-artifact@v4
         with:
           name: coverage-report
           path: coverage.xml
+
+  lean-install:
+    name: Lean install (no engines)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      # Core must install with no compiler and no heavy wheels. This job is the
+      # guard against a runtime dependency creeping back into `dependencies`, or an
+      # eager import making the CLI unusable without an engine installed.
+      - name: Install core only
+        run: pip install .
+
+      - name: Assert no engine leaked into core
+        run: |
+          if pip list --format=freeze | grep -iE "^(torch|llama-cpp-python|onnxruntime|transformers|numpy)="; then
+            echo "::error::An inference engine is installed by core; it belongs in an extra"
+            exit 1
+          fi
+          echo "Core is lean."
+
+      - name: Commands that need no engine must work
+        run: |
+          slm --help
+          slm list
+          slm list --installed
+          slm init --name t --path /tmp/m.gguf --format gguf --runtime llama_cpp -o /tmp/t.yaml
+
+      - name: Missing engine must point at the right extra
+        run: |
+          output="$(slm run /tmp/t.yaml --prompt hi 2>&1 || true)"
+          echo "$output"
+          echo "$output" | grep -q "slm-packager\[gguf\]" \
+            || { echo "::error::error message does not name the gguf extra"; exit 1; }
+
+  test-macos:
+    name: Test (macOS)
+    runs-on: macos-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+
+      # Lean install, so no llama-cpp-python source build on the macOS runner —
+      # this leg is now fast and reliable enough to block merges on.
+      - name: Install package and dev dependencies
+        run: pip install -e ".[torch,onnx,dev]"
+
+      - name: Run tests
+        run: pytest tests/ -q

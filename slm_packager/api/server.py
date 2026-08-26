@@ -6,7 +6,7 @@ from typing import AsyncIterator, List, Optional
 import uvicorn
 from fastapi import Body, FastAPI, HTTPException, Request
 from fastapi.responses import StreamingResponse
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from .. import __version__
 from ..config.models import GenerationParams
@@ -21,7 +21,13 @@ async def lifespan(app: FastAPI):
     yield
     # Shutdown
     if hasattr(app.state, "model_manager"):
-        await app.state.model_manager.unload()
+        manager: ModelManager = app.state.model_manager
+        try:
+            # Bounded so a wedged generation can't keep the process alive forever.
+            await asyncio.wait_for(manager.unload(), timeout=30)
+        except Exception:
+            pass
+        manager.shutdown()
 
 
 app = FastAPI(title="SLM Packager API", version=__version__, lifespan=lifespan)
@@ -30,6 +36,14 @@ app = FastAPI(title="SLM Packager API", version=__version__, lifespan=lifespan)
 class GenerateRequest(BaseModel):
     prompt: str
     params: Optional[GenerationParams] = None
+    raw: bool = Field(
+        default=False,
+        description=(
+            "Send the prompt verbatim. By default it is wrapped in the model's chat "
+            "template, matching `slm run`; instruction-tuned models need that to "
+            "answer rather than continue the text."
+        ),
+    )
 
 
 @app.post("/load")
@@ -54,7 +68,7 @@ async def generate(request: Request, body: GenerateRequest):
         raise HTTPException(status_code=400, detail="Model not loaded. Call /load first.")
 
     try:
-        result = await manager.generate(body.prompt, body.params)
+        result = await manager.generate(body.prompt, body.params, raw=body.raw)
 
         if isinstance(result, str):
             return {"text": result}
@@ -93,7 +107,9 @@ async def _stream_wrapper(iterator) -> AsyncIterator[str]:
     except StopIteration:
         yield "data: [DONE]\n\n"
     except Exception as e:
-        yield f"data: {json.dumps({'error': str(e)})}\n\n"
+        # Headers are already sent, so the status code stays 200. Emit a named SSE
+        # event so clients can distinguish a failure from generated text.
+        yield f"event: error\ndata: {json.dumps({'error': str(e)})}\n\n"
         yield "data: [DONE]\n\n"
 
 
