@@ -13,7 +13,7 @@
         <link rel="canonical" href="https://ayo-cyber.github.io/slm-packager/cli-reference/">
       
       
-        <link rel="prev" href="../QUICKSTART/">
+        <link rel="prev" href="../quickstart/">
       
       
         <link rel="next" href="../runtimes/">
@@ -23,7 +23,7 @@
       
       
       <link rel="icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
     
     
       
@@ -31,7 +31,7 @@
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.ec1eaa64.min.css">
       
         
         <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
@@ -218,18 +218,17 @@
   
   
   
-    
-    
-      <li class="md-tabs__item">
-        <a href="../QUICKSTART/" class="md-tabs__link">
-          
+    <li class="md-tabs__item">
+      <a href="../quickstart/" class="md-tabs__link">
+        
   
   
-  Getting Started
+    
+  
+  Quick Start
 
-        </a>
-      </li>
-    
+      </a>
+    </li>
   
 
       
@@ -279,7 +278,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="../GPU_ACCELERATION/" class="md-tabs__link">
+      <a href="../gpu-acceleration/" class="md-tabs__link">
         
   
   
@@ -300,7 +299,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../GGUF_GUIDE/" class="md-tabs__link">
+        <a href="../gguf-guide/" class="md-tabs__link">
           
   
   
@@ -409,60 +408,8 @@
   
   
   
-    
-    
-    
-    
-      
-      
-        
-      
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
-        
-          
-          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Getting Started
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_2">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    Getting Started
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
     <li class="md-nav__item">
-      <a href="../QUICKSTART/" class="md-nav__link">
+      <a href="../quickstart/" class="md-nav__link">
         
   
   
@@ -478,42 +425,6 @@
   
 
       </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../index.md#install" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Installation
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
     </li>
   
 
@@ -725,7 +636,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../GPU_ACCELERATION/" class="md-nav__link">
+      <a href="../gpu-acceleration/" class="md-nav__link">
         
   
   
@@ -804,7 +715,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../GGUF_GUIDE/" class="md-nav__link">
+      <a href="../gguf-guide/" class="md-nav__link">
         
   
   
@@ -832,7 +743,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../ONNX_GUIDE/" class="md-nav__link">
+      <a href="../onnx-guide/" class="md-nav__link">
         
   
   
@@ -860,14 +771,42 @@
   
   
     <li class="md-nav__item">
-      <a href="../INIT_GUIDE/" class="md-nav__link">
+      <a href="../model-formats/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Config Reference
+    Model Formats
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../init-guide/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Creating Configs
   
 
     
@@ -1108,8 +1047,8 @@
 <hr />
 <h2 id="slm-run"><code>slm run</code><a class="headerlink" href="#slm-run" title="Permanent link">&para;</a></h2>
 <p>Run a model from a config file or by installed name.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>slm<span class="w"> </span>run<span class="w"> </span>tinyllama<span class="w"> </span>--prompt<span class="w"> </span><span class="s2">&quot;Hello!&quot;</span>
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>slm<span class="w"> </span>run<span class="w"> </span>my-model.yaml<span class="w"> </span>--prompt<span class="w"> </span><span class="s2">&quot;Summarise this document&quot;</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>slm<span class="w"> </span>run<span class="w"> </span>tinyllama<span class="w"> </span>--prompt<span class="w"> </span><span class="s2">"Hello!"</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>slm<span class="w"> </span>run<span class="w"> </span>my-model.yaml<span class="w"> </span>--prompt<span class="w"> </span><span class="s2">"Summarise this document"</span>
 <a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>slm<span class="w"> </span>run<span class="w"> </span>gpt2<span class="w"> </span>--no-stream<span class="w">          </span><span class="c1"># disable streaming</span>
 <a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>slm<span class="w"> </span>run<span class="w"> </span>tinyllama<span class="w"> </span>--raw<span class="w">           </span><span class="c1"># skip chat template formatting</span>
 </code></pre></div>
@@ -1138,18 +1077,57 @@
 </table>
 <hr />
 <h2 id="slm-benchmark"><code>slm benchmark</code><a class="headerlink" href="#slm-benchmark" title="Permanent link">&para;</a></h2>
-<p>Measure load time, generation speed, memory usage, and latency.</p>
+<p>Measure load time, throughput, and memory use. Runs a discarded warmup pass, then
+<code>--runs</code> timed generations, and reports the median tokens/sec. The prompt is wrapped
+in the model's chat template so instruction-tuned models actually produce output.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>slm<span class="w"> </span>benchmark<span class="w"> </span>tinyllama
 <a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>slm<span class="w"> </span>benchmark<span class="w"> </span>my-model.yaml
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>slm<span class="w"> </span>benchmark<span class="w"> </span>tinyllama<span class="w"> </span>--runs<span class="w"> </span><span class="m">5</span><span class="w"> </span>--max-tokens<span class="w"> </span><span class="m">256</span>
 </code></pre></div>
+<p><strong>Options:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Flag</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--prompt</code> / <code>-p</code></td>
+<td>built-in instruction prompt</td>
+<td>Prompt to benchmark with</td>
+</tr>
+<tr>
+<td><code>--runs</code></td>
+<td><code>3</code></td>
+<td>Timed runs to take the median of</td>
+</tr>
+<tr>
+<td><code>--max-tokens</code></td>
+<td><code>128</code></td>
+<td>Tokens to generate per run</td>
+</tr>
+<tr>
+<td><code>--warmup</code> / <code>--no-warmup</code></td>
+<td><code>--warmup</code></td>
+<td>Discard an initial untimed run</td>
+</tr>
+</tbody>
+</table>
 <p>Output:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>📊 Benchmark Results:
-<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>   Load Time: 1.23s
-<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>   Generation Time: 8.45s
-<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>   Memory Usage: 812.30 MB
-<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>   Latency: 8450.00 ms
-<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>   Estimated TPS: 12.43
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>   Load Time: 0.81s
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>   Memory Usage (process RSS): 1369.19 MB
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>   Tokens Generated: 700 over 5 run(s)
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>   Generation Time (mean): 0.98s
+<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>   Tokens/sec (median): 142.92
+<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>   Time per Token: 7.00 ms
 </code></pre></div>
+<p><code>Memory Usage</code> is whole-process RSS, including Python and the framework — an upper
+bound, not model weight size. If a model generates nothing for the given prompt, the
+command fails rather than reporting a throughput measured over zero tokens.</p>
 <hr />
 <h2 id="slm-serve"><code>slm serve</code><a class="headerlink" href="#slm-serve" title="Permanent link">&para;</a></h2>
 <p>Start a FastAPI HTTP server for model inference.</p>
@@ -1179,7 +1157,52 @@
 </tr>
 </tbody>
 </table>
-<p>See the API endpoints at <code>http://localhost:8000/docs</code> once the server is running.</p>
+<p><strong>Endpoints:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Endpoint</th>
+<th>Method</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>/load</code></td>
+<td>POST</td>
+<td>Load a model: <code>{"config_path": "~/.slm/configs/model.yaml"}</code></td>
+</tr>
+<tr>
+<td><code>/generate</code></td>
+<td>POST</td>
+<td>Generate: <code>{"prompt": "...", "params": {...}, "raw": false}</code></td>
+</tr>
+<tr>
+<td><code>/info</code></td>
+<td>GET</td>
+<td>Active model config</td>
+</tr>
+<tr>
+<td><code>/health</code></td>
+<td>GET</td>
+<td>Liveness check</td>
+</tr>
+</tbody>
+</table>
+<p>The server starts with <strong>no model loaded</strong> — call <code>/load</code> first or <code>/generate</code>
+returns <code>400 Model not loaded</code>. Generations are serialized per model, and a
+<code>/load</code> during an active generation waits for it to finish (concurrent requests
+mid-switch get <code>409</code>).</p>
+<p><code>/generate</code> wraps the prompt in the model's chat template by default, so it returns
+what <code>slm run</code> would for the same input. Send <code>"raw": true</code> to pass the prompt through
+untouched.</p>
+<div class="admonition warning">
+<p class="admonition-title">Binding beyond localhost</p>
+<p>There is no authentication on these endpoints, and <code>/load</code> accepts any
+config path on disk. Only use <code>--host 0.0.0.0</code> on a trusted network, behind
+a reverse proxy that handles auth.</p>
+</div>
+<p>See the interactive API docs at <code>http://localhost:8000/docs</code> once the server is running.</p>
 <hr />
 <h2 id="slm-init"><code>slm init</code><a class="headerlink" href="#slm-init" title="Permanent link">&para;</a></h2>
 <p>Create a YAML config file interactively or via flags.</p>
@@ -1229,37 +1252,86 @@
 <a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>slm<span class="w"> </span>quantize<span class="w"> </span>model.onnx<span class="w"> </span>--type<span class="w"> </span>int8
 </code></pre></div>
 <p><strong>Supported types:</strong> <code>q4_k_m</code>, <code>q4_0</code>, <code>q5_k_m</code>, <code>q8_0</code> (GGUF) · <code>int8</code> (ONNX)</p>
+<p>GGUF quantization downloads a <code>llama-quantize</code> binary from a pinned llama.cpp release
+on first use. That path is <strong>supported on macOS (Intel and Apple Silicon) and x86_64
+Linux</strong>; Windows and ARM Linux are not yet supported. Pulling a pre-quantized variant
+avoids the whole issue:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>slm<span class="w"> </span>pull<span class="w"> </span>tinyllama<span class="w"> </span>--quant<span class="w"> </span>q4_k_m
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>slm<span class="w"> </span>pull<span class="w"> </span>phi-2<span class="w"> </span>--list-variants
+</code></pre></div>
 <hr />
 <h2 id="slm-rm"><code>slm rm</code><a class="headerlink" href="#slm-rm" title="Permanent link">&para;</a></h2>
 <p>Remove an installed model and its config.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>slm<span class="w"> </span>rm<span class="w"> </span>tinyllama
-<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>slm<span class="w"> </span>rm<span class="w"> </span>tinyllama<span class="w"> </span>--yes<span class="w">    </span><span class="c1"># skip confirmation prompt</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>slm<span class="w"> </span>rm<span class="w"> </span>tinyllama
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>slm<span class="w"> </span>rm<span class="w"> </span>tinyllama<span class="w"> </span>--yes<span class="w">    </span><span class="c1"># skip confirmation prompt</span>
 </code></pre></div>
 <hr />
 <h2 id="config-schema">Config Schema<a class="headerlink" href="#config-schema" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="nt">model</span><span class="p">:</span>
-<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">my-model</span><span class="w">          </span><span class="c1"># display name</span>
-<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="w">  </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/path/to/model</span><span class="w">    </span><span class="c1"># file path or HF repo ID</span>
-<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="w">  </span><span class="nt">format</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gguf</span><span class="w">            </span><span class="c1"># gguf | onnx | pytorch</span>
-<a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="w">  </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;optional&quot;</span>
-<a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a>
-<a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a><span class="nt">runtime</span><span class="p">:</span>
-<a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a><span class="w">  </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">llama_cpp</span><span class="w">         </span><span class="c1"># llama_cpp | onnx | transformers</span>
-<a id="__codelineno-9-9" name="__codelineno-9-9" href="#__codelineno-9-9"></a><span class="w">  </span><span class="nt">device</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">cpu</span><span class="w">             </span><span class="c1"># cpu | cuda | mps</span>
-<a id="__codelineno-9-10" name="__codelineno-9-10" href="#__codelineno-9-10"></a><span class="w">  </span><span class="nt">threads</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">4</span><span class="w">              </span><span class="c1"># CPU thread count (llama_cpp)</span>
-<a id="__codelineno-9-11" name="__codelineno-9-11" href="#__codelineno-9-11"></a><span class="w">  </span><span class="nt">gpu_layers</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0</span><span class="w">           </span><span class="c1"># layers to offload to GPU</span>
-<a id="__codelineno-9-12" name="__codelineno-9-12" href="#__codelineno-9-12"></a><span class="w">  </span><span class="nt">context_size</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2048</span><span class="w">      </span><span class="c1"># context window size</span>
-<a id="__codelineno-9-13" name="__codelineno-9-13" href="#__codelineno-9-13"></a><span class="w">  </span><span class="nt">trust_remote_code</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
-<a id="__codelineno-9-14" name="__codelineno-9-14" href="#__codelineno-9-14"></a>
-<a id="__codelineno-9-15" name="__codelineno-9-15" href="#__codelineno-9-15"></a><span class="nt">params</span><span class="p">:</span>
-<a id="__codelineno-9-16" name="__codelineno-9-16" href="#__codelineno-9-16"></a><span class="w">  </span><span class="nt">temperature</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.7</span>
-<a id="__codelineno-9-17" name="__codelineno-9-17" href="#__codelineno-9-17"></a><span class="w">  </span><span class="nt">top_p</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.9</span>
-<a id="__codelineno-9-18" name="__codelineno-9-18" href="#__codelineno-9-18"></a><span class="w">  </span><span class="nt">top_k</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">40</span>
-<a id="__codelineno-9-19" name="__codelineno-9-19" href="#__codelineno-9-19"></a><span class="w">  </span><span class="nt">max_tokens</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">512</span>
-<a id="__codelineno-9-20" name="__codelineno-9-20" href="#__codelineno-9-20"></a><span class="w">  </span><span class="nt">stream</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
-<a id="__codelineno-9-21" name="__codelineno-9-21" href="#__codelineno-9-21"></a><span class="w">  </span><span class="nt">repetition_penalty</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1.1</span>
-<a id="__codelineno-9-22" name="__codelineno-9-22" href="#__codelineno-9-22"></a><span class="w">  </span><span class="nt">stop</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[]</span><span class="w">                </span><span class="c1"># stop sequences</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="nt">model</span><span class="p">:</span>
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">my-model</span><span class="w">          </span><span class="c1"># display name</span>
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="w">  </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/path/to/model</span><span class="w">    </span><span class="c1"># file path or HF repo ID</span>
+<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="w">  </span><span class="nt">format</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gguf</span><span class="w">            </span><span class="c1"># gguf | onnx | pytorch</span>
+<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a><span class="w">  </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="s">"optional"</span>
+<a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a>
+<a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a><span class="nt">runtime</span><span class="p">:</span>
+<a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a><span class="w">  </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">llama_cpp</span><span class="w">         </span><span class="c1"># llama_cpp | onnx | transformers</span>
+<a id="__codelineno-10-9" name="__codelineno-10-9" href="#__codelineno-10-9"></a><span class="w">  </span><span class="nt">device</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">cpu</span><span class="w">             </span><span class="c1"># cpu | cuda | mps</span>
+<a id="__codelineno-10-10" name="__codelineno-10-10" href="#__codelineno-10-10"></a><span class="w">  </span><span class="nt">threads</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">4</span><span class="w">              </span><span class="c1"># CPU thread count (llama_cpp)</span>
+<a id="__codelineno-10-11" name="__codelineno-10-11" href="#__codelineno-10-11"></a><span class="w">  </span><span class="nt">gpu_layers</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0</span><span class="w">           </span><span class="c1"># layers to offload to GPU</span>
+<a id="__codelineno-10-12" name="__codelineno-10-12" href="#__codelineno-10-12"></a><span class="w">  </span><span class="nt">context_size</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2048</span><span class="w">      </span><span class="c1"># context window size</span>
+<a id="__codelineno-10-13" name="__codelineno-10-13" href="#__codelineno-10-13"></a><span class="w">  </span><span class="nt">trust_remote_code</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
+<a id="__codelineno-10-14" name="__codelineno-10-14" href="#__codelineno-10-14"></a>
+<a id="__codelineno-10-15" name="__codelineno-10-15" href="#__codelineno-10-15"></a><span class="nt">params</span><span class="p">:</span>
+<a id="__codelineno-10-16" name="__codelineno-10-16" href="#__codelineno-10-16"></a><span class="w">  </span><span class="nt">temperature</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.7</span>
+<a id="__codelineno-10-17" name="__codelineno-10-17" href="#__codelineno-10-17"></a><span class="w">  </span><span class="nt">top_p</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.9</span>
+<a id="__codelineno-10-18" name="__codelineno-10-18" href="#__codelineno-10-18"></a><span class="w">  </span><span class="nt">top_k</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">40</span>
+<a id="__codelineno-10-19" name="__codelineno-10-19" href="#__codelineno-10-19"></a><span class="w">  </span><span class="nt">max_tokens</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">512</span>
+<a id="__codelineno-10-20" name="__codelineno-10-20" href="#__codelineno-10-20"></a><span class="w">  </span><span class="nt">stream</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<a id="__codelineno-10-21" name="__codelineno-10-21" href="#__codelineno-10-21"></a><span class="w">  </span><span class="nt">repetition_penalty</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1.1</span>
+<a id="__codelineno-10-22" name="__codelineno-10-22" href="#__codelineno-10-22"></a><span class="w">  </span><span class="nt">stop</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[]</span><span class="w">                </span><span class="c1"># stop sequences</span>
 </code></pre></div>
+<p><strong>Generation parameters:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Key</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>temperature</code></td>
+<td>Sampling temperature. <strong><code>0</code> means greedy decoding</strong> — the highest-probability token every step, so output is deterministic. <code>top_p</code>/<code>top_k</code> don't apply then.</td>
+</tr>
+<tr>
+<td><code>top_p</code></td>
+<td>Nucleus sampling threshold (ignored when <code>temperature: 0</code>)</td>
+</tr>
+<tr>
+<td><code>top_k</code></td>
+<td>Top-k sampling cutoff (ignored when <code>temperature: 0</code>)</td>
+</tr>
+<tr>
+<td><code>max_tokens</code></td>
+<td>Maximum tokens to generate</td>
+</tr>
+<tr>
+<td><code>repetition_penalty</code></td>
+<td>Above <code>1.0</code> discourages repeating tokens already produced</td>
+</tr>
+<tr>
+<td><code>stop</code></td>
+<td>Stop sequences. Generation ends at the first match and the stop text is <strong>not</strong> included in the output, streaming or not. Sequences spanning several tokens are handled.</td>
+</tr>
+<tr>
+<td><code>stream</code></td>
+<td>Emit tokens as they are produced</td>
+</tr>
+</tbody>
+</table>
+<p>All of these are honored by the llama.cpp and transformers runtimes. The
+experimental ONNX runtime honors them too but is otherwise less exercised — see
+<a href="../runtimes/">Runtimes</a>.</p>
 
 
 
@@ -1345,7 +1417,7 @@
       <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.tabs", "navigation.sections", "navigation.top", "search.highlight", "search.share", "content.code.copy", "content.code.annotate"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
-      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      <script src="../assets/javascripts/bundle.d7400e89.min.js"></script>
       
     
   </body>

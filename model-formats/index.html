@@ -10,28 +10,28 @@
       
       
       
-        <link rel="canonical" href="https://ayo-cyber.github.io/slm-packager/INIT_GUIDE/">
+        <link rel="canonical" href="https://ayo-cyber.github.io/slm-packager/model-formats/">
       
       
-        <link rel="prev" href="../ONNX_GUIDE/">
+        <link rel="prev" href="../onnx-guide/">
       
       
-        <link rel="next" href="../benchmarks/">
+        <link rel="next" href="../init-guide/">
       
       
         
       
       
       <link rel="icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
     
     
       
-        <title>Config Reference - SLM Packager</title>
+        <title>Model Formats - SLM Packager</title>
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.ec1eaa64.min.css">
       
         
         <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
@@ -76,7 +76,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#slm-init-interactive-guide" class="md-skip">
+        <a href="#understanding-model-formats-runtimes" class="md-skip">
           Skip to content
         </a>
       
@@ -110,7 +110,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Config Reference
+              Model Formats
             
           </span>
         </div>
@@ -218,18 +218,17 @@
   
   
   
-    
-    
-      <li class="md-tabs__item">
-        <a href="../QUICKSTART/" class="md-tabs__link">
-          
+    <li class="md-tabs__item">
+      <a href="../quickstart/" class="md-tabs__link">
+        
   
   
-  Getting Started
+    
+  
+  Quick Start
 
-        </a>
-      </li>
-    
+      </a>
+    </li>
   
 
       
@@ -277,7 +276,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="../GPU_ACCELERATION/" class="md-tabs__link">
+      <a href="../gpu-acceleration/" class="md-tabs__link">
         
   
   
@@ -300,7 +299,7 @@
     
     
       <li class="md-tabs__item md-tabs__item--active">
-        <a href="../GGUF_GUIDE/" class="md-tabs__link">
+        <a href="../gguf-guide/" class="md-tabs__link">
           
   
   
@@ -409,60 +408,8 @@
   
   
   
-    
-    
-    
-    
-      
-      
-        
-      
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
-        
-          
-          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Getting Started
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_2">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    Getting Started
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
     <li class="md-nav__item">
-      <a href="../QUICKSTART/" class="md-nav__link">
+      <a href="../quickstart/" class="md-nav__link">
         
   
   
@@ -478,42 +425,6 @@
   
 
       </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../index.md#install" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Installation
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
     </li>
   
 
@@ -579,7 +490,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../GPU_ACCELERATION/" class="md-nav__link">
+      <a href="../gpu-acceleration/" class="md-nav__link">
         
   
   
@@ -663,7 +574,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../GGUF_GUIDE/" class="md-nav__link">
+      <a href="../gguf-guide/" class="md-nav__link">
         
   
   
@@ -691,7 +602,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../ONNX_GUIDE/" class="md-nav__link">
+      <a href="../onnx-guide/" class="md-nav__link">
         
   
   
@@ -735,7 +646,7 @@
   <span class="md-ellipsis">
     
   
-    Config Reference
+    Model Formats
   
 
     
@@ -753,7 +664,7 @@
   <span class="md-ellipsis">
     
   
-    Config Reference
+    Model Formats
   
 
     
@@ -779,22 +690,33 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#scenario-1-gguf-model-recommended-for-cpu-speed" class="md-nav__link">
+  <a href="#quick-decision-guide" class="md-nav__link">
     <span class="md-ellipsis">
       
-        🎯 Scenario 1: GGUF Model (Recommended for CPU Speed)
+        🎯 Quick Decision Guide
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="🎯 Scenario 1: GGUF Model (Recommended for CPU Speed)">
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#model-formats-explained" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        📦 Model Formats Explained
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="📦 Model Formats Explained">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#what-youll-answer" class="md-nav__link">
+  <a href="#gguf-gpt-generated-unified-format" class="md-nav__link">
     <span class="md-ellipsis">
       
-        What You'll Answer:
+        GGUF (GPT-Generated Unified Format)
       
     </span>
   </a>
@@ -802,10 +724,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#explanation" class="md-nav__link">
+  <a href="#pytorch-bin-safetensors" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Explanation:
+        PyTorch (.bin, .safetensors)
       
     </span>
   </a>
@@ -813,10 +735,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#before-running" class="md-nav__link">
+  <a href="#onnx-open-neural-network-exchange" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Before Running:
+        ONNX (Open Neural Network Exchange)
       
     </span>
   </a>
@@ -829,22 +751,22 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#scenario-2-huggingface-model-easiest-but-slower-on-cpu" class="md-nav__link">
+  <a href="#runtime-comparison" class="md-nav__link">
     <span class="md-ellipsis">
       
-        🎯 Scenario 2: HuggingFace Model (Easiest but Slower on CPU)
+        ⚙️ Runtime Comparison
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="🎯 Scenario 2: HuggingFace Model (Easiest but Slower on CPU)">
+    <nav class="md-nav" aria-label="⚙️ Runtime Comparison">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#what-youll-answer_1" class="md-nav__link">
+  <a href="#llamacpp-runtime" class="md-nav__link">
     <span class="md-ellipsis">
       
-        What You'll Answer:
+        llama.cpp Runtime
       
     </span>
   </a>
@@ -852,10 +774,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#explanation_1" class="md-nav__link">
+  <a href="#transformers-runtime" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Explanation:
+        Transformers Runtime
       
     </span>
   </a>
@@ -863,10 +785,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#what-happens" class="md-nav__link">
+  <a href="#onnx-runtime" class="md-nav__link">
     <span class="md-ellipsis">
       
-        What Happens:
+        ONNX Runtime
       
     </span>
   </a>
@@ -879,33 +801,33 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#scenario-3-local-pytorch-model" class="md-nav__link">
+  <a href="#choosing-a-format" class="md-nav__link">
     <span class="md-ellipsis">
       
-        🎯 Scenario 3: Local PyTorch Model
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="🎯 Scenario 3: Local PyTorch Model">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#what-youll-answer_2" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        What You'll Answer:
+        📊 Choosing a Format
       
     </span>
   </a>
   
 </li>
-        
-          <li class="md-nav__item">
-  <a href="#explanation_2" class="md-nav__link">
+      
+        <li class="md-nav__item">
+  <a href="#quantization-types-gguf" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Explanation:
+        🎓 Quantization Types (GGUF)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="🎓 Quantization Types (GGUF)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#common-quantization-types" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Common Quantization Types
       
     </span>
   </a>
@@ -918,44 +840,22 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#quick-reference-table" class="md-nav__link">
+  <a href="#where-to-find-models" class="md-nav__link">
     <span class="md-ellipsis">
       
-        📋 Quick Reference Table
+        🔍 Where to Find Models
       
     </span>
   </a>
   
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#format-runtime-must-match" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        🔍 Format &amp; Runtime Must Match!
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#step-by-step-your-first-gguf-model" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        🎓 Step-by-Step: Your First GGUF Model
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="🎓 Step-by-Step: Your First GGUF Model">
+    <nav class="md-nav" aria-label="🔍 Where to Find Models">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#step-1-download-the-model" class="md-nav__link">
+  <a href="#gguf-models" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Step 1: Download the Model
+        GGUF Models
       
     </span>
   </a>
@@ -963,10 +863,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#step-2-initialize-config" class="md-nav__link">
+  <a href="#pytorch-models" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Step 2: Initialize Config
+        PyTorch Models
       
     </span>
   </a>
@@ -974,10 +874,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#step-3-run-it" class="md-nav__link">
+  <a href="#onnx-models" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Step 3: Run It!
+        ONNX Models
       
     </span>
   </a>
@@ -990,22 +890,22 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#tips-tricks" class="md-nav__link">
+  <a href="#practical-recommendations" class="md-nav__link">
     <span class="md-ellipsis">
       
-        💡 Tips &amp; Tricks
+        💡 Practical Recommendations
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="💡 Tips &amp; Tricks">
+    <nav class="md-nav" aria-label="💡 Practical Recommendations">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#tip-1-use-relative-paths" class="md-nav__link">
+  <a href="#for-learning-testing" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Tip 1: Use Relative Paths
+        For Learning &amp; Testing
       
     </span>
   </a>
@@ -1013,10 +913,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#tip-2-non-interactive-mode" class="md-nav__link">
+  <a href="#for-production-on-cpu" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Tip 2: Non-Interactive Mode
+        For Production on CPU
       
     </span>
   </a>
@@ -1024,10 +924,32 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#tip-3-multiple-configs" class="md-nav__link">
+  <a href="#for-production-on-gpu" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Tip 3: Multiple Configs
+        For Production on GPU
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#for-maximum-speed-on-apple-silicon-m1m2m3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        For Maximum Speed on Apple Silicon (M1/M2/M3)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#for-edge-devices-limited-memory" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        For Edge Devices / Limited Memory
       
     </span>
   </a>
@@ -1036,17 +958,6 @@
         
       </ul>
     </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#common-questions" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        ❓ Common Questions
-      
-    </span>
-  </a>
   
 </li>
       
@@ -1054,7 +965,7 @@
   <a href="#next-steps" class="md-nav__link">
     <span class="md-ellipsis">
       
-        📚 Next Steps
+        🚀 Next Steps
       
     </span>
   </a>
@@ -1065,6 +976,34 @@
   
 </nav>
       
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../init-guide/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Creating Configs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
     </li>
   
 
@@ -1131,22 +1070,33 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#scenario-1-gguf-model-recommended-for-cpu-speed" class="md-nav__link">
+  <a href="#quick-decision-guide" class="md-nav__link">
     <span class="md-ellipsis">
       
-        🎯 Scenario 1: GGUF Model (Recommended for CPU Speed)
+        🎯 Quick Decision Guide
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="🎯 Scenario 1: GGUF Model (Recommended for CPU Speed)">
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#model-formats-explained" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        📦 Model Formats Explained
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="📦 Model Formats Explained">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#what-youll-answer" class="md-nav__link">
+  <a href="#gguf-gpt-generated-unified-format" class="md-nav__link">
     <span class="md-ellipsis">
       
-        What You'll Answer:
+        GGUF (GPT-Generated Unified Format)
       
     </span>
   </a>
@@ -1154,10 +1104,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#explanation" class="md-nav__link">
+  <a href="#pytorch-bin-safetensors" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Explanation:
+        PyTorch (.bin, .safetensors)
       
     </span>
   </a>
@@ -1165,10 +1115,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#before-running" class="md-nav__link">
+  <a href="#onnx-open-neural-network-exchange" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Before Running:
+        ONNX (Open Neural Network Exchange)
       
     </span>
   </a>
@@ -1181,22 +1131,22 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#scenario-2-huggingface-model-easiest-but-slower-on-cpu" class="md-nav__link">
+  <a href="#runtime-comparison" class="md-nav__link">
     <span class="md-ellipsis">
       
-        🎯 Scenario 2: HuggingFace Model (Easiest but Slower on CPU)
+        ⚙️ Runtime Comparison
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="🎯 Scenario 2: HuggingFace Model (Easiest but Slower on CPU)">
+    <nav class="md-nav" aria-label="⚙️ Runtime Comparison">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#what-youll-answer_1" class="md-nav__link">
+  <a href="#llamacpp-runtime" class="md-nav__link">
     <span class="md-ellipsis">
       
-        What You'll Answer:
+        llama.cpp Runtime
       
     </span>
   </a>
@@ -1204,10 +1154,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#explanation_1" class="md-nav__link">
+  <a href="#transformers-runtime" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Explanation:
+        Transformers Runtime
       
     </span>
   </a>
@@ -1215,10 +1165,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#what-happens" class="md-nav__link">
+  <a href="#onnx-runtime" class="md-nav__link">
     <span class="md-ellipsis">
       
-        What Happens:
+        ONNX Runtime
       
     </span>
   </a>
@@ -1231,33 +1181,33 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#scenario-3-local-pytorch-model" class="md-nav__link">
+  <a href="#choosing-a-format" class="md-nav__link">
     <span class="md-ellipsis">
       
-        🎯 Scenario 3: Local PyTorch Model
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="🎯 Scenario 3: Local PyTorch Model">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#what-youll-answer_2" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        What You'll Answer:
+        📊 Choosing a Format
       
     </span>
   </a>
   
 </li>
-        
-          <li class="md-nav__item">
-  <a href="#explanation_2" class="md-nav__link">
+      
+        <li class="md-nav__item">
+  <a href="#quantization-types-gguf" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Explanation:
+        🎓 Quantization Types (GGUF)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="🎓 Quantization Types (GGUF)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#common-quantization-types" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Common Quantization Types
       
     </span>
   </a>
@@ -1270,44 +1220,22 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#quick-reference-table" class="md-nav__link">
+  <a href="#where-to-find-models" class="md-nav__link">
     <span class="md-ellipsis">
       
-        📋 Quick Reference Table
+        🔍 Where to Find Models
       
     </span>
   </a>
   
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#format-runtime-must-match" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        🔍 Format &amp; Runtime Must Match!
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#step-by-step-your-first-gguf-model" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        🎓 Step-by-Step: Your First GGUF Model
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="🎓 Step-by-Step: Your First GGUF Model">
+    <nav class="md-nav" aria-label="🔍 Where to Find Models">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#step-1-download-the-model" class="md-nav__link">
+  <a href="#gguf-models" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Step 1: Download the Model
+        GGUF Models
       
     </span>
   </a>
@@ -1315,10 +1243,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#step-2-initialize-config" class="md-nav__link">
+  <a href="#pytorch-models" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Step 2: Initialize Config
+        PyTorch Models
       
     </span>
   </a>
@@ -1326,10 +1254,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#step-3-run-it" class="md-nav__link">
+  <a href="#onnx-models" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Step 3: Run It!
+        ONNX Models
       
     </span>
   </a>
@@ -1342,22 +1270,22 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#tips-tricks" class="md-nav__link">
+  <a href="#practical-recommendations" class="md-nav__link">
     <span class="md-ellipsis">
       
-        💡 Tips &amp; Tricks
+        💡 Practical Recommendations
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="💡 Tips &amp; Tricks">
+    <nav class="md-nav" aria-label="💡 Practical Recommendations">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#tip-1-use-relative-paths" class="md-nav__link">
+  <a href="#for-learning-testing" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Tip 1: Use Relative Paths
+        For Learning &amp; Testing
       
     </span>
   </a>
@@ -1365,10 +1293,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#tip-2-non-interactive-mode" class="md-nav__link">
+  <a href="#for-production-on-cpu" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Tip 2: Non-Interactive Mode
+        For Production on CPU
       
     </span>
   </a>
@@ -1376,10 +1304,32 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#tip-3-multiple-configs" class="md-nav__link">
+  <a href="#for-production-on-gpu" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Tip 3: Multiple Configs
+        For Production on GPU
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#for-maximum-speed-on-apple-silicon-m1m2m3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        For Maximum Speed on Apple Silicon (M1/M2/M3)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#for-edge-devices-limited-memory" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        For Edge Devices / Limited Memory
       
     </span>
   </a>
@@ -1388,17 +1338,6 @@
         
       </ul>
     </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#common-questions" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        ❓ Common Questions
-      
-    </span>
-  </a>
   
 </li>
       
@@ -1406,7 +1345,7 @@
   <a href="#next-steps" class="md-nav__link">
     <span class="md-ellipsis">
       
-        📚 Next Steps
+        🚀 Next Steps
       
     </span>
   </a>
@@ -1433,200 +1372,289 @@
   
 
 
-<h1 id="slm-init-interactive-guide">SLM Init - Interactive Guide<a class="headerlink" href="#slm-init-interactive-guide" title="Permanent link">&para;</a></h1>
-<p>This guide shows you <strong>exactly</strong> what to input during <code>slm init</code> for different scenarios.</p>
-<h2 id="scenario-1-gguf-model-recommended-for-cpu-speed">🎯 Scenario 1: GGUF Model (Recommended for CPU Speed)<a class="headerlink" href="#scenario-1-gguf-model-recommended-for-cpu-speed" title="Permanent link">&para;</a></h2>
-<p><strong>Best for:</strong> Fast CPU inference, production deployments, low memory</p>
-<h3 id="what-youll-answer">What You'll Answer:<a class="headerlink" href="#what-youll-answer" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>$<span class="w"> </span>slm<span class="w"> </span>init
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>Model<span class="w"> </span>Name:<span class="w"> </span>tinyllama-fast
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>Model<span class="w"> </span>Path:<span class="w"> </span>./models/tinyllama-1.1b-chat-v1.0.Q4_K_M.gguf
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>Model<span class="w"> </span>Format<span class="w"> </span><span class="o">(</span>gguf,<span class="w"> </span>onnx,<span class="w"> </span>pytorch<span class="o">)</span>:<span class="w"> </span>gguf
-<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>Runtime<span class="w"> </span><span class="o">(</span>llama_cpp,<span class="w"> </span>onnx,<span class="w"> </span>transformers<span class="o">)</span>:<span class="w"> </span>llama_cpp
-<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>
-<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>Config<span class="w"> </span>saved<span class="w"> </span>to<span class="w"> </span>slm.yaml
-</code></pre></div>
-<h3 id="explanation">Explanation:<a class="headerlink" href="#explanation" title="Permanent link">&para;</a></h3>
-<ul>
-<li><strong>Model Name</strong>: <code>tinyllama-fast</code> - Any friendly name you want</li>
-<li><strong>Model Path</strong>: Path to your downloaded <code>.gguf</code> file</li>
-<li>Can be relative: <code>./models/model.gguf</code></li>
-<li>Or absolute: <code>/Users/you/models/model.gguf</code></li>
-<li><strong>Model Format</strong>: <code>gguf</code> - The file format</li>
-<li><strong>Runtime</strong>: <code>llama_cpp</code> - The engine to run GGUF files</li>
-</ul>
-<h3 id="before-running">Before Running:<a class="headerlink" href="#before-running" title="Permanent link">&para;</a></h3>
-<p>Make sure you've downloaded the GGUF file:
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>mkdir<span class="w"> </span>-p<span class="w"> </span>models
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="nb">cd</span><span class="w"> </span>models
-<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>wget<span class="w"> </span>https://huggingface.co/TheBloke/TinyLlama-1.1B-Chat-v1.0-GGUF/resolve/main/tinyllama-1.1b-chat-v1.0.Q4_K_M.gguf
-<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="nb">cd</span><span class="w"> </span>..
-</code></pre></div></p>
-<hr />
-<h2 id="scenario-2-huggingface-model-easiest-but-slower-on-cpu">🎯 Scenario 2: HuggingFace Model (Easiest but Slower on CPU)<a class="headerlink" href="#scenario-2-huggingface-model-easiest-but-slower-on-cpu" title="Permanent link">&para;</a></h2>
-<p><strong>Best for:</strong> Quick testing, GPU deployments, development</p>
-<h3 id="what-youll-answer_1">What You'll Answer:<a class="headerlink" href="#what-youll-answer_1" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>$<span class="w"> </span>slm<span class="w"> </span>init
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>
-<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>Model<span class="w"> </span>Name:<span class="w"> </span>gpt2-test
-<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>Model<span class="w"> </span>Path:<span class="w"> </span>gpt2
-<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>Model<span class="w"> </span>Format<span class="w"> </span><span class="o">(</span>gguf,<span class="w"> </span>onnx,<span class="w"> </span>pytorch<span class="o">)</span>:<span class="w"> </span>pytorch
-<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>Runtime<span class="w"> </span><span class="o">(</span>llama_cpp,<span class="w"> </span>onnx,<span class="w"> </span>transformers<span class="o">)</span>:<span class="w"> </span>transformers
-<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>
-<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>Config<span class="w"> </span>saved<span class="w"> </span>to<span class="w"> </span>slm.yaml
-</code></pre></div>
-<h3 id="explanation_1">Explanation:<a class="headerlink" href="#explanation_1" title="Permanent link">&para;</a></h3>
-<ul>
-<li><strong>Model Name</strong>: <code>gpt2-test</code> - Your choice of name</li>
-<li><strong>Model Path</strong>: <code>gpt2</code> - <strong>HuggingFace model ID</strong> (no download needed!)</li>
-<li>Format: <code>namespace/repo-name</code> or just <code>model-name</code></li>
-<li>Examples: <code>gpt2</code>, <code>microsoft/phi-2</code>, <code>TinyLlama/TinyLlama-1.1B-Chat-v1.0</code></li>
-<li><strong>Model Format</strong>: <code>pytorch</code> - Standard HuggingFace format</li>
-<li><strong>Runtime</strong>: <code>transformers</code> - Uses the transformers library</li>
-</ul>
-<h3 id="what-happens">What Happens:<a class="headerlink" href="#what-happens" title="Permanent link">&para;</a></h3>
-<p>Model auto-downloads from HuggingFace on first run (cached for future use)</p>
-<hr />
-<h2 id="scenario-3-local-pytorch-model">🎯 Scenario 3: Local PyTorch Model<a class="headerlink" href="#scenario-3-local-pytorch-model" title="Permanent link">&para;</a></h2>
-<p><strong>Best for:</strong> Using a model you've already downloaded or fine-tuned</p>
-<h3 id="what-youll-answer_2">What You'll Answer:<a class="headerlink" href="#what-youll-answer_2" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>$<span class="w"> </span>slm<span class="w"> </span>init
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>
-<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>Model<span class="w"> </span>Name:<span class="w"> </span>my-local-model
-<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>Model<span class="w"> </span>Path:<span class="w"> </span>/Users/you/models/my-model
-<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>Model<span class="w"> </span>Format<span class="w"> </span><span class="o">(</span>gguf,<span class="w"> </span>onnx,<span class="w"> </span>pytorch<span class="o">)</span>:<span class="w"> </span>pytorch
-<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>Runtime<span class="w"> </span><span class="o">(</span>llama_cpp,<span class="w"> </span>onnx,<span class="w"> </span>transformers<span class="o">)</span>:<span class="w"> </span>transformers
-<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>
-<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>Config<span class="w"> </span>saved<span class="w"> </span>to<span class="w"> </span>slm.yaml
-</code></pre></div>
-<h3 id="explanation_2">Explanation:<a class="headerlink" href="#explanation_2" title="Permanent link">&para;</a></h3>
-<ul>
-<li><strong>Model Path</strong>: Full path to directory containing model files</li>
-<li>Must have: <code>config.json</code>, <code>pytorch_model.bin</code> (or <code>.safetensors</code>), tokenizer files</li>
-</ul>
-<hr />
-<h2 id="quick-reference-table">📋 Quick Reference Table<a class="headerlink" href="#quick-reference-table" title="Permanent link">&para;</a></h2>
+<h1 id="understanding-model-formats-runtimes">Understanding Model Formats &amp; Runtimes<a class="headerlink" href="#understanding-model-formats-runtimes" title="Permanent link">&para;</a></h1>
+<p>A beginner's guide to choosing the right model format and runtime for your use case.</p>
+<h2 id="quick-decision-guide">🎯 Quick Decision Guide<a class="headerlink" href="#quick-decision-guide" title="Permanent link">&para;</a></h2>
+<p><strong>Choose based on your priority:</strong></p>
 <table>
 <thead>
 <tr>
-<th>Want</th>
-<th>Model Format</th>
+<th>Priority</th>
+<th>Best Choice</th>
 <th>Runtime</th>
-<th>Model Path Example</th>
+<th>Format</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><strong>Fast CPU</strong></td>
-<td><code>gguf</code></td>
+<td><strong>Speed on CPU</strong></td>
+<td>llama.cpp</td>
 <td><code>llama_cpp</code></td>
-<td><code>./models/model.Q4_K_M.gguf</code></td>
+<td>GGUF</td>
 </tr>
 <tr>
-<td><strong>HuggingFace</strong></td>
-<td><code>pytorch</code></td>
+<td><strong>Flexibility</strong></td>
+<td>Transformers</td>
 <td><code>transformers</code></td>
-<td><code>gpt2</code> or <code>microsoft/phi-2</code></td>
+<td>PyTorch</td>
 </tr>
 <tr>
-<td><strong>Local file</strong></td>
-<td><code>pytorch</code></td>
+<td><strong>Small size</strong></td>
+<td>llama.cpp</td>
+<td><code>llama_cpp</code></td>
+<td>GGUF (quantized)</td>
+</tr>
+<tr>
+<td><strong>GPU inference</strong></td>
+<td>Transformers or llama.cpp</td>
+<td><code>transformers</code> or <code>llama_cpp</code></td>
+<td>PyTorch or GGUF</td>
+</tr>
+<tr>
+<td><strong>Just testing</strong></td>
+<td>Transformers</td>
 <td><code>transformers</code></td>
-<td><code>/path/to/model/directory</code></td>
+<td>PyTorch</td>
 </tr>
 <tr>
-<td><strong>ONNX</strong></td>
-<td><code>onnx</code></td>
-<td><code>onnx</code></td>
-<td><code>./models/model.onnx</code></td>
+<td><strong>Production CPU</strong></td>
+<td>llama.cpp</td>
+<td><code>llama_cpp</code></td>
+<td>GGUF</td>
 </tr>
 </tbody>
 </table>
 <hr />
-<h2 id="format-runtime-must-match">🔍 Format &amp; Runtime Must Match!<a class="headerlink" href="#format-runtime-must-match" title="Permanent link">&para;</a></h2>
-<p><strong>Critical Rule:</strong> Format and Runtime must be compatible:</p>
-<p>✅ <strong>Correct Combinations:</strong>
-- <code>gguf</code> + <code>llama_cpp</code>
-- <code>pytorch</code> + <code>transformers</code>
-- <code>onnx</code> + <code>onnx</code></p>
-<p>❌ <strong>Wrong Combinations:</strong>
-- <code>gguf</code> + <code>transformers</code> ❌ Won't work!
-- <code>pytorch</code> + <code>llama_cpp</code> ❌ Won't work!</p>
+<h2 id="model-formats-explained">📦 Model Formats Explained<a class="headerlink" href="#model-formats-explained" title="Permanent link">&para;</a></h2>
+<h3 id="gguf-gpt-generated-unified-format">GGUF (GPT-Generated Unified Format)<a class="headerlink" href="#gguf-gpt-generated-unified-format" title="Permanent link">&para;</a></h3>
+<p><strong>What is it?</strong>
+- Binary format optimized for llama.cpp
+- Supports aggressive quantization (4-bit, 5-bit, 8-bit)
+- Single-file format with model + metadata</p>
+<p><strong>Pros:</strong>
+- ⚡ <strong>Much faster on CPU</strong> than PyTorch (see <a href="../benchmarks/">Benchmarks</a>)
+- 💾 <strong>Much smaller</strong> files (4-bit = ~4x smaller)
+- 🚀 <strong>Low memory usage</strong> 
+- 🔧 <strong>CPU-optimized</strong> with SIMD instructions</p>
+<p><strong>Cons:</strong>
+- ⚠️ Limited to models supported by llama.cpp
+- ⚠️ Need to download pre-converted GGUF files
+- ⚠️ Quantization can slightly reduce quality</p>
+<p><strong>Best For:</strong>
+- Production deployments on CPU
+- Edge devices / laptops
+- Memory-constrained environments
+- Fast inference without GPU</p>
+<p><strong>Example Models:</strong>
+- TinyLlama Q4_K_M (600MB vs 2.2GB)
+- Phi-2 Q4_K_M (1.6GB vs 5GB)
+- Llama-2-7B Q4_K_M (4GB vs 13GB)</p>
 <hr />
-<h2 id="step-by-step-your-first-gguf-model">🎓 Step-by-Step: Your First GGUF Model<a class="headerlink" href="#step-by-step-your-first-gguf-model" title="Permanent link">&para;</a></h2>
-<p>Let's walk through setting up TinyLlama GGUF from scratch:</p>
-<h3 id="step-1-download-the-model">Step 1: Download the Model<a class="headerlink" href="#step-1-download-the-model" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="c1"># Create directory</span>
-<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>mkdir<span class="w"> </span>-p<span class="w"> </span>models
-<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>
-<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="c1"># Download GGUF file (600MB)</span>
-<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>curl<span class="w"> </span>-L<span class="w"> </span>-o<span class="w"> </span>models/tinyllama.gguf<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="w">  </span><span class="s2">&quot;https://huggingface.co/TheBloke/TinyLlama-1.1B-Chat-v1.0-GGUF/resolve/main/tinyllama-1.1b-chat-v1.0.Q4_K_M.gguf&quot;</span>
-</code></pre></div>
-<h3 id="step-2-initialize-config">Step 2: Initialize Config<a class="headerlink" href="#step-2-initialize-config" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>slm<span class="w"> </span>init
-</code></pre></div>
-<p><strong>Type these answers:</strong>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>Model Name: tinyllama-gguf
-<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>Model Path: ./models/tinyllama.gguf
-<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>Model Format: gguf
-<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>Runtime: llama_cpp
-</code></pre></div></p>
-<h3 id="step-3-run-it">Step 3: Run It!<a class="headerlink" href="#step-3-run-it" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>slm<span class="w"> </span>run<span class="w"> </span>slm.yaml<span class="w"> </span>--prompt<span class="w"> </span><span class="s2">&quot;What is machine learning?&quot;</span>
-</code></pre></div>
-<p><strong>Result:</strong> Fast inference at ~35 tokens/sec on CPU! 🚀</p>
+<h3 id="pytorch-bin-safetensors">PyTorch (.bin, .safetensors)<a class="headerlink" href="#pytorch-bin-safetensors" title="Permanent link">&para;</a></h3>
+<p><strong>What is it?</strong>
+- Native PyTorch model format
+- Full-precision or half-precision (FP32/FP16)
+- Standard format on HuggingFace</p>
+<p><strong>Pros:</strong>
+- ✅ <strong>Most compatible</strong> - works with all transformers models
+- ✅ <strong>Easy to use</strong> - just provide HuggingFace model ID
+- ✅ <strong>Full ecosystem</strong> - training, fine-tuning, etc.
+- ✅ <strong>No conversion</strong> needed</p>
+<p><strong>Cons:</strong>
+- 🐌 <strong>Slower on CPU</strong> than GGUF
+- 💾 <strong>Larger file sizes</strong>
+- 🧠 <strong>Higher memory usage</strong>
+- ⚡ Requires GPU for good speed</p>
+<p><strong>Best For:</strong>
+- Development and experimentation
+- GPU-based deployments
+- Fine-tuning models
+- When you need full model flexibility</p>
+<p><strong>Example Models:</strong>
+- GPT-2 (500MB)
+- TinyLlama (2.2GB)
+- Phi-2 (5GB)</p>
 <hr />
-<h2 id="tips-tricks">💡 Tips &amp; Tricks<a class="headerlink" href="#tips-tricks" title="Permanent link">&para;</a></h2>
-<h3 id="tip-1-use-relative-paths">Tip 1: Use Relative Paths<a class="headerlink" href="#tip-1-use-relative-paths" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="c1"># Instead of:</span>
-<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>Model<span class="w"> </span>Path:<span class="w"> </span>/Users/johndoe/Documents/models/model.gguf
-<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>
-<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="c1"># Use:</span>
-<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>Model<span class="w"> </span>Path:<span class="w"> </span>./models/model.gguf
-</code></pre></div>
-<p>Makes configs portable across machines!</p>
-<h3 id="tip-2-non-interactive-mode">Tip 2: Non-Interactive Mode<a class="headerlink" href="#tip-2-non-interactive-mode" title="Permanent link">&para;</a></h3>
-<p>Skip the prompts:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>slm<span class="w"> </span>init<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="w">  </span>--name<span class="w"> </span>tinyllama-gguf<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="w">  </span>--path<span class="w"> </span>./models/tinyllama.gguf<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="w">  </span>--format<span class="w"> </span>gguf<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="w">  </span>--runtime<span class="w"> </span>llama_cpp<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a><span class="w">  </span>--output<span class="w"> </span>tinyllama.yaml
-</code></pre></div>
-<h3 id="tip-3-multiple-configs">Tip 3: Multiple Configs<a class="headerlink" href="#tip-3-multiple-configs" title="Permanent link">&para;</a></h3>
-<p>Create different configs for different models:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>slm<span class="w"> </span>init<span class="w"> </span>--output<span class="w"> </span>gpt2.yaml<span class="w">        </span><span class="c1"># GPT-2 config</span>
-<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>slm<span class="w"> </span>init<span class="w"> </span>--output<span class="w"> </span>tinyllama.yaml<span class="w">   </span><span class="c1"># TinyLlama config</span>
-<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>slm<span class="w"> </span>init<span class="w"> </span>--output<span class="w"> </span>phi2.yaml<span class="w">        </span><span class="c1"># Phi-2 config</span>
-<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a>
-<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a><span class="c1"># Then run any:</span>
-<a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a>slm<span class="w"> </span>run<span class="w"> </span>gpt2.yaml
-<a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a>slm<span class="w"> </span>run<span class="w"> </span>tinyllama.yaml
+<h3 id="onnx-open-neural-network-exchange">ONNX (Open Neural Network Exchange)<a class="headerlink" href="#onnx-open-neural-network-exchange" title="Permanent link">&para;</a></h3>
+<p><strong>What is it?</strong>
+- Cross-platform model format
+- Optimized for inference
+- Supports many frameworks</p>
+<p><strong>Pros:</strong>
+- 🔄 <strong>Cross-platform</strong> (works everywhere)
+- ⚡ <strong>Optimized inference</strong>
+- 🛠️ <strong>Framework agnostic</strong></p>
+<p><strong>Cons:</strong>
+- ⚠️ <strong>Current SLM Packager ONNX support is basic</strong>
+- ⚠️ Conversion can be tricky
+- ⚠️ Not all models convert well</p>
+<p><strong>Best For:</strong>
+- Production systems requiring cross-platform support
+- When you need framework independence
+- (Note: Currently experimental in SLM Packager)</p>
+<hr />
+<h2 id="runtime-comparison">⚙️ Runtime Comparison<a class="headerlink" href="#runtime-comparison" title="Permanent link">&para;</a></h2>
+<h3 id="llamacpp-runtime">llama.cpp Runtime<a class="headerlink" href="#llamacpp-runtime" title="Permanent link">&para;</a></h3>
+<p><strong>Speed:</strong> ⭐⭐⭐⭐⭐ (Fastest on CPU)<br />
+<strong>Memory:</strong> ⭐⭐⭐⭐⭐ (Most efficient)<br />
+<strong>Compatibility:</strong> ⭐⭐⭐ (Growing but limited)</p>
+<p><strong>When to use:</strong>
+- Running on CPU (especially Apple Silicon M1/M2/M3)
+- Need fast inference without GPU
+- Memory-constrained environments
+- Production deployments</p>
+<p><strong>Requires:</strong> GGUF model files</p>
+<hr />
+<h3 id="transformers-runtime">Transformers Runtime<a class="headerlink" href="#transformers-runtime" title="Permanent link">&para;</a></h3>
+<p><strong>Speed:</strong> ⭐⭐ (Slow on CPU, fast on GPU)<br />
+<strong>Memory:</strong> ⭐⭐ (High usage)<br />
+<strong>Compatibility:</strong> ⭐⭐⭐⭐⭐ (Works with everything)</p>
+<p><strong>When to use:</strong>
+- Have a GPU available
+- Need maximum compatibility
+- Want easy access to HuggingFace models
+- Development and testing</p>
+<p><strong>Requires:</strong> PyTorch model files or HuggingFace ID</p>
+<hr />
+<h3 id="onnx-runtime">ONNX Runtime<a class="headerlink" href="#onnx-runtime" title="Permanent link">&para;</a></h3>
+<p><strong>Speed:</strong> ⭐⭐⭐ (Good)<br />
+<strong>Memory:</strong> ⭐⭐⭐ (Moderate)<br />
+<strong>Compatibility:</strong> ⭐⭐⭐ (Platform independent)</p>
+<p><strong>When to use:</strong>
+- Need cross-platform deployment
+- Want optimized inference
+- (Note: Limited support in current version)</p>
+<p><strong>Requires:</strong> ONNX model files</p>
+<hr />
+<h2 id="choosing-a-format">📊 Choosing a Format<a class="headerlink" href="#choosing-a-format" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Format</th>
+<th>Best for</th>
+<th>Trade-off</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>GGUF</strong> (llama.cpp)</td>
+<td>CPU inference, laptops, smallest memory footprint</td>
+<td>Quantization costs some quality; needs a GGUF conversion of the model</td>
+</tr>
+<tr>
+<td><strong>PyTorch</strong> (transformers)</td>
+<td>Widest model support, GPU/CUDA, anything brand new on the Hub</td>
+<td>Largest download and memory use; slowest on CPU</td>
+</tr>
+<tr>
+<td><strong>ONNX</strong></td>
+<td>Exported models where you specifically need ONNX Runtime</td>
+<td><strong>Experimental</strong> — see the caveats in <a href="../onnx-guide/">ONNX</a></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Rule of thumb:</strong> on a laptop without a discrete GPU, GGUF with llama.cpp is the
+fastest route by a wide margin. With CUDA available, PyTorch becomes competitive and
+supports more models.</p>
+<p>For measured numbers on real hardware — and the exact command to reproduce them —
+see <a href="../benchmarks/">Benchmarks</a>. Speed depends heavily on your machine, so benchmark
+rather than trusting any table:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>slm<span class="w"> </span>benchmark<span class="w"> </span>&lt;model&gt;<span class="w"> </span>--runs<span class="w"> </span><span class="m">5</span><span class="w"> </span>--max-tokens<span class="w"> </span><span class="m">128</span>
 </code></pre></div>
 <hr />
-<h2 id="common-questions">❓ Common Questions<a class="headerlink" href="#common-questions" title="Permanent link">&para;</a></h2>
-<p><strong>Q: Where do I get GGUF models?</strong>
-A: TheBloke on HuggingFace - search for "[model name] GGUF"</p>
-<p><strong>Q: What's the difference between Q4_K_M and Q8_0?</strong>
-A: Q4 is smaller/faster, Q8 is larger/better quality. Start with Q4_K_M.</p>
-<p><strong>Q: Can I use the same config on different computers?</strong>
-A: Yes! Use relative paths (e.g., <code>./models/...</code>) and commit the config to git.</p>
-<p><strong>Q: Do I need to download HuggingFace models first?</strong>
-A: No! Just use the model ID (e.g., <code>gpt2</code>) and it auto-downloads.</p>
-<p><strong>Q: Which is faster: GGUF or PyTorch?</strong>
-A: GGUF is ~5-10x faster on CPU. PyTorch is faster on GPU.</p>
+<h2 id="quantization-types-gguf">🎓 Quantization Types (GGUF)<a class="headerlink" href="#quantization-types-gguf" title="Permanent link">&para;</a></h2>
+<p>When you see model names like <code>Q4_K_M</code>, here's what it means:</p>
+<h3 id="common-quantization-types">Common Quantization Types<a class="headerlink" href="#common-quantization-types" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Size</th>
+<th>Quality</th>
+<th>Speed</th>
+<th>Use Case</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Q4_0</strong></td>
+<td>Smallest</td>
+<td>Good</td>
+<td>Fastest</td>
+<td>Maximum speed, tight memory</td>
+</tr>
+<tr>
+<td><strong>Q4_K_M</strong></td>
+<td>Small</td>
+<td>Better</td>
+<td>Very fast</td>
+<td><strong>Recommended balance</strong></td>
+</tr>
+<tr>
+<td><strong>Q5_K_M</strong></td>
+<td>Medium</td>
+<td>Great</td>
+<td>Fast</td>
+<td>Better quality, still efficient</td>
+</tr>
+<tr>
+<td><strong>Q8_0</strong></td>
+<td>Large</td>
+<td>Excellent</td>
+<td>Moderate</td>
+<td>Quality over size</td>
+</tr>
+<tr>
+<td><strong>F16</strong></td>
+<td>Largest</td>
+<td>Perfect</td>
+<td>Slower</td>
+<td>When quality is critical</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Recommendation:</strong> Start with <strong>Q4_K_M</strong> - it's the sweet spot of speed, size, and quality.</p>
 <hr />
-<h2 id="next-steps">📚 Next Steps<a class="headerlink" href="#next-steps" title="Permanent link">&para;</a></h2>
+<h2 id="where-to-find-models">🔍 Where to Find Models<a class="headerlink" href="#where-to-find-models" title="Permanent link">&para;</a></h2>
+<h3 id="gguf-models">GGUF Models<a class="headerlink" href="#gguf-models" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>TheBloke on HuggingFace</strong> - Most popular GGUF converter</li>
+<li>Example: https://huggingface.co/TheBloke/TinyLlama-1.1B-Chat-v1.0-GGUF</li>
+<li>Download individual <code>.gguf</code> files</li>
+</ul>
+<h3 id="pytorch-models">PyTorch Models<a class="headerlink" href="#pytorch-models" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>HuggingFace Model Hub</strong></li>
+<li>Use model ID directly: <code>microsoft/phi-2</code></li>
+<li>Or download and use local path</li>
+</ul>
+<h3 id="onnx-models">ONNX Models<a class="headerlink" href="#onnx-models" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>HuggingFace</strong> or <strong>ONNX Model Zoo</strong></li>
+<li>Convert PyTorch models using <code>optimum</code> library</li>
+</ul>
+<hr />
+<h2 id="practical-recommendations">💡 Practical Recommendations<a class="headerlink" href="#practical-recommendations" title="Permanent link">&para;</a></h2>
+<h3 id="for-learning-testing">For Learning &amp; Testing<a class="headerlink" href="#for-learning-testing" title="Permanent link">&para;</a></h3>
+<p>→ Use <strong>PyTorch + Transformers</strong> with small models (GPT-2, DistilGPT-2)</p>
+<h3 id="for-production-on-cpu">For Production on CPU<a class="headerlink" href="#for-production-on-cpu" title="Permanent link">&para;</a></h3>
+<p>→ Use <strong>GGUF Q4_K_M + llama.cpp</strong> for speed and efficiency</p>
+<h3 id="for-production-on-gpu">For Production on GPU<a class="headerlink" href="#for-production-on-gpu" title="Permanent link">&para;</a></h3>
+<p>→ Use <strong>PyTorch + Transformers</strong> (or vLLM for advanced use)</p>
+<h3 id="for-maximum-speed-on-apple-silicon-m1m2m3">For Maximum Speed on Apple Silicon (M1/M2/M3)<a class="headerlink" href="#for-maximum-speed-on-apple-silicon-m1m2m3" title="Permanent link">&para;</a></h3>
+<p>→ Use <strong>GGUF + llama.cpp</strong> with Metal acceleration</p>
+<h3 id="for-edge-devices-limited-memory">For Edge Devices / Limited Memory<a class="headerlink" href="#for-edge-devices-limited-memory" title="Permanent link">&para;</a></h3>
+<p>→ Use <strong>GGUF Q4_0 + llama.cpp</strong> for smallest footprint</p>
+<hr />
+<h2 id="next-steps">🚀 Next Steps<a class="headerlink" href="#next-steps" title="Permanent link">&para;</a></h2>
 <ol>
-<li>✅ Create your first config with <code>slm init</code></li>
-<li>📖 Read <a href="../GGUF_GUIDE/">GGUF_GUIDE.md</a> for detailed GGUF setup</li>
-<li>📖 Read <a href="../MODEL_FORMATS/">MODEL_FORMATS.md</a> to understand the differences</li>
-<li>🚀 Run <code>slm benchmark</code> to compare different configs</li>
+<li>Read <a href="../quickstart/">quickstart.md</a> for setup instructions</li>
+<li>Try both runtimes to see the difference</li>
+<li>Benchmark your specific use case with <code>slm benchmark</code></li>
+<li>Choose the format that best fits your needs</li>
 </ol>
-<p>Happy experimenting! 🎯</p>
+<p><strong>Questions?</strong> Start at the <a href="../">documentation home</a>, or
+<a href="https://github.com/Ayo-Cyber/slm-packager/issues">open an issue</a>.</p>
 
 
 
@@ -1712,7 +1740,7 @@ A: GGUF is ~5-10x faster on CPU. PyTorch is faster on GPU.</p>
       <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.tabs", "navigation.sections", "navigation.top", "search.highlight", "search.share", "content.code.copy", "content.code.annotate"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
-      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      <script src="../assets/javascripts/bundle.d7400e89.min.js"></script>
       
     
   </body>

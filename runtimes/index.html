@@ -16,14 +16,14 @@
         <link rel="prev" href="../cli-reference/">
       
       
-        <link rel="next" href="../GPU_ACCELERATION/">
+        <link rel="next" href="../gpu-acceleration/">
       
       
         
       
       
       <link rel="icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
     
     
       
@@ -31,7 +31,7 @@
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.ec1eaa64.min.css">
       
         
         <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
@@ -218,18 +218,17 @@
   
   
   
-    
-    
-      <li class="md-tabs__item">
-        <a href="../QUICKSTART/" class="md-tabs__link">
-          
+    <li class="md-tabs__item">
+      <a href="../quickstart/" class="md-tabs__link">
+        
   
   
-  Getting Started
+    
+  
+  Quick Start
 
-        </a>
-      </li>
-    
+      </a>
+    </li>
   
 
       
@@ -279,7 +278,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="../GPU_ACCELERATION/" class="md-tabs__link">
+      <a href="../gpu-acceleration/" class="md-tabs__link">
         
   
   
@@ -300,7 +299,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../GGUF_GUIDE/" class="md-tabs__link">
+        <a href="../gguf-guide/" class="md-tabs__link">
           
   
   
@@ -409,60 +408,8 @@
   
   
   
-    
-    
-    
-    
-      
-      
-        
-      
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
-        
-          
-          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Getting Started
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_2">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    Getting Started
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
     <li class="md-nav__item">
-      <a href="../QUICKSTART/" class="md-nav__link">
+      <a href="../quickstart/" class="md-nav__link">
         
   
   
@@ -478,42 +425,6 @@
   
 
       </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../index.md#install" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Installation
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
     </li>
   
 
@@ -670,7 +581,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../GPU_ACCELERATION/" class="md-nav__link">
+      <a href="../gpu-acceleration/" class="md-nav__link">
         
   
   
@@ -749,7 +660,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../GGUF_GUIDE/" class="md-nav__link">
+      <a href="../gguf-guide/" class="md-nav__link">
         
   
   
@@ -777,7 +688,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../ONNX_GUIDE/" class="md-nav__link">
+      <a href="../onnx-guide/" class="md-nav__link">
         
   
   
@@ -805,14 +716,42 @@
   
   
     <li class="md-nav__item">
-      <a href="../INIT_GUIDE/" class="md-nav__link">
+      <a href="../model-formats/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Config Reference
+    Model Formats
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../init-guide/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Creating Configs
   
 
     
@@ -980,11 +919,11 @@
 <td>Higher memory usage</td>
 </tr>
 <tr>
-<td><strong>ONNX</strong></td>
+<td><strong>ONNX</strong> ⚠️</td>
 <td><code>.onnx</code></td>
-<td>Cross-platform, optimized pipelines</td>
-<td>Fast CPU inference, portable</td>
-<td>Requires model export first</td>
+<td>Existing ONNX pipelines</td>
+<td>Portable</td>
+<td><strong>Experimental</strong> — see caveats below</td>
 </tr>
 </tbody>
 </table>
@@ -1029,7 +968,18 @@
 </code></pre></div></p>
 <hr />
 <h2 id="onnx-runtime">ONNX Runtime<a class="headerlink" href="#onnx-runtime" title="Permanent link">&para;</a></h2>
-<p>Best choice when you have an exported ONNX model or need to integrate with an existing ML pipeline.</p>
+<div class="admonition warning">
+<p class="admonition-title">Experimental</p>
+<p>Use this only if you specifically need ONNX Runtime. Current known limitations:</p>
+<ul>
+<li>KV-cache tensors are initialized as float32, so fp16 exports fail</li>
+<li><code>context_size</code> is not enforced</li>
+<li>No benchmark coverage, and no ONNX model is exercised in the test suite</li>
+</ul>
+<p>For GGUF models prefer llama.cpp, and for PyTorch models prefer transformers.
+Both are considerably better exercised.</p>
+</div>
+<p>Reasonable when you have an exported ONNX model or need to integrate with an existing ML pipeline.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="nt">runtime</span><span class="p">:</span>
 <a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">  </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">onnx</span>
 <a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">  </span><span class="nt">device</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">cpu</span>
@@ -1039,14 +989,14 @@
 - You need a portable, optimized inference graph
 - You're targeting a cross-platform deployment</p>
 <p><strong>Export a model to ONNX first:</strong>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;optimum[exporters]&quot;</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">"optimum[exporters]"</span>
 <a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>optimum-cli<span class="w"> </span><span class="nb">export</span><span class="w"> </span>onnx<span class="w"> </span>--model<span class="w"> </span>gpt2<span class="w"> </span>--task<span class="w"> </span>text-generation-with-past<span class="w"> </span>models/gpt2-onnx/
 </code></pre></div></p>
 <p>Then run it:
 <div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>slm<span class="w"> </span>init<span class="w"> </span>--name<span class="w"> </span>gpt2-onnx<span class="w"> </span>--path<span class="w"> </span>models/gpt2-onnx<span class="w"> </span>--format<span class="w"> </span>onnx<span class="w"> </span>--runtime<span class="w"> </span>onnx
-<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>slm<span class="w"> </span>run<span class="w"> </span>gpt2-onnx<span class="w"> </span>--prompt<span class="w"> </span><span class="s2">&quot;Hello!&quot;</span>
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>slm<span class="w"> </span>run<span class="w"> </span>gpt2-onnx<span class="w"> </span>--prompt<span class="w"> </span><span class="s2">"Hello!"</span>
 </code></pre></div></p>
-<p>→ See the <a href="../ONNX_GUIDE/">ONNX Guide</a> for the full export workflow.</p>
+<p>→ See the <a href="../onnx-guide/">ONNX Guide</a> for the full export workflow.</p>
 
 
 
@@ -1132,7 +1082,7 @@
       <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.tabs", "navigation.sections", "navigation.top", "search.highlight", "search.share", "content.code.copy", "content.code.annotate"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
-      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      <script src="../assets/javascripts/bundle.d7400e89.min.js"></script>
       
     
   </body>

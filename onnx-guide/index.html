@@ -10,20 +10,20 @@
       
       
       
-        <link rel="canonical" href="https://ayo-cyber.github.io/slm-packager/ONNX_GUIDE/">
+        <link rel="canonical" href="https://ayo-cyber.github.io/slm-packager/onnx-guide/">
       
       
-        <link rel="prev" href="../GGUF_GUIDE/">
+        <link rel="prev" href="../gguf-guide/">
       
       
-        <link rel="next" href="../INIT_GUIDE/">
+        <link rel="next" href="../model-formats/">
       
       
         
       
       
       <link rel="icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
     
     
       
@@ -31,7 +31,7 @@
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.ec1eaa64.min.css">
       
         
         <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
@@ -218,18 +218,17 @@
   
   
   
-    
-    
-      <li class="md-tabs__item">
-        <a href="../QUICKSTART/" class="md-tabs__link">
-          
+    <li class="md-tabs__item">
+      <a href="../quickstart/" class="md-tabs__link">
+        
   
   
-  Getting Started
+    
+  
+  Quick Start
 
-        </a>
-      </li>
-    
+      </a>
+    </li>
   
 
       
@@ -277,7 +276,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="../GPU_ACCELERATION/" class="md-tabs__link">
+      <a href="../gpu-acceleration/" class="md-tabs__link">
         
   
   
@@ -300,7 +299,7 @@
     
     
       <li class="md-tabs__item md-tabs__item--active">
-        <a href="../GGUF_GUIDE/" class="md-tabs__link">
+        <a href="../gguf-guide/" class="md-tabs__link">
           
   
   
@@ -409,60 +408,8 @@
   
   
   
-    
-    
-    
-    
-      
-      
-        
-      
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
-        
-          
-          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Getting Started
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_2">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    Getting Started
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
     <li class="md-nav__item">
-      <a href="../QUICKSTART/" class="md-nav__link">
+      <a href="../quickstart/" class="md-nav__link">
         
   
   
@@ -478,42 +425,6 @@
   
 
       </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../index.md#install" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Installation
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
     </li>
   
 
@@ -579,7 +490,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../GPU_ACCELERATION/" class="md-nav__link">
+      <a href="../gpu-acceleration/" class="md-nav__link">
         
   
   
@@ -663,7 +574,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../GGUF_GUIDE/" class="md-nav__link">
+      <a href="../gguf-guide/" class="md-nav__link">
         
   
   
@@ -774,17 +685,6 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#basic-onnx-support-cpu" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Basic ONNX Support (CPU)
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#gpu-support-cuda" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -858,23 +758,6 @@
       
     </span>
   </a>
-  
-    <nav class="md-nav" aria-label="Performance">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#expected-performance-approximate" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Expected Performance (Approximate)
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -1083,14 +966,42 @@
   
   
     <li class="md-nav__item">
-      <a href="../INIT_GUIDE/" class="md-nav__link">
+      <a href="../model-formats/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Config Reference
+    Model Formats
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../init-guide/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Creating Configs
   
 
     
@@ -1188,17 +1099,6 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#basic-onnx-support-cpu" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Basic ONNX Support (CPU)
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#gpu-support-cuda" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1272,23 +1172,6 @@
       
     </span>
   </a>
-  
-    <nav class="md-nav" aria-label="Performance">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#expected-performance-approximate" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Expected Performance (Approximate)
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -1504,24 +1387,32 @@
 <h1 id="onnx-runtime-guide">ONNX Runtime Guide<a class="headerlink" href="#onnx-runtime-guide" title="Permanent link">&para;</a></h1>
 <p>Using ONNX models with SLM Packager for optimized inference.</p>
 <h2 id="overview">Overview<a class="headerlink" href="#overview" title="Permanent link">&para;</a></h2>
-<p>ONNX Runtime provides optimized inference for ONNX models exported from frameworks like PyTorch or TensorFlow. As of v0.2, SLM Packager supports <strong>proper ONNX text generation</strong> with KV-cache through <code>onnxruntime-genai</code>.</p>
+<p>ONNX Runtime provides optimized inference for ONNX models exported from frameworks
+like PyTorch or TensorFlow. SLM Packager runs ONNX text generation with KV-cache on
+plain <code>onnxruntime</code> plus <code>transformers</code> for tokenization, both provided by the
+optional <code>[onnx]</code> extra.</p>
+<div class="admonition note">
+<p class="admonition-title">onnxruntime-genai is no longer used</p>
+<p>Releases before v0.2.0 required <code>onnxruntime-genai</code>. It was dropped because the
+generation path didn't work reliably; do <strong>not</strong> install it. The ONNX runtime is
+still the least mature of the three — prefer llama.cpp for GGUF models.</p>
+</div>
 <h2 id="installation">Installation<a class="headerlink" href="#installation" title="Permanent link">&para;</a></h2>
-<h3 id="basic-onnx-support-cpu">Basic ONNX Support (CPU)<a class="headerlink" href="#basic-onnx-support-cpu" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;.[onnx]&quot;</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="c1"># Or manually:</span>
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>pip<span class="w"> </span>install<span class="w"> </span>onnxruntime-genai
+<p>Install the ONNX extra — prebuilt wheels, no compiler needed:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">"slm-packager[onnx]"</span>
 </code></pre></div>
 <h3 id="gpu-support-cuda">GPU Support (CUDA)<a class="headerlink" href="#gpu-support-cuda" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>pip<span class="w"> </span>install<span class="w"> </span>onnxruntime-genai-cuda
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>pip<span class="w"> </span>install<span class="w"> </span>onnxruntime-gpu
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="c1"># Verify the CUDA provider is visible</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>python<span class="w"> </span>-c<span class="w"> </span><span class="s2">"import onnxruntime as ort; print(ort.get_available_providers())"</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="c1"># Should include: CUDAExecutionProvider</span>
 </code></pre></div>
-<blockquote>
-<p><strong>Note</strong>: onnxruntime-genai requires Python 3.8-3.11</p>
-</blockquote>
 <h2 id="model-requirements">Model Requirements<a class="headerlink" href="#model-requirements" title="Permanent link">&para;</a></h2>
-<p>ONNX models for text generation must be in the <strong>onnxruntime-genai format</strong>:
-- Directory containing <code>.onnx</code> model files
-- <code>config.json</code> with model configuration
-- Tokenizer files</p>
+<p>An ONNX model directory needs:
+- One or more <code>.onnx</code> model files (exported with past-key-value support)
+- <code>config.json</code> with the model configuration
+- Tokenizer files loadable by <code>transformers.AutoTokenizer</code></p>
 <h3 id="supported-model-formats">Supported Model Formats<a class="headerlink" href="#supported-model-formats" title="Permanent link">&para;</a></h3>
 <p>ONNX models exported using <code>optimum</code> from HuggingFace models work well:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1"># Export a model to ONNX with optimum</span>
@@ -1535,13 +1426,13 @@
 <h2 id="configuration">Configuration<a class="headerlink" href="#configuration" title="Permanent link">&para;</a></h2>
 <p>Example config for ONNX runtime:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="nt">model</span><span class="p">:</span>
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;microsoft/phi-2&quot;</span>
-<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">  </span><span class="nt">format</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;onnx&quot;</span>
-<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">  </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;./models/phi-2-onnx&quot;</span><span class="w">  </span><span class="c1"># Directory, not file</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">"microsoft/phi-2"</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">  </span><span class="nt">format</span><span class="p">:</span><span class="w"> </span><span class="s">"onnx"</span>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">  </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="s">"./models/phi-2-onnx"</span><span class="w">  </span><span class="c1"># Directory, not file</span>
 <a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>
 <a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="nt">runtime</span><span class="p">:</span>
-<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="w">  </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;onnx&quot;</span>
-<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="w">  </span><span class="nt">device</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;cpu&quot;</span><span class="w">  </span><span class="c1"># or &quot;cuda&quot;</span>
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="w">  </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="s">"onnx"</span>
+<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="w">  </span><span class="nt">device</span><span class="p">:</span><span class="w"> </span><span class="s">"cpu"</span><span class="w">  </span><span class="c1"># or "cuda"</span>
 <a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="w">  </span><span class="nt">threads</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">4</span>
 <a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="w">  </span><span class="nt">context_size</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2048</span>
 <a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a>
@@ -1555,65 +1446,29 @@
 <h2 id="usage">Usage<a class="headerlink" href="#usage" title="Permanent link">&para;</a></h2>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="c1"># Initialize config</span>
 <a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>slm<span class="w"> </span>init<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">  </span>--name<span class="w"> </span><span class="s2">&quot;phi-2-onnx&quot;</span><span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="w">  </span>--path<span class="w"> </span><span class="s2">&quot;./models/phi-2-onnx&quot;</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">  </span>--name<span class="w"> </span><span class="s2">"phi-2-onnx"</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="w">  </span>--path<span class="w"> </span><span class="s2">"./models/phi-2-onnx"</span><span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="w">  </span>--format<span class="w"> </span>onnx<span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="w">  </span>--runtime<span class="w"> </span>onnx<span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="w">  </span>--output<span class="w"> </span>phi2-onnx.yaml
 <a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a>
 <a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="c1"># Run inference</span>
-<a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a>slm<span class="w"> </span>run<span class="w"> </span>phi2-onnx.yaml<span class="w"> </span>--prompt<span class="w"> </span><span class="s2">&quot;Explain quantum computing&quot;</span>
+<a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a>slm<span class="w"> </span>run<span class="w"> </span>phi2-onnx.yaml<span class="w"> </span>--prompt<span class="w"> </span><span class="s2">"Explain quantum computing"</span>
 <a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a>
 <a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a><span class="c1"># Benchmark</span>
 <a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a>slm<span class="w"> </span>benchmark<span class="w"> </span>phi2-onnx.yaml
 </code></pre></div>
 <h2 id="performance">Performance<a class="headerlink" href="#performance" title="Permanent link">&para;</a></h2>
 <p>ONNX Runtime with KV-cache provides:
-- <strong>Efficient inference</strong>: Optimized operators
-- <strong>Low latency</strong>: ~20-40 tokens/sec on CPU
-- <strong>Small memory footprint</strong>: Comparable to GGUF
-- <strong>GPU acceleration</strong>: Via CUDA execution provider</p>
-<h3 id="expected-performance-approximate">Expected Performance (Approximate)<a class="headerlink" href="#expected-performance-approximate" title="Permanent link">&para;</a></h3>
-<table>
-<thead>
-<tr>
-<th>Model Size</th>
-<th>Device</th>
-<th>Tokens/sec</th>
-<th>Memory</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>1-2B params</td>
-<td>CPU</td>
-<td>20-30</td>
-<td>2-3GB</td>
-</tr>
-<tr>
-<td>1-2B params</td>
-<td>CUDA</td>
-<td>60-100</td>
-<td>2GB VRAM</td>
-</tr>
-<tr>
-<td>7B params</td>
-<td>CPU</td>
-<td>5-10</td>
-<td>8-10GB</td>
-</tr>
-<tr>
-<td>7B params</td>
-<td>CUDA</td>
-<td>30-50</td>
-<td>7GB VRAM</td>
-</tr>
-</tbody>
-</table>
+- <strong>Optimized operators</strong> via ONNX Runtime
+- <strong>GPU acceleration</strong> via the CUDA execution provider</p>
+<p>No throughput figures are published for this runtime: it is experimental and has no
+benchmark coverage. Measure your own model with <code>slm benchmark</code>, and prefer llama.cpp
+for GGUF or transformers for PyTorch if you have the choice.</p>
 <h2 id="exporting-models-to-onnx">Exporting Models to ONNX<a class="headerlink" href="#exporting-models-to-onnx" title="Permanent link">&para;</a></h2>
 <h3 id="using-optimum-recommended">Using Optimum (Recommended)<a class="headerlink" href="#using-optimum-recommended" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="c1"># Install optimum</span>
-<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;optimum[exporters,onnxruntime]&quot;</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">"optimum[exporters,onnxruntime]"</span>
 <a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>
 <a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="c1"># Export with KV-cache support</span>
 <a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>optimum-cli<span class="w"> </span><span class="nb">export</span><span class="w"> </span>onnx<span class="w"> </span><span class="se">\</span>
@@ -1624,7 +1479,7 @@
 <a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a>
 <a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a><span class="c1"># Test the exported model</span>
 <a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a>slm<span class="w"> </span>init<span class="w"> </span>--name<span class="w"> </span>phi-2<span class="w"> </span>--path<span class="w"> </span>./phi-2-onnx<span class="w"> </span>--format<span class="w"> </span>onnx<span class="w"> </span>--runtime<span class="w"> </span>onnx<span class="w"> </span>-o<span class="w"> </span>phi2.yaml
-<a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a>slm<span class="w"> </span>run<span class="w"> </span>phi2.yaml<span class="w"> </span>--prompt<span class="w"> </span><span class="s2">&quot;Test&quot;</span>
+<a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a>slm<span class="w"> </span>run<span class="w"> </span>phi2.yaml<span class="w"> </span>--prompt<span class="w"> </span><span class="s2">"Test"</span>
 </code></pre></div>
 <h3 id="supported-models">Supported Models<a class="headerlink" href="#supported-models" title="Permanent link">&para;</a></h3>
 <p>Models that export well to ONNX:
@@ -1634,17 +1489,18 @@
 - ✅ TinyLlama, SmolLM</p>
 <h2 id="gpu-acceleration">GPU Acceleration<a class="headerlink" href="#gpu-acceleration" title="Permanent link">&para;</a></h2>
 <h3 id="cuda-setup">CUDA Setup<a class="headerlink" href="#cuda-setup" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="c1"># Install CUDA-enabled onnxruntime-genai</span>
-<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>pip<span class="w"> </span>install<span class="w"> </span>onnxruntime-genai-cuda
-<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>
-<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="c1"># Verify CUDA is available</span>
-<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>python<span class="w"> </span>-c<span class="w"> </span><span class="s2">&quot;import onnxruntime as ort; print(ort.get_available_providers())&quot;</span>
-<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="c1"># Should show: [&#39;CUDAExecutionProvider&#39;, &#39;CPUExecutionProvider&#39;]</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="c1"># Replace the CPU build with the GPU build</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>pip<span class="w"> </span>uninstall<span class="w"> </span>-y<span class="w"> </span>onnxruntime
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>pip<span class="w"> </span>install<span class="w"> </span>onnxruntime-gpu
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>
+<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="c1"># Verify CUDA is available</span>
+<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>python<span class="w"> </span>-c<span class="w"> </span><span class="s2">"import onnxruntime as ort; print(ort.get_available_providers())"</span>
+<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="c1"># Should show: ['CUDAExecutionProvider', 'CPUExecutionProvider']</span>
 </code></pre></div>
 <p>Update config:
 <div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="nt">runtime</span><span class="p">:</span>
-<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="w">  </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;onnx&quot;</span>
-<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="w">  </span><span class="nt">device</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;cuda&quot;</span><span class="w">  </span><span class="c1"># Enable GPU</span>
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="w">  </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="s">"onnx"</span>
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="w">  </span><span class="nt">device</span><span class="p">:</span><span class="w"> </span><span class="s">"cuda"</span><span class="w">  </span><span class="c1"># Enable GPU</span>
 </code></pre></div></p>
 <h2 id="troubleshooting">Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permanent link">&para;</a></h2>
 <h3 id="model-not-found">Model Not Found<a class="headerlink" href="#model-not-found" title="Permanent link">&para;</a></h3>
@@ -1654,11 +1510,9 @@
 - Ensure directory contains config.json and model files
 - Use absolute path or path relative to current directory</p>
 <h3 id="import-error">Import Error<a class="headerlink" href="#import-error" title="Permanent link">&para;</a></h3>
-<p><strong>Error</strong>: <code>onnxruntime-genai not installed</code></p>
-<p><strong>Solution</strong>:
-<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>pip<span class="w"> </span>install<span class="w"> </span>onnxruntime-genai
-<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="c1"># Or for CUDA:</span>
-<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>pip<span class="w"> </span>install<span class="w"> </span>onnxruntime-genai-cuda
+<p><strong>Error</strong>: <code>onnxruntime not installed</code> or <code>transformers not installed</code></p>
+<p><strong>Solution</strong>: install the ONNX extra, which provides both:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">"slm-packager[onnx]"</span>
 </code></pre></div></p>
 <h3 id="generation-issues">Generation Issues<a class="headerlink" href="#generation-issues" title="Permanent link">&para;</a></h3>
 <p><strong>Error</strong>: During text generation</p>
@@ -1669,9 +1523,9 @@
 <h3 id="cuda-not-available">CUDA Not Available<a class="headerlink" href="#cuda-not-available" title="Permanent link">&para;</a></h3>
 <p><strong>Error</strong>: <code>CUDA provider not available</code></p>
 <p><strong>Solution</strong>:
-- Install <code>onnxruntime-genai-cuda</code> (not regular onnxruntime-genai)
-- Verify CUDA installation
-- Set <code>device: cpu</code> in config as fallback</p>
+- Install <code>onnxruntime-gpu</code> in place of <code>onnxruntime</code>
+- Verify your CUDA installation
+- Set <code>device: cpu</code> in config as a fallback</p>
 <h2 id="comparison-with-other-runtimes">Comparison with Other Runtimes<a class="headerlink" href="#comparison-with-other-runtimes" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
@@ -1734,7 +1588,7 @@
 <a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">slm_packager.runtime</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_runtime</span>
 <a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>
 <a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="c1"># Load config</span>
-<a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="n">config</span> <span class="o">=</span> <span class="n">ConfigLoader</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;phi2-onnx.yaml&quot;</span><span class="p">)</span>
+<a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="n">config</span> <span class="o">=</span> <span class="n">ConfigLoader</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">"phi2-onnx.yaml"</span><span class="p">)</span>
 <a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a><span class="n">config</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">stream</span> <span class="o">=</span> <span class="kc">True</span>
 <a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a>
 <a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a><span class="c1"># Create runtime</span>
@@ -1742,28 +1596,28 @@
 <a id="__codelineno-9-10" name="__codelineno-9-10" href="#__codelineno-9-10"></a><span class="n">runtime</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
 <a id="__codelineno-9-11" name="__codelineno-9-11" href="#__codelineno-9-11"></a>
 <a id="__codelineno-9-12" name="__codelineno-9-12" href="#__codelineno-9-12"></a><span class="c1"># Stream tokens</span>
-<a id="__codelineno-9-13" name="__codelineno-9-13" href="#__codelineno-9-13"></a><span class="k">for</span> <span class="n">token</span> <span class="ow">in</span> <span class="n">runtime</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span><span class="s2">&quot;Tell me a story about&quot;</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">params</span><span class="p">):</span>
-<a id="__codelineno-9-14" name="__codelineno-9-14" href="#__codelineno-9-14"></a>    <span class="nb">print</span><span class="p">(</span><span class="n">token</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">flush</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<a id="__codelineno-9-13" name="__codelineno-9-13" href="#__codelineno-9-13"></a><span class="k">for</span> <span class="n">token</span> <span class="ow">in</span> <span class="n">runtime</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span><span class="s2">"Tell me a story about"</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">params</span><span class="p">):</span>
+<a id="__codelineno-9-14" name="__codelineno-9-14" href="#__codelineno-9-14"></a>    <span class="nb">print</span><span class="p">(</span><span class="n">token</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">""</span><span class="p">,</span> <span class="n">flush</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <a id="__codelineno-9-15" name="__codelineno-9-15" href="#__codelineno-9-15"></a>
 <a id="__codelineno-9-16" name="__codelineno-9-16" href="#__codelineno-9-16"></a><span class="n">runtime</span><span class="o">.</span><span class="n">unload</span><span class="p">()</span>
 </code></pre></div>
 <h3 id="batch-processing">Batch Processing<a class="headerlink" href="#batch-processing" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="n">prompts</span> <span class="o">=</span> <span class="p">[</span>
-<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>    <span class="s2">&quot;Explain AI in simple terms&quot;</span><span class="p">,</span>
-<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>    <span class="s2">&quot;What is machine learning?&quot;</span><span class="p">,</span>
-<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a>    <span class="s2">&quot;Define deep learning&quot;</span>
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>    <span class="s2">"Explain AI in simple terms"</span><span class="p">,</span>
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>    <span class="s2">"What is machine learning?"</span><span class="p">,</span>
+<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a>    <span class="s2">"Define deep learning"</span>
 <a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a><span class="p">]</span>
 <a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a>
 <a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a><span class="k">for</span> <span class="n">prompt</span> <span class="ow">in</span> <span class="n">prompts</span><span class="p">:</span>
 <a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a>    <span class="n">output</span> <span class="o">=</span> <span class="n">runtime</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span><span class="n">prompt</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">params</span><span class="p">)</span>
-<a id="__codelineno-10-9" name="__codelineno-10-9" href="#__codelineno-10-9"></a>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Q: </span><span class="si">{</span><span class="n">prompt</span><span class="si">}</span><span class="se">\n</span><span class="s2">A: </span><span class="si">{</span><span class="n">output</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+<a id="__codelineno-10-9" name="__codelineno-10-9" href="#__codelineno-10-9"></a>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Q: </span><span class="si">{</span><span class="n">prompt</span><span class="si">}</span><span class="se">\n</span><span class="s2">A: </span><span class="si">{</span><span class="n">output</span><span class="si">}</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span>
 </code></pre></div>
 <h2 id="links">Links<a class="headerlink" href="#links" title="Permanent link">&para;</a></h2>
 <ul>
-<li><a href="https://github.com/microsoft/onnxruntime-genai">onnxruntime-genai Documentation</a></li>
+<li><a href="https://onnxruntime.ai/docs/">ONNX Runtime Documentation</a></li>
 <li><a href="https://huggingface.co/docs/optimum/exporters/onnx/usage_guides/export_a_model">Optimum ONNX Export Guide</a></li>
 <li><a href="https://github.com/onnx/models">ONNX Model Zoo</a></li>
-<li><a href="https://github.com/YOUR_USERNAME/slm-packager">SLM Packager GitHub</a></li>
+<li><a href="https://github.com/Ayo-Cyber/slm-packager">SLM Packager GitHub</a></li>
 </ul>
 
 
@@ -1850,7 +1704,7 @@
       <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.tabs", "navigation.sections", "navigation.top", "search.highlight", "search.share", "content.code.copy", "content.code.annotate"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
-      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      <script src="../assets/javascripts/bundle.d7400e89.min.js"></script>
       
     
   </body>

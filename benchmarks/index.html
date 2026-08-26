@@ -13,7 +13,7 @@
         <link rel="canonical" href="https://ayo-cyber.github.io/slm-packager/benchmarks/">
       
       
-        <link rel="prev" href="../INIT_GUIDE/">
+        <link rel="prev" href="../init-guide/">
       
       
       
@@ -21,7 +21,7 @@
       
       
       <link rel="icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
     
     
       
@@ -29,7 +29,7 @@
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.ec1eaa64.min.css">
       
         
         <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
@@ -216,18 +216,17 @@
   
   
   
-    
-    
-      <li class="md-tabs__item">
-        <a href="../QUICKSTART/" class="md-tabs__link">
-          
+    <li class="md-tabs__item">
+      <a href="../quickstart/" class="md-tabs__link">
+        
   
   
-  Getting Started
+    
+  
+  Quick Start
 
-        </a>
-      </li>
-    
+      </a>
+    </li>
   
 
       
@@ -275,7 +274,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="../GPU_ACCELERATION/" class="md-tabs__link">
+      <a href="../gpu-acceleration/" class="md-tabs__link">
         
   
   
@@ -296,7 +295,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../GGUF_GUIDE/" class="md-tabs__link">
+        <a href="../gguf-guide/" class="md-tabs__link">
           
   
   
@@ -407,60 +406,8 @@
   
   
   
-    
-    
-    
-    
-      
-      
-        
-      
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
-        
-          
-          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Getting Started
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_2">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    Getting Started
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
     <li class="md-nav__item">
-      <a href="../QUICKSTART/" class="md-nav__link">
+      <a href="../quickstart/" class="md-nav__link">
         
   
   
@@ -476,42 +423,6 @@
   
 
       </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../index.md#install" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Installation
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
     </li>
   
 
@@ -577,7 +488,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../GPU_ACCELERATION/" class="md-nav__link">
+      <a href="../gpu-acceleration/" class="md-nav__link">
         
   
   
@@ -656,7 +567,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../GGUF_GUIDE/" class="md-nav__link">
+      <a href="../gguf-guide/" class="md-nav__link">
         
   
   
@@ -684,7 +595,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../ONNX_GUIDE/" class="md-nav__link">
+      <a href="../onnx-guide/" class="md-nav__link">
         
   
   
@@ -712,14 +623,42 @@
   
   
     <li class="md-nav__item">
-      <a href="../INIT_GUIDE/" class="md-nav__link">
+      <a href="../model-formats/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Config Reference
+    Model Formats
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../init-guide/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Creating Configs
   
 
     
@@ -949,7 +888,13 @@
 
 
 <h1 id="benchmarks">Benchmarks<a class="headerlink" href="#benchmarks" title="Permanent link">&para;</a></h1>
-<p>Real-world performance numbers collected on an Apple M3 Pro with 18GB unified memory, running macOS. All benchmarks use the <code>slm benchmark</code> command, which runs a single generation pass with streaming disabled for accurate timing.</p>
+<p>Performance numbers collected on an Apple M3 Pro with 18GB unified memory, running
+macOS. Every figure below comes from:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>slm<span class="w"> </span>benchmark<span class="w"> </span>&lt;model&gt;<span class="w"> </span>--runs<span class="w"> </span><span class="m">5</span><span class="w"> </span>--max-tokens<span class="w"> </span><span class="m">128</span>
+</code></pre></div>
+<p>That is: one discarded warmup run, then 5 timed runs, reporting the <strong>median</strong>
+tokens/sec. Output tokens are counted with the model's own tokenizer (transformers)
+or <code>tokenize()</code> (llama.cpp), never a character estimate.</p>
 <hr />
 <h2 id="results">Results<a class="headerlink" href="#results" title="Permanent link">&para;</a></h2>
 <table>
@@ -959,89 +904,105 @@
 <th>Params</th>
 <th>Runtime</th>
 <th>Device</th>
-<th>Tokens/sec</th>
+<th>Tokens/sec (median)</th>
 <th>Load Time</th>
-<th>Memory</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>GPT-2</td>
-<td>124M</td>
-<td>transformers</td>
-<td>CPU</td>
-<td>53.16</td>
-<td>~2s</td>
-<td>~600MB</td>
-</tr>
-<tr>
-<td>GPT-2</td>
-<td>124M</td>
-<td>transformers</td>
-<td>MPS ⚡</td>
-<td>28.06</td>
-<td>~3s</td>
-<td>~600MB</td>
-</tr>
-<tr>
-<td>TinyLlama 1.1B</td>
+<td>TinyLlama 1.1B Chat Q4_K_M</td>
 <td>1.1B</td>
 <td>llama.cpp</td>
 <td>CPU</td>
-<td>9.19</td>
-<td>~1s</td>
-<td>~800MB</td>
+<td>142.9</td>
+<td>0.8s</td>
 </tr>
 <tr>
-<td>Phi-2</td>
+<td>GPT-2</td>
+<td>124M</td>
+<td>transformers</td>
+<td>CPU</td>
+<td>79.7</td>
+<td>2.9s</td>
+</tr>
+<tr>
+<td>GPT-2</td>
+<td>124M</td>
+<td>transformers</td>
+<td>MPS</td>
+<td>77.0</td>
+<td>2.9s</td>
+</tr>
+<tr>
+<td>Phi-2 Q4_K_M</td>
 <td>2.7B</td>
 <td>llama.cpp</td>
 <td>CPU</td>
-<td>33.67</td>
-<td>~3s</td>
-<td>~1.8GB</td>
+<td>30.9</td>
+<td>2.1s</td>
 </tr>
 <tr>
-<td>Qwen3 4B</td>
+<td>Qwen3 4B Q4_K_M</td>
 <td>4B</td>
 <td>llama.cpp</td>
 <td>CPU</td>
-<td>31.71</td>
-<td>~2.6s</td>
-<td>~3.3GB</td>
+<td>27.4</td>
+<td>4.9s</td>
 </tr>
 </tbody>
 </table>
+<p>These are single-machine numbers. Treat them as a starting point, not a leaderboard —
+running <code>slm benchmark</code> on your own hardware is the point of the command.</p>
 <hr />
 <h2 id="run-your-own-benchmarks">Run Your Own Benchmarks<a class="headerlink" href="#run-your-own-benchmarks" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1"># Benchmark an installed model</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>slm<span class="w"> </span>benchmark<span class="w"> </span>tinyllama
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="c1"># Benchmark via config file</span>
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>slm<span class="w"> </span>benchmark<span class="w"> </span>my-model.yaml
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># Benchmark an installed model</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>slm<span class="w"> </span>benchmark<span class="w"> </span>tinyllama
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="c1"># More samples, longer generations</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>slm<span class="w"> </span>benchmark<span class="w"> </span>tinyllama<span class="w"> </span>--runs<span class="w"> </span><span class="m">5</span><span class="w"> </span>--max-tokens<span class="w"> </span><span class="m">256</span>
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="c1"># Benchmark via config file</span>
+<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>slm<span class="w"> </span>benchmark<span class="w"> </span>my-model.yaml
 </code></pre></div>
-<p>Output includes:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>📊 Benchmark Results:
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>   Load Time: 2.60s
-<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>   Generation Time: 16.12s
-<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>   Memory Usage: 3270.45 MB
-<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>   Latency: 16115.85 ms
-<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>   Estimated TPS: 31.71
+<p>Output:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>📊 Benchmark Results:
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>   Load Time: 0.81s
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>   Memory Usage (process RSS): 1369.19 MB
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>   Tokens Generated: 700 over 5 run(s)
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>   Generation Time (mean): 0.98s
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>   Tokens/sec (median): 142.92
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>   Time per Token: 7.00 ms
 </code></pre></div>
 <hr />
 <h2 id="notes-on-the-numbers">Notes on the Numbers<a class="headerlink" href="#notes-on-the-numbers" title="Permanent link">&para;</a></h2>
-<p><strong>GPT-2 CPU vs MPS:</strong> GPT-2 (124M) is small enough that MPS dispatch overhead outweighs the GPU compute benefit. For larger models (1B+), MPS gains become more significant.</p>
-<p><strong>llama.cpp efficiency:</strong> Phi-2 (2.7B) and Qwen3 (4B) both achieve ~32 TPS on CPU via Q4_K_M quantization — comparable throughput despite Qwen3 being 50% larger. llama.cpp's CPU optimizations are very effective for GGUF models.</p>
-<p><strong>Token counting:</strong> TPS is measured on the generated output using the model's own tokenizer (transformers) or <code>tokenize()</code> method (llama.cpp), not a character estimate.</p>
+<p><strong>Throughput scales inversely with model size</strong>, as you'd expect for
+memory-bandwidth-bound decoding: TinyLlama (0.6GB of weights) runs ~4.6x faster than
+Phi-2 (1.8GB) and ~5.2x faster than Qwen3 4B (2.5GB).</p>
+<p><strong>GPT-2 CPU vs MPS is a wash</strong> (79.7 vs 77.0 — within run-to-run noise). At 124M
+parameters the per-step GPU dispatch overhead cancels the compute benefit. Expect MPS
+to pull ahead on larger PyTorch models; don't expect it to help at this size. Note
+also that the transformers runtime uses float32 on MPS and float16 on CUDA, which
+caps the MPS ceiling.</p>
+<p><strong>Memory is whole-process RSS</strong> measured after load — it includes the Python
+interpreter and the framework, so it is an upper bound rather than model weight size,
+and it varies by 20%+ between runs. Use it for rough capacity planning only.</p>
+<p><strong><code>slm benchmark</code> applies the model's chat template</strong> before generating. Without it,
+instruction-tuned models answer an unformatted prompt with an immediate
+end-of-sequence, and a "throughput" measured over zero generated tokens is
+meaningless. (Numbers published before v0.2.3 were affected by exactly this: the
+harness counted an empty generation as one token, which understated TinyLlama by
+roughly 15x. They have been re-measured.)</p>
 <hr />
 <h2 id="hardware-reference">Hardware Reference<a class="headerlink" href="#hardware-reference" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>Machine:  Apple MacBook Pro
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>Chip:     M3 Pro
-<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>Memory:   18GB unified
-<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>OS:       macOS Sequoia
-<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>Python:   3.12
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>Machine:  Apple MacBook Pro
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>Chip:     M3 Pro
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>Memory:   18GB unified
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>OS:       macOS
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>Python:   3.12
 </code></pre></div>
-<p>To submit benchmarks from your machine, open an <a href="https://github.com/Ayo-Cyber/slm-packager/issues">issue</a> with your results.</p>
+<p>To submit benchmarks from your machine, open an
+<a href="https://github.com/Ayo-Cyber/slm-packager/issues">issue</a> with your results and the
+exact command you ran.</p>
 
 
 
@@ -1127,7 +1088,7 @@
       <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.tabs", "navigation.sections", "navigation.top", "search.highlight", "search.share", "content.code.copy", "content.code.annotate"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
-      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      <script src="../assets/javascripts/bundle.d7400e89.min.js"></script>
       
     
   </body>

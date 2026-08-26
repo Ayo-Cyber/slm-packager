@@ -14,14 +14,14 @@
       
       
       
-        <link rel="next" href="QUICKSTART/">
+        <link rel="next" href="quickstart/">
       
       
         
       
       
       <link rel="icon" href="assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
     
     
       
@@ -29,7 +29,7 @@
       
     
     
-      <link rel="stylesheet" href="assets/stylesheets/main.484c7ddc.min.css">
+      <link rel="stylesheet" href="assets/stylesheets/main.ec1eaa64.min.css">
       
         
         <link rel="stylesheet" href="assets/stylesheets/palette.ab4e12ef.min.css">
@@ -218,18 +218,17 @@
   
   
   
-    
-    
-      <li class="md-tabs__item">
-        <a href="QUICKSTART/" class="md-tabs__link">
-          
+    <li class="md-tabs__item">
+      <a href="quickstart/" class="md-tabs__link">
+        
   
   
-  Getting Started
+    
+  
+  Quick Start
 
-        </a>
-      </li>
-    
+      </a>
+    </li>
   
 
       
@@ -277,7 +276,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="GPU_ACCELERATION/" class="md-tabs__link">
+      <a href="gpu-acceleration/" class="md-tabs__link">
         
   
   
@@ -298,7 +297,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="GGUF_GUIDE/" class="md-tabs__link">
+        <a href="gguf-guide/" class="md-tabs__link">
           
   
   
@@ -520,60 +519,8 @@
   
   
   
-    
-    
-    
-    
-      
-      
-        
-      
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
-        
-          
-          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Getting Started
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_2">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    Getting Started
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
     <li class="md-nav__item">
-      <a href="QUICKSTART/" class="md-nav__link">
+      <a href="quickstart/" class="md-nav__link">
         
   
   
@@ -589,42 +536,6 @@
   
 
       </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="index.md#install" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Installation
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
     </li>
   
 
@@ -690,7 +601,7 @@
   
   
     <li class="md-nav__item">
-      <a href="GPU_ACCELERATION/" class="md-nav__link">
+      <a href="gpu-acceleration/" class="md-nav__link">
         
   
   
@@ -769,7 +680,7 @@
   
   
     <li class="md-nav__item">
-      <a href="GGUF_GUIDE/" class="md-nav__link">
+      <a href="gguf-guide/" class="md-nav__link">
         
   
   
@@ -797,7 +708,7 @@
   
   
     <li class="md-nav__item">
-      <a href="ONNX_GUIDE/" class="md-nav__link">
+      <a href="onnx-guide/" class="md-nav__link">
         
   
   
@@ -825,14 +736,42 @@
   
   
     <li class="md-nav__item">
-      <a href="INIT_GUIDE/" class="md-nav__link">
+      <a href="model-formats/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Config Reference
+    Model Formats
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="init-guide/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Creating Configs
   
 
     
@@ -994,20 +933,72 @@
 
 <h1 id="slm-packager">SLM Packager<a class="headerlink" href="#slm-packager" title="Permanent link">&para;</a></h1>
 <p><strong>Run any small language model locally — one command.</strong></p>
-<p>SLM Packager is an open-source toolkit for running, packaging, and benchmarking Small Language Models (1B–7B parameters) across GGUF, PyTorch, and ONNX formats. One unified CLI. Three runtimes. Zero friction.</p>
+<p>SLM Packager is an open-source toolkit for running, packaging, and benchmarking Small Language Models (1B–7B parameters). One CLI over llama.cpp and transformers, plus an ONNX path for exported models — so switching runtime or quantization is a config change, not a rewrite. GGUF and PyTorch are the well-tested routes; <strong>ONNX is experimental</strong>.</p>
 <hr />
 <h2 id="install">Install<a class="headerlink" href="#install" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>pip<span class="w"> </span>install<span class="w"> </span>slm-packager
+<p>Install the engine you need. Core is small and pure-Python (~50MB, seconds, no
+compiler):</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">"slm-packager[gguf]"</span><span class="w">    </span><span class="c1"># GGUF via llama.cpp — best on CPU</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">"slm-packager[torch]"</span><span class="w">   </span><span class="c1"># PyTorch/HuggingFace via transformers</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">"slm-packager[onnx]"</span><span class="w">    </span><span class="c1"># ONNX Runtime (experimental)</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">"slm-packager[all]"</span><span class="w">     </span><span class="c1"># everything</span>
 </code></pre></div>
+<table>
+<thead>
+<tr>
+<th>Extra</th>
+<th>Pulls</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><em>(core)</em></td>
+<td>click, pydantic, fastapi, huggingface-hub</td>
+<td>CLI, config, registry, API server</td>
+</tr>
+<tr>
+<td><code>[gguf]</code></td>
+<td>llama-cpp-python</td>
+<td><strong>Builds from source</strong> — needs cmake and a C/C++ toolchain</td>
+</tr>
+<tr>
+<td><code>[torch]</code></td>
+<td>torch, transformers, accelerate</td>
+<td>Multi-GB download</td>
+</tr>
+<tr>
+<td><code>[onnx]</code></td>
+<td>onnxruntime, transformers, numpy</td>
+<td>Prebuilt wheels, no compiler</td>
+</tr>
+<tr>
+<td><code>[speed]</code></td>
+<td>hf_transfer</td>
+<td>Faster model downloads</td>
+</tr>
+</tbody>
+</table>
+<p>Core alone is enough for <code>slm list</code>, <code>slm pull</code>, <code>slm init</code>, and <code>slm serve</code>. Add an
+engine when you want to actually generate; running a model without the matching
+engine names the extra to install.</p>
+<p>With <code>pipx</code> (no venv setup needed):
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>pipx<span class="w"> </span>install<span class="w"> </span><span class="s2">"slm-packager[gguf]"</span>
+</code></pre></div></p>
+<div class="admonition tip">
+<p class="admonition-title">macOS users</p>
+<p>If <code>pip install</code> gives an <em>externally-managed-environment</em> error, use <code>pipx</code> instead:
+<code>brew install pipx &amp;&amp; pipx install "slm-packager[gguf]"</code></p>
+</div>
 <h2 id="quickstart">Quickstart<a class="headerlink" href="#quickstart" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># Pull a model</span>
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>slm<span class="w"> </span>pull<span class="w"> </span>tinyllama
-<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>
-<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="c1"># Run it</span>
-<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>slm<span class="w"> </span>run<span class="w"> </span>tinyllama<span class="w"> </span>--prompt<span class="w"> </span><span class="s2">&quot;Explain transformers in one sentence&quot;</span>
-<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>
-<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="c1"># Benchmark it</span>
-<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>slm<span class="w"> </span>benchmark<span class="w"> </span>tinyllama
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1"># Pull a model</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>slm<span class="w"> </span>pull<span class="w"> </span>tinyllama
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="c1"># Run it</span>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>slm<span class="w"> </span>run<span class="w"> </span>tinyllama<span class="w"> </span>--prompt<span class="w"> </span><span class="s2">"Explain transformers in one sentence"</span>
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="c1"># Benchmark it</span>
+<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>slm<span class="w"> </span>benchmark<span class="w"> </span>tinyllama
 </code></pre></div>
 <p>That's it. Model downloads, auto-configures, and runs.</p>
 <hr />
@@ -1023,15 +1014,15 @@
 </ul>
 <hr />
 <h2 id="architecture">Architecture<a class="headerlink" href="#architecture" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>┌─────────────────────────────────┐
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>│   CLI  ·  API Server            │
-<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>├─────────────────────────────────┤
-<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>│   Runtime Abstraction Layer     │
-<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>│   load()  ·  generate()  ·  unload()  │
-<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>├──────────┬──────────┬───────────┤
-<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>│ llama.cpp│Transformers│   ONNX  │
-<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>│  (GGUF)  │ (PyTorch) │ Runtime  │
-<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>└──────────┴──────────┴───────────┘
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>┌─────────────────────────────────┐
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>│   CLI  ·  API Server            │
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>├─────────────────────────────────┤
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>│   Runtime Abstraction Layer     │
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>│   load()  ·  generate()  ·  unload()  │
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>├──────────┬──────────┬───────────┤
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>│ llama.cpp│Transformers│   ONNX  │
+<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>│  (GGUF)  │ (PyTorch) │ Runtime  │
+<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>└──────────┴──────────┴───────────┘
 </code></pre></div>
 <p>Three runtimes — one interface. Switch runtimes by changing one line in your YAML config.</p>
 <hr />
@@ -1082,10 +1073,10 @@
 <hr />
 <h2 id="next-steps">Next Steps<a class="headerlink" href="#next-steps" title="Permanent link">&para;</a></h2>
 <ul>
-<li><a href="QUICKSTART/">Quick Start</a> — full walkthrough from install to serving</li>
+<li><a href="quickstart/">Quick Start</a> — full walkthrough from install to serving</li>
 <li><a href="cli-reference/">CLI Reference</a> — every command and flag</li>
 <li><a href="runtimes/">Runtimes</a> — choosing between llama.cpp, transformers, and ONNX</li>
-<li><a href="GPU_ACCELERATION/">GPU Acceleration</a> — MPS, CUDA, Metal setup</li>
+<li><a href="gpu-acceleration/">GPU Acceleration</a> — MPS, CUDA, Metal setup</li>
 <li><a href="benchmarks/">Benchmarks</a> — methodology and full results</li>
 </ul>
 
@@ -1173,7 +1164,7 @@
       <script id="__config" type="application/json">{"annotate": null, "base": ".", "features": ["navigation.tabs", "navigation.sections", "navigation.top", "search.highlight", "search.share", "content.code.copy", "content.code.annotate"], "search": "assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
-      <script src="assets/javascripts/bundle.79ae519e.min.js"></script>
+      <script src="assets/javascripts/bundle.d7400e89.min.js"></script>
       
     
   </body>
